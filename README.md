@@ -1,2 +1,7 @@
 # gemini-viewer
-Viewer for gemini.
+
+Viewer for gemini.  
+
+# Lisence
+
+MIT
