@@ -1,0 +1,41 @@
+<h1>Gemini summary</h1>
+
+<ul *ngFor="let name of names">
+  <li>{{name}}</li>
+</ul>
+
+
+<md-input #input_keyword>
+    <md-placeholder>
+        <i class="material-icons app-input-icon">search</i> Search word
+    </md-placeholder>
+</md-input>
+
+<button (click)="fetchReport(input_keyword.value, input_region.value, input_accessKeyId.value, input_secretAccessKey.value); input_keyword.value=keyWord">Fetch summary</button>
+
+<hr/>
+
+<md-input #input_region>
+    <md-placeholder>
+        <i class="material-icons app-input-icon">search</i> Region
+    </md-placeholder>
+</md-input>
+
+<md-input type="password" #input_accessKeyId>
+    <md-placeholder>
+        <i class="material-icons app-input-icon">search</i> Access key ID
+    </md-placeholder>
+</md-input>
+
+<md-input type="password" #input_secretAccessKey>
+    <md-placeholder>
+        <i class="material-icons app-input-icon">search</i> Secret access key
+    </md-placeholder>
+</md-input>
+
+<hr/>
+
+<ng2-smart-table [settings]="settings" [source]="tableSource"></ng2-smart-table>
+
+<div>{{report}}</div>
+<p class="error" *ngIf="errorMessage">{{errorMessage}}</p>
