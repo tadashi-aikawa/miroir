@@ -11,3 +11,11 @@ TODO
 ## Demo
 
 TODO
+
+
+## Development
+
+```
+$ npm install
+$ ng serve
+```
