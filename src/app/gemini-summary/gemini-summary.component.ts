@@ -2,6 +2,7 @@ import {Summary, ReportRow} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
 import {Component} from '@angular/core';
 import {LocalDataSource} from 'ng2-smart-table';
+import {AngularTools} from '@angular/platform-browser/src/browser/tools/common_tools';
 
 @Component({
     selector: 'gemini-summary',
@@ -50,7 +51,7 @@ export class GeminiSummaryComponent {
         this.secretAccessKey = secretAccessKey;
         this.service.fetchReport(keyWord, region, accessKeyId, secretAccessKey)
             .then(r => {
-                this.report = JSON.stringify(r);
+                this.report =  JSON.stringify(r, null, "  ");
                 const reportRows: ReportRow[] = r.Items.map(x => ({
                     hashKey: x.hashkey,
                     title: x.title,
