@@ -1,0 +1,11 @@
+md-sidenav {
+    padding: 10px;
+}
+
+md-sidenav-container {
+    min-height: 1024px;
+}
+
+div.smart-div {
+    padding: 20px;
+}

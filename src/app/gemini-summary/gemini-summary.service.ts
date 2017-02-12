@@ -2,11 +2,12 @@ import {Injectable} from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import {S3, DynamoDB} from 'aws-sdk'
+import {DynamoResult} from './gemini-summary';
 
 @Injectable()
 export class SummaryService {
 
-    fetchReport(keyWord: string, region: string, accessKeyId: string, secretAccessKey: string): Promise<any> {
+    fetchReport(keyWord: string, region: string, accessKeyId: string, secretAccessKey: string): Promise<DynamoResult> {
         return new Promise((resolve, reject) => {
             const db = new DynamoDB.DocumentClient({
                 service: new DynamoDB({region, accessKeyId, secretAccessKey})

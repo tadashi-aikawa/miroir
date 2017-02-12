@@ -1,18 +1,35 @@
-export class ReportRow {
+export class DynamoResult {
+    Count: number;
+    ScannedCount: number;
+    Items: DynamoRow[];
+}
+
+export class DynamoRow {
     hashKey: string;
     title: string;
-    sameCount: number;
-    differentCount: number;
-    oneHost: string;
-    otherHost: string;
+    same_count: number;
+    different_count: number;
+    one_host: string;
+    other_host: string;
     start: string;
     end: string;
+    report: Report;
+}
+
+export class Report {
+    summary: Summary;
+    trials: Trial[];
 }
 
 export class Summary {
   one: AccessPoint;
   other: AccessPoint;
   time: Time;
+  title: string;
+  status: {
+      same: number;
+      different: number;
+  };
 }
 
 class AccessPoint {
@@ -26,4 +43,19 @@ class Time {
   end: string;
 }
 
+export class Trial {
+    headers: any;
+    queries: any;
+    one: ResponseSummary;
+    other: ResponseSummary;
+    path: string;
+    request_time: string;
+    status: string
+}
 
+export class ResponseSummary {
+    status_code: number;
+    byte: number;
+    response_sec: number;
+    url: string
+}

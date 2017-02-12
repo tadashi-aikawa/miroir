@@ -1,41 +1,32 @@
-<h1>Gemini summary</h1>
+<md-sidenav-container>
 
-<ul *ngFor="let name of names">
-  <li>{{name}}</li>
-</ul>
+    <md-sidenav #sidenav mode="side" class="app-sidenav" align="start">
+        <md-chip-list class="md-chip-list-stacked">
+            <md-chip *ngFor="let row of rows" (click)="showReport(row.report)">
+                {{row.title}}
+            </md-chip>
+        </md-chip-list>
+    </md-sidenav>
 
+    <md-sidenav #sidenav2 mode="over" class="app-sidenav" align="end">
+        <pre>{{jsjs}}</pre>
+    </md-sidenav>
 
-<md-input #input_keyword>
-    <md-placeholder>
-        <i class="material-icons app-input-icon">search</i> Search word
-    </md-placeholder>
-</md-input>
+    <div class="smart-div">
+        <md-input #keyWord (keyup.enter)="fetchReport(keyWord.value); sidenav.open()">
+            <md-placeholder>
+                <i class="material-icons app-input-icon">search</i> Search word
+            </md-placeholder>
+        </md-input>
+        <hr/>
+        <div *ngIf="activeReport">
+            <ng2-smart-table [settings]="settings"
+                             [source]="tableSource"
+                             (userRowSelect)="showDetail($event.data); sidenav2.open()"
+            >
+            </ng2-smart-table>
+        </div>
+        <p class="error" *ngIf="errorMessage">{{errorMessage}}</p>
+    </div>
 
-<button (click)="fetchReport(input_keyword.value, input_region.value, input_accessKeyId.value, input_secretAccessKey.value); input_keyword.value=keyWord">Fetch summary</button>
-
-<hr/>
-
-<md-input #input_region>
-    <md-placeholder>
-        <i class="material-icons app-input-icon">search</i> Region
-    </md-placeholder>
-</md-input>
-
-<md-input type="password" #input_accessKeyId>
-    <md-placeholder>
-        <i class="material-icons app-input-icon">search</i> Access key ID
-    </md-placeholder>
-</md-input>
-
-<md-input type="password" #input_secretAccessKey>
-    <md-placeholder>
-        <i class="material-icons app-input-icon">search</i> Secret access key
-    </md-placeholder>
-</md-input>
-
-<hr/>
-
-<ng2-smart-table [settings]="settings" [source]="tableSource"></ng2-smart-table>
-
-<pre>{{report}}</pre>
-<p class="error" *ngIf="errorMessage">{{errorMessage}}</p>
+</md-sidenav-container>
