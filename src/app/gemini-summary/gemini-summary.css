@@ -2,6 +2,10 @@ md-sidenav {
     padding: 10px;
 }
 
+md-sidenav.app-sidenav2 {
+    width: 800px;
+}
+
 md-sidenav-container {
     min-height: 1024px;
 }

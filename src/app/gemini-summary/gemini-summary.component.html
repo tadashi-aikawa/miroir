@@ -8,11 +8,8 @@
         </md-chip-list>
     </md-sidenav>
 
-    <md-sidenav #sidenav2 mode="over" class="app-sidenav" align="end">
-        <pre>{{jsjs}}</pre>
-    </md-sidenav>
-
     <div class="smart-div">
+
         <md-input #keyWord (keyup.enter)="fetchReport(keyWord.value); sidenav.open()">
             <md-placeholder>
                 <i class="material-icons app-input-icon">search</i> Search word
@@ -22,7 +19,7 @@
         <div *ngIf="activeReport">
             <ng2-smart-table [settings]="settings"
                              [source]="tableSource"
-                             (userRowSelect)="showDetail($event.data); sidenav2.open()"
+                             (userRowSelect)="showDetail($event.data);"
             >
             </ng2-smart-table>
         </div>

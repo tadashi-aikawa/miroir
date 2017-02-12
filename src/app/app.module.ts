@@ -7,12 +7,15 @@ import { Ng2SmartTableModule } from 'ng2-smart-table';
 import 'hammerjs';
 
 import {AppComponent} from './app.component';
-import {GeminiSummaryComponent} from './gemini-summary/gemini-summary.component';
+import {GeminiSummaryComponent, DialogContent} from './gemini-summary/gemini-summary.component';
+import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
 
 @NgModule({
     declarations: [
         AppComponent,
-        GeminiSummaryComponent
+        GeminiSummaryComponent,
+        MergeViewerComponent,
+        DialogContent
     ],
     imports: [
         BrowserModule,
@@ -21,6 +24,7 @@ import {GeminiSummaryComponent} from './gemini-summary/gemini-summary.component'
         MaterialModule.forRoot(),
         Ng2SmartTableModule
     ],
+    entryComponents: [DialogContent],
     providers: [],
     bootstrap: [AppComponent]
 })

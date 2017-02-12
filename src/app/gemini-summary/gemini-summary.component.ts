@@ -1,7 +1,9 @@
 import {DynamoResult, DynamoRow, Report, ResponseSummary, Trial} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
-import {Component, Input} from '@angular/core';
+import {Component, Input, Optional} from '@angular/core';
 import {LocalDataSource} from 'ng2-smart-table';
+import * as CodeMirror from 'codemirror';
+import {MdDialogRef, MdDialog} from '@angular/material';
 
 const filterFunction = (v, q) => q.split(" and ").every(x => v.includes(x));
 
@@ -32,9 +34,7 @@ export class GeminiSummaryComponent {
     activeReport: Report;
     tableSource = new LocalDataSource();
 
-    jsjs: string;
-
-    constructor(private service: SummaryService) {
+    constructor(private service: SummaryService, private _dialog: MdDialog) {
     }
 
     fetchReport(keyWord: string) {
@@ -60,6 +60,7 @@ export class GeminiSummaryComponent {
             }
         };
         this.tableSource.load(r.trials.map(t => ({
+            trial: t,
             path: t.path,
             queries: Object.keys(t.queries).map(k => `${k}: ${t.queries[k]}`).join("<br/>"),
             status: t.status,
@@ -69,6 +70,28 @@ export class GeminiSummaryComponent {
     }
 
     showDetail(row: any) {
-        this.jsjs = JSON.stringify(row.queries, null, "  ");
+        let dialogRef = this._dialog.open(DialogContent, {
+            width: '1000px'
+        });
+
+        dialogRef.componentInstance.mergeViewConfig = {
+            value: JSON.stringify(row.trial, null, "  "),
+                orig: JSON.stringify(row.trial, null, "  ").replace(/2/g, "8"),
+                lineNumbers: true,
+                readOnly: true
+        };
     }
+
+}
+
+@Component({
+    template: `
+    <p>This is a dialog</p>
+    <merge-viewer [config]="mergeViewConfig"></merge-viewer>
+  `,
+})
+export class DialogContent {
+    @Input() mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
+
+    constructor(@Optional() public dialogRef: MdDialogRef<DialogContent>) { }
 }
