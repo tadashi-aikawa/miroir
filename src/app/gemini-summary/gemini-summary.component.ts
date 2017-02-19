@@ -91,19 +91,22 @@ export class GeminiSummaryComponent {
             `${this.activeReport.key}/${file}`, this.accessKeyId, this.secretAccessKey
         );
 
+        const dialogRef = this._dialog.open(DialogContent, {
+            width: '80vw',
+            height: '95%'
+        });
+        dialogRef.componentInstance.title = data.path;
+
+        // viewportMaring <==> search
         Promise.all([ff(data.trial.one.file), ff(data.trial.other.file)])
             .then((rs: string[]) => {
-                const dialogRef = this._dialog.open(DialogContent, {
-                    width: '95%',
-                    height: '95%'
-                });
-                dialogRef.componentInstance.title = data.path;
-
                 dialogRef.componentInstance.mergeViewConfig = {
                     value: rs[0], orig: rs[1],
                     lineNumbers: true,
+                    lineWrapping: true,
+                    viewportMargin: 10,
+                    collapseIdentical: 30,
                     readOnly: true,
-                    collapseIdentical: 30
                 };
             })
             .catch(err => this.errorMessage = err);

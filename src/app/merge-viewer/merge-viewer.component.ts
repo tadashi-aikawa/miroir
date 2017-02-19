@@ -3,6 +3,7 @@ import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/merge/merge';
 
+
 @Component({
     selector: 'merge-viewer',
     styleUrls: ['./merge-viewer.css'],
@@ -10,24 +11,26 @@ import 'codemirror/addon/merge/merge';
 })
 export class MergeViewerComponent implements OnChanges {
 
-    @Input() config: any;
+    @Input() config: CodeMirror.MergeView.MergeViewEditorConfiguration;
+    @Input() height?: string;
     @Output() instance: CodeMirror.MergeView.MergeViewEditor;
 
     @ViewChild('view') view;
 
     ngOnChanges(changes: SimpleChanges): void {
-        console.log("change")
         this.config = changes["config"]["currentValue"];
         this.view.nativeElement.innerHTML = "";
-        this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config || {
-                value: "",
-                orig: "",
-                lineNumbers: true,
-                readOnly: true
-            });
-        // if (this.instance.leftOriginal()) {
-        //     this.instance.leftOriginal().getWrapperElement().style.height = "1000px";
-        //     this.instance.rightOriginal().getWrapperElement().style.height = "1000px";
-        // }
+        if (this.config) {
+            this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config);
+            this.setHeight(this.height || "80vh");
+        }
+    }
+
+    private setHeight(height: string) {
+        const instanceAny: any = this.instance;
+        instanceAny.wrap.style.height = height;
+        this.instance.editor().setSize(null, height);
+        this.instance.leftOriginal() && this.instance.leftOriginal().setSize(null, height);
+        this.instance.rightOriginal() && this.instance.rightOriginal().setSize(null, height);
     }
 }
