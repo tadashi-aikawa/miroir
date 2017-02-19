@@ -107,6 +107,7 @@ export class GeminiSummaryComponent {
                     viewportMargin: 10,
                     collapseIdentical: 30,
                     readOnly: true,
+                    connect: "align"
                 };
             })
             .catch(err => this.errorMessage = err);
