@@ -1,20 +1,23 @@
 <md-sidenav-container>
 
     <md-sidenav #sidenav mode="side" class="app-sidenav" align="start">
-        <md-chip-list class="md-chip-list-stacked">
-            <md-chip *ngFor="let row of rows" (click)="showReport(row.report)">
-                {{row.title}}
-            </md-chip>
-        </md-chip-list>
+        <md-list>
+            <md-list-item *ngFor="let row of rows" (click)="showReport(row.report)">
+                <md-icon md-list-avatar>insert_drive_file</md-icon>
+                <h4 md-line>{{row.title}}</h4>
+                <p md-line> {{row.start}} </p>
+            </md-list-item>
+        </md-list>
     </md-sidenav>
 
     <div class="smart-div">
 
-        <md-input #keyWord (keyup.enter)="fetchReport(keyWord.value); sidenav.open()">
+        <md-input-container>
+            <input mdInput #keyWord (keyup.enter)="fetchReport(keyWord.value); sidenav.open()">
             <md-placeholder>
                 <i class="material-icons app-input-icon">search</i> Search word
             </md-placeholder>
-        </md-input>
+        </md-input-container>
         <hr/>
         <div *ngIf="activeReport">
             <h4>{{activeReport.title}} {{activeReport.summary.time.start}} -> {{activeReport.summary.time.end}}</h4>

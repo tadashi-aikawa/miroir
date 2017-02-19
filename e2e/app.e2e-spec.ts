@@ -1,10 +1,10 @@
-import { GeminiViewerPage } from './app.po';
+import { HogePage } from './app.po';
 
-describe('gemini-viewer App', function() {
-  let page: GeminiViewerPage;
+describe('hoge App', () => {
+  let page: HogePage;
 
   beforeEach(() => {
-    page = new GeminiViewerPage();
+    page = new HogePage();
   });
 
   it('should display message saying app works', () => {

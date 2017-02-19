@@ -21,7 +21,7 @@ import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
         BrowserModule,
         FormsModule,
         HttpModule,
-        MaterialModule.forRoot(),
+        MaterialModule,
         Ng2SmartTableModule
     ],
     entryComponents: [DialogContent],

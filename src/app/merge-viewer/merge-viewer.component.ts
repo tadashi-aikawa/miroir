@@ -2,6 +2,7 @@ import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges} from '@an
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/merge/merge';
+//import 'mergely';
 
 
 @Component({

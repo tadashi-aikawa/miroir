@@ -1,6 +1,6 @@
 import { browser, element, by } from 'protractor';
 
-export class GeminiViewerPage {
+export class HogePage {
   navigateTo() {
     return browser.get('/');
   }
