@@ -7,6 +7,17 @@ import {DynamoResult} from './gemini-summary';
 @Injectable()
 export class SummaryService {
 
+    fetchDetail(key: string, accessKeyId: string, secretAccessKey: string): Promise<Object> {
+        return new Promise((resolve, reject) => {
+            const s3 = new S3({apiVersion: '2006-03-01', accessKeyId, secretAccessKey});
+
+            s3.getObject(
+                {Key: key, Bucket: "mamansoft-gemini-test"},
+                (err, data) => err ? reject(err.message) : resolve(data.Body.toString())
+            );
+        });
+    }
+
     fetchReport(keyWord: string, region: string, accessKeyId: string, secretAccessKey: string): Promise<DynamoResult> {
         return new Promise((resolve, reject) => {
             const db = new DynamoDB.DocumentClient({

@@ -17,6 +17,7 @@
         </md-input>
         <hr/>
         <div *ngIf="activeReport">
+            <h4>{{activeReport.title}} {{activeReport.summary.time.start}} -> {{activeReport.summary.time.end}}</h4>
             <ng2-smart-table [settings]="settings"
                              [source]="tableSource"
                              (userRowSelect)="showDetail($event.data);"

@@ -17,6 +17,8 @@ export class DynamoRow {
 }
 
 export class Report {
+    key: string;
+    title: string;
     summary: Summary;
     trials: Trial[];
 }
@@ -25,7 +27,6 @@ export class Summary {
   one: AccessPoint;
   other: AccessPoint;
   time: Time;
-  title: string;
   status: {
       same: number;
       different: number;
@@ -57,5 +58,6 @@ export class ResponseSummary {
     status_code: number;
     byte: number;
     response_sec: number;
-    url: string
+    url: string;
+    file?: string;
 }
