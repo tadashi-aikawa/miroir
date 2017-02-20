@@ -5,6 +5,14 @@ import 'codemirror/addon/merge/merge';
 //import 'mergely';
 
 
+function scrollToCenter(cm) {
+    const {line, ch} = cm.getCursor();
+
+    const top = cm.charCoords({line: line, ch: 0}, "local").top;
+    const halfWindowHeight = cm.getWrapperElement().offsetHeight / 2;
+    cm.scrollTo(null, top - halfWindowHeight);
+}
+
 @Component({
     selector: 'merge-viewer',
     styleUrls: ['./merge-viewer.css'],
@@ -25,8 +33,14 @@ export class MergeViewerComponent implements OnChanges {
             this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config);
             this.setHeight(this.height || "80vh");
             this.instance.editor().setOption("extraKeys", {
-                'Alt-K': "goNextDiff",
-                'Alt-I': "goPrevDiff"
+                'Alt-K': cm => {
+                    cm.execCommand("goNextDiff");
+                    scrollToCenter(cm);
+                },
+                'Alt-I': cm => {
+                    cm.execCommand("goPrevDiff");
+                    scrollToCenter(cm)
+;                },
             });
         }
     }
