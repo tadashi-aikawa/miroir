@@ -9,6 +9,7 @@ export class DynamoRow {
     title: string;
     same_count: number;
     different_count: number;
+    failure_count: number;
     one_host: string;
     other_host: string;
     start: string;

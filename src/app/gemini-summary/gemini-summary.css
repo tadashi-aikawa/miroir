@@ -13,3 +13,7 @@ md-sidenav-container {
 div.smart-div {
     padding: 20px;
 }
+
+md-card {
+    margin: 10px;
+}
