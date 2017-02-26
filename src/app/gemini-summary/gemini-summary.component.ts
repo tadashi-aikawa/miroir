@@ -4,6 +4,7 @@ import {Component, Input, Optional, AfterViewInit} from '@angular/core';
 import {LocalDataSource} from 'ng2-smart-table';
 import * as CodeMirror from 'codemirror';
 import {MdDialogRef, MdDialog} from '@angular/material';
+import {AwsConfig} from '../models';
 
 const filterFunction = (v, q) => q.split(" and ").every(x => v.includes(x));
 
@@ -30,9 +31,7 @@ interface RowData {
     ]
 })
 export class GeminiSummaryComponent {
-    @Input() region: string;
-    @Input() accessKeyId: string;
-    @Input() secretAccessKey: string;
+    @Input() awsConfig: AwsConfig;
 
     rows: DynamoRow[];
     settings: any;
@@ -45,7 +44,7 @@ export class GeminiSummaryComponent {
     }
 
     fetchReport(keyWord: string) {
-        this.service.fetchReport(keyWord, this.region, this.accessKeyId, this.secretAccessKey)
+        this.service.fetchReport(keyWord, this.awsConfig)
             .then((r: DynamoResult) => this.rows = r.Items)
             .catch(err => this.errorMessage = err);
     }
@@ -87,9 +86,8 @@ export class GeminiSummaryComponent {
     }
 
     showDetail(data: RowData) {
-        const ff = (file: string) => this.service.fetchDetail(
-            `${this.activeReport.key}/${file}`, this.accessKeyId, this.secretAccessKey
-        );
+        const fetchFile = (file: string) =>
+            this.service.fetchDetail(`${this.activeReport.key}/${file}`, this.awsConfig);
 
         const dialogRef = this._dialog.open(DialogContent, {
             width: '80vw',
@@ -98,10 +96,11 @@ export class GeminiSummaryComponent {
         dialogRef.componentInstance.title = data.path;
 
         // viewportMaring <==> search
-        Promise.all([ff(data.trial.one.file), ff(data.trial.other.file)])
+        Promise.all([fetchFile(data.trial.one.file), fetchFile(data.trial.other.file)])
             .then((rs: string[]) => {
                 dialogRef.componentInstance.mergeViewConfig = {
-                    value: rs[0], orig: rs[1],
+                    value: rs[0],
+                    orig: rs[1],
                     lineNumbers: true,
                     lineWrapping: true,
                     viewportMargin: 10,
