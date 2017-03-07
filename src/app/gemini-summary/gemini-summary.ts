@@ -5,7 +5,7 @@ export class DynamoResult {
 }
 
 export class DynamoRow {
-    hashKey: string;
+    hashkey: string;
     title: string;
     same_count: number;
     different_count: number;
@@ -14,7 +14,6 @@ export class DynamoRow {
     other_host: string;
     start: string;
     end: string;
-    report: Report;
 }
 
 export class Report {

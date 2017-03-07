@@ -1,7 +1,7 @@
 <md-sidenav-container>
 
     <md-sidenav #sidenav mode="side" class="app-sidenav" align="start">
-        <md-card *ngFor="let row of rows" (click)="showReport(row.report)">
+        <md-card *ngFor="let row of rows" (click)="showReport(row.hashkey)">
             <md-card-header>
                 <md-card-title>{{row.title}}</md-card-title>
                 <md-card-subtitle>{{row.start}}</md-card-subtitle>
@@ -19,7 +19,7 @@
     <div class="smart-div">
 
         <md-input-container>
-            <input mdInput #keyWord (keyup.enter)="fetchReport(keyWord.value); sidenav.open()">
+            <input mdInput #keyWord (keyup.enter)="searchReport(keyWord.value); sidenav.open()">
             <md-placeholder>
                 <i class="material-icons app-input-icon">search</i> Search word
             </md-placeholder>

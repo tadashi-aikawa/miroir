@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import {S3, DynamoDB} from 'aws-sdk'
-import {DynamoResult} from './gemini-summary';
+import {DynamoResult, Report} from './gemini-summary';
 import {AwsConfig} from '../models';
 
 @Injectable()
@@ -23,7 +23,22 @@ export class SummaryService {
         });
     }
 
-    fetchReport(keyWord: string, awsConfig: AwsConfig): Promise<DynamoResult> {
+    fetchReport(key: string, awsConfig: AwsConfig): Promise<Report> {
+        return new Promise((resolve, reject) => {
+            const s3 = new S3({
+                apiVersion: '2006-03-01',
+                accessKeyId: awsConfig.accessKeyId,
+                secretAccessKey: awsConfig.secretAccessKey
+            });
+
+            s3.getObject(
+                {Key: key, Bucket: awsConfig.bucket},
+                (err, data) => err ? reject(err.message) : resolve(JSON.parse(data.Body.toString()))
+            );
+        });
+    }
+
+    searchReport(keyWord: string, awsConfig: AwsConfig): Promise<DynamoResult> {
         return new Promise((resolve, reject) => {
             const db = new DynamoDB.DocumentClient({
                 service: new DynamoDB({

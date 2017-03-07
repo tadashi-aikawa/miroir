@@ -43,46 +43,50 @@ export class GeminiSummaryComponent {
     constructor(private service: SummaryService, private _dialog: MdDialog) {
     }
 
-    fetchReport(keyWord: string) {
-        this.service.fetchReport(keyWord, this.awsConfig)
+    searchReport(keyWord: string) {
+        this.service.searchReport(keyWord, this.awsConfig)
             .then((r: DynamoResult) => this.rows = r.Items)
             .catch(err => this.errorMessage = err);
     }
 
-    showReport(r: Report) {
-        this.activeReport = r;
-        this.settings = {
-            columns: {
-                path: {title: 'Path', filterFunction},
-                status: {title: 'Status', filterFunction},
-                queries: {title: 'Queries', type: 'html', filterFunction},
-                oneByte: {title: '<- Byte'},
-                otherByte: {title: 'Byte ->'},
-                oneSec: {title: '<- Sec'},
-                otherSec: {title: 'Sec ->'},
-                oneStatus: {title: '<- Status'},
-                otherStatus: {title: 'Status ->'},
-                requestTime: {title: 'Request time'}
-            },
-            actions: {
-                add: false,
-                edit: false,
-                "delete": false
-            }
-        };
-        this.tableSource.load(r.trials.map(t => (<RowData>{
-            trial: t,
-            path: t.path,
-            status: t.status,
-            queries: Object.keys(t.queries).map(k => `${k}: ${t.queries[k]}`).join("<br/>"),
-            oneByte: t.one.byte,
-            otherByte: t.other.byte,
-            oneSec: t.one.response_sec,
-            otherSec: t.other.response_sec,
-            oneStatus: t.one.status_code,
-            otherStatus: t.other.status_code,
-            requestTime: t.request_time
-        })));
+    showReport(key: string) {
+        this.service.fetchReport(`${key}/report.json`, this.awsConfig)
+            .then((r: Report) => {
+                this.activeReport = r;
+                this.settings = {
+                    columns: {
+                        path: {title: 'Path', filterFunction},
+                        status: {title: 'Status', filterFunction},
+                        queries: {title: 'Queries', type: 'html', filterFunction},
+                        oneByte: {title: '<- Byte'},
+                        otherByte: {title: 'Byte ->'},
+                        oneSec: {title: '<- Sec'},
+                        otherSec: {title: 'Sec ->'},
+                        oneStatus: {title: '<- Status'},
+                        otherStatus: {title: 'Status ->'},
+                        requestTime: {title: 'Request time'}
+                    },
+                    actions: {
+                        add: false,
+                        edit: false,
+                        "delete": false
+                    }
+                };
+                this.tableSource.load(r.trials.map(t => (<RowData>{
+                    trial: t,
+                    path: t.path,
+                    status: t.status,
+                    queries: Object.keys(t.queries).map(k => `${k}: ${t.queries[k]}`).join("<br/>"),
+                    oneByte: t.one.byte,
+                    otherByte: t.other.byte,
+                    oneSec: t.one.response_sec,
+                    otherSec: t.other.response_sec,
+                    oneStatus: t.one.status_code,
+                    otherStatus: t.other.status_code,
+                    requestTime: t.request_time
+                })));
+            })
+            .catch(err => this.errorMessage = err);
     }
 
     showDetail(data: RowData) {
