@@ -1,7 +1,7 @@
 import {DynamoResult, DynamoRow, Report, ResponseSummary, Trial} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
-import {Component, Input, Optional, AfterViewInit} from '@angular/core';
-import {LocalDataSource} from 'ng2-smart-table';
+import {Component, Input, Optional, AfterViewInit, OnInit} from '@angular/core';
+import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import * as CodeMirror from 'codemirror';
 import {MdDialogRef, MdDialog} from '@angular/material';
 import {AwsConfig} from '../models';
@@ -57,7 +57,7 @@ export class GeminiSummaryComponent {
                     columns: {
                         path: {title: 'Path', filterFunction},
                         status: {title: 'Status', filterFunction},
-                        queries: {title: 'Queries', type: 'html', filterFunction},
+                        queries: {title: 'Queries', type: 'custom', renderComponent: HoverComponent, filterFunction},
                         oneByte: {title: '<- Byte'},
                         otherByte: {title: 'Byte ->'},
                         oneSec: {title: '<- Sec'},
@@ -76,7 +76,7 @@ export class GeminiSummaryComponent {
                     trial: t,
                     path: t.path,
                     status: t.status,
-                    queries: Object.keys(t.queries).map(k => `${k}: ${t.queries[k]}`).join("<br/>"),
+                    queries: Object.keys(t.queries).map(k => `${k}: ${t.queries[k]}`).join("&"),
                     oneByte: t.one.byte,
                     otherByte: t.other.byte,
                     oneSec: t.one.response_sec,
@@ -128,5 +128,21 @@ export class DialogContent {
     @Input() mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
 
     constructor(@Optional() public dialogRef: MdDialogRef<DialogContent>) {
+    }
+}
+
+@Component({
+    template: `
+    <span [mdTooltip]="hoverValue">{{renderValue}}</span>
+    `
+})
+export class HoverComponent implements ViewCell, OnInit {
+    renderValue: string;
+    hoverValue: string;
+    @Input() value: string|number;
+
+    ngOnInit(): void {
+        this.renderValue = `${String(this.value).split("&").length} queries`;
+        this.hoverValue = String(this.value).split("&").join("\n");
     }
 }
