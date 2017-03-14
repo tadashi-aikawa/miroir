@@ -55,12 +55,14 @@ export class SummaryService {
                     "contains(title, :title)",
                     "contains(one_host, :one_host)",
                     "contains(other_host, :other_host)",
+                    "contains(begin_time, :begin_time)"
                 ].join(" OR "),
                 ExpressionAttributeValues: {
                     ":hashkey": keyWord,
                     ":title": keyWord,
                     ":one_host": keyWord,
-                    ":other_host": keyWord
+                    ":other_host": keyWord,
+                    ":begin_time": keyWord
                 }
             };
 

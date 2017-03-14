@@ -12,8 +12,8 @@ export class DynamoRow {
     failure_count: number;
     one_host: string;
     other_host: string;
-    start: string;
-    end: string;
+    begin_time: string;
+    end_time: string;
 }
 
 export class Report {
