@@ -3,7 +3,7 @@ import {SummaryService} from './gemini-summary.service';
 import {Component, Input, Optional, AfterViewInit, OnInit} from '@angular/core';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import * as CodeMirror from 'codemirror';
-import {MdDialogRef, MdDialog} from '@angular/material';
+import {MdDialogRef, MdDialog, MdSnackBar, MdSnackBarRef, SimpleSnackBar} from '@angular/material';
 import {AwsConfig} from '../models';
 
 const filterFunction = (v, q) => q.split(" and ").every(x => v.includes(x));
@@ -40,7 +40,7 @@ export class GeminiSummaryComponent {
     activeReport: Report;
     tableSource = new LocalDataSource();
 
-    constructor(private service: SummaryService, private _dialog: MdDialog) {
+    constructor(private service: SummaryService, private _dialog: MdDialog, public snackBar: MdSnackBar) {
     }
 
     searchReport(keyWord: string) {
@@ -93,15 +93,17 @@ export class GeminiSummaryComponent {
         const fetchFile = (file: string) =>
             this.service.fetchDetail(`${this.activeReport.key}/${file}`, this.awsConfig);
 
-        const dialogRef = this._dialog.open(DialogContent, {
-            width: '80vw',
-            height: '95%'
-        });
-        dialogRef.componentInstance.title = data.path;
+        const snack: MdSnackBarRef<SimpleSnackBar> = this.snackBar.open('Now Loading');
 
         // viewportMaring <==> search
         Promise.all([fetchFile(data.trial.one.file), fetchFile(data.trial.other.file)])
             .then((rs: string[]) => {
+                snack.dismiss();
+                const dialogRef = this._dialog.open(DialogContent, {
+                    width: '80vw',
+                    height: '95%'
+                });
+                dialogRef.componentInstance.title = data.path;
                 dialogRef.componentInstance.mergeViewConfig = {
                     value: rs[0],
                     orig: rs[1],
@@ -112,7 +114,10 @@ export class GeminiSummaryComponent {
                     readOnly: true
                 };
             })
-            .catch(err => this.errorMessage = err);
+            .catch(err => {
+                this.errorMessage = err;
+                this.snackBar.open('Not found files', undefined, {duration: 2000});
+            });
     }
 
 }
