@@ -10,6 +10,7 @@ const filterFunction = (v, q) => q.split(" and ").every(x => v.includes(x));
 
 interface RowData {
     trial: Trial;
+    name: string;
     path: string;
     queries: Object;
     status: string;
@@ -55,6 +56,7 @@ export class GeminiSummaryComponent {
                 this.activeReport = r;
                 this.settings = {
                     columns: {
+                        name: {title: 'Name', filterFunction},
                         path: {title: 'Path', filterFunction},
                         status: {title: 'Status', filterFunction},
                         queries: {title: 'Queries', type: 'custom', renderComponent: HoverComponent, filterFunction},
@@ -74,6 +76,7 @@ export class GeminiSummaryComponent {
                 };
                 this.tableSource.load(r.trials.map(t => (<RowData>{
                     trial: t,
+                    name: t.name,
                     path: t.path,
                     status: t.status,
                     queries: Object.keys(t.queries).map(k => `${k}: ${t.queries[k]}`).join("&"),

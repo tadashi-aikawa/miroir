@@ -45,6 +45,7 @@ class Time {
 }
 
 export class Trial {
+    name: string;
     headers: any;
     queries: any;
     one: ResponseSummary;
