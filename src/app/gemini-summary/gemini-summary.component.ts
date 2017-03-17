@@ -58,14 +58,14 @@ export class GeminiSummaryComponent {
                     columns: {
                         name: {title: 'Name', filterFunction},
                         path: {title: 'Path', filterFunction},
-                        status: {title: 'Status', filterFunction},
+                        status: {title: 'Status', type: 'custom', renderComponent: StatusComponent, filterFunction},
                         queries: {title: 'Queries', type: 'custom', renderComponent: HoverComponent, filterFunction},
                         oneByte: {title: '<- Byte'},
                         otherByte: {title: 'Byte ->'},
                         oneSec: {title: '<- Sec'},
                         otherSec: {title: 'Sec ->'},
-                        oneStatus: {title: '<- Status'},
-                        otherStatus: {title: 'Status ->'},
+                        oneStatus: {title: '<- Status', type: 'custom', renderComponent: StatusCodeComponent},
+                        otherStatus: {title: 'Status ->', type: 'custom', renderComponent: StatusCodeComponent},
                         requestTime: {title: 'Request time'}
                     },
                     actions: {
@@ -141,6 +141,29 @@ export class DialogContent {
 
 @Component({
     template: `
+    <span [class]="status">{{renderValue}}</span>
+    `,
+    styles: [
+        '.server-error { color: red; font-weight: bold;}',
+        '.client-error { color: blue; font-weight: bold;}',
+        '.success { color: green; }'
+    ],
+})
+export class StatusCodeComponent implements ViewCell, OnInit {
+    renderValue: string;
+    status: string;
+    @Input() value: string|number;
+
+    ngOnInit(): void {
+        const v = String(this.value);
+        this.renderValue = v;
+        this.status = v[0] == '5' ? "server-error" :
+            v[0] == '4' ? "client-error" : "success"
+    }
+}
+
+@Component({
+    template: `
     <span [mdTooltip]="hoverValue">{{renderValue}}</span>
     `
 })
@@ -152,5 +175,26 @@ export class HoverComponent implements ViewCell, OnInit {
     ngOnInit(): void {
         this.renderValue = `${String(this.value).split("&").length} queries`;
         this.hoverValue = String(this.value).split("&").join("\n");
+    }
+}
+
+@Component({
+    template: `
+    <md-chip-list>
+        <md-chip [color]="kind" selected="true">{{renderValue}}</md-chip>
+    </md-chip-list>
+    `
+})
+export class StatusComponent implements ViewCell, OnInit {
+    renderValue: string;
+    kind: string;
+    @Input() value: string|number;
+
+    ngOnInit(): void {
+        const v = String(this.value);
+        this.renderValue = v;
+        this.kind = v == "same" ? "primary" :
+            v == "different" ? "accent" :
+                v == "failure" ? "warn" : "";
     }
 }

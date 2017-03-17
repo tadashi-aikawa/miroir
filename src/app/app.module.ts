@@ -8,7 +8,10 @@ import {LocalStorageModule} from 'angular-2-local-storage';
 import 'hammerjs';
 
 import {AppComponent} from './app.component';
-import {GeminiSummaryComponent, DialogContent, HoverComponent} from './gemini-summary/gemini-summary.component';
+import {
+    GeminiSummaryComponent, DialogContent, HoverComponent, StatusCodeComponent,
+    StatusComponent
+} from './gemini-summary/gemini-summary.component';
 import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
 
 @NgModule({
@@ -17,7 +20,9 @@ import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
         GeminiSummaryComponent,
         MergeViewerComponent,
         DialogContent,
-        HoverComponent
+        HoverComponent,
+        StatusCodeComponent,
+        StatusComponent
     ],
     imports: [
         BrowserModule,
@@ -30,7 +35,7 @@ import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
             storageType: 'localStorage'
         })
     ],
-    entryComponents: [DialogContent, HoverComponent],
+    entryComponents: [DialogContent, HoverComponent, StatusCodeComponent, StatusComponent],
     providers: [],
     bootstrap: [AppComponent]
 })
