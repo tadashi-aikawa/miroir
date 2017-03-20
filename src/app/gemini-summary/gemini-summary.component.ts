@@ -38,6 +38,8 @@ interface RowData {
 export class GeminiSummaryComponent {
     @Input() awsConfig: AwsConfig;
 
+    searchingSummary: boolean;
+    searchErrorMessage: string;
     rows: DynamoRow[];
     settings: any;
     errorMessage: string;
@@ -50,9 +52,18 @@ export class GeminiSummaryComponent {
     }
 
     searchReport(keyWord: string) {
+        this.searchErrorMessage = undefined;
+        this.searchingSummary = true;
+
         this.service.searchReport(keyWord, this.awsConfig)
-            .then((r: DynamoResult) => this.rows = r.Items)
-            .catch(err => this.errorMessage = err);
+            .then((r: DynamoResult) => {
+                this.searchingSummary = false;
+                this.rows = r.Items;
+            })
+            .catch(err => {
+                this.searchingSummary = false;
+                this.searchErrorMessage = err
+            });
     }
 
     showReport(key: string) {
