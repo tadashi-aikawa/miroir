@@ -45,7 +45,7 @@ export class GeminiSummaryComponent {
     errorMessage: string;
 
     activeReport: Report;
-    loadingKey: string;
+    loadingReportKey: string;
     tableSource = new LocalDataSource();
 
     constructor(private service: SummaryService, private _dialog: MdDialog, public snackBar: MdSnackBar) {
@@ -67,10 +67,10 @@ export class GeminiSummaryComponent {
     }
 
     showReport(key: string) {
-        this.loadingKey = key;
+        this.loadingReportKey = key;
         this.service.fetchReport(`${key}/report.json`, this.awsConfig)
             .then((r: Report) => {
-                this.loadingKey = undefined;
+                this.loadingReportKey = undefined;
 
                 this.activeReport = r;
                 this.settings = {
@@ -109,7 +109,7 @@ export class GeminiSummaryComponent {
                 })));
             })
             .catch(err => {
-                this.loadingKey = undefined;
+                this.loadingReportKey = undefined;
                 this.errorMessage = err;
             });
     }
@@ -148,21 +148,29 @@ export class GeminiSummaryComponent {
         event.stopPropagation();
     }
 
+    onSelectRow(data: RowData) {
+        data.status == "different" ?
+            this.showDetail(data) :
+            this.snackBar.open("There are no stored responsies.", "Close", {duration: 3000});
+    }
+
     showDetail(data: RowData) {
         const fetchFile = (file: string) =>
             this.service.fetchDetail(`${this.activeReport.key}/${file}`, this.awsConfig);
 
-        const snack: MdSnackBarRef<SimpleSnackBar> = this.snackBar.open('Now Loading');
+        const dialogRef = this._dialog.open(DetailDialogContent, {
+            width: '80vw',
+            height: '95%'
+        });
+        dialogRef.componentInstance.isLoading = true;
+        dialogRef.componentInstance.title = `${data.name} (${data.path})`;
+        dialogRef.componentInstance.trial = data.trial;
 
         // viewportMaring <==> search
         Promise.all([fetchFile(data.trial.one.file), fetchFile(data.trial.other.file)])
             .then((rs: string[]) => {
-                snack.dismiss();
-                const dialogRef = this._dialog.open(DetailDialogContent, {
-                    width: '80vw',
-                    height: '95%'
-                });
-                dialogRef.componentInstance.title = data.path;
+                dialogRef.componentInstance.isLoading = false;
+                dialogRef.componentInstance.errorMessage = undefined;
                 dialogRef.componentInstance.mergeViewConfig = {
                     value: rs[0],
                     orig: rs[1],
@@ -174,8 +182,8 @@ export class GeminiSummaryComponent {
                 };
             })
             .catch(err => {
-                this.errorMessage = err;
-                this.snackBar.open('Not found files', undefined, {duration: 2000});
+                dialogRef.componentInstance.isLoading = false;
+                dialogRef.componentInstance.errorMessage = err;
             });
     }
 
@@ -183,13 +191,34 @@ export class GeminiSummaryComponent {
 
 @Component({
     template: `
-    <p>{{title}}</p>
-    <merge-viewer [config]="mergeViewConfig"></merge-viewer>
+    <h2>{{title}}</h2>
+    <div class="smart-padding-without-top">
+        <small>
+            <md-chip>Left</md-chip>
+            <div class="ellipsis-text" style="width: 30vw">{{trial.one.url}}</div>
+        </small>
+        <small>
+            <md-chip>Right</md-chip>
+            <div class="ellipsis-text" style="width: 30vw">{{trial.other.url}}</div>
+        </small>
+    </div>
+    <div *ngIf="isLoading" class="center" style="height: 50vh;">
+        <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
+    </div>
+    <div *ngIf="!isLoading">
+        <merge-viewer [config]="mergeViewConfig"></merge-viewer>
+    </div>
+    <div *ngIf="errorMessage">
+        {{errorMessage}}
+    </div>
   `,
 })
 export class DetailDialogContent {
     @Input() title: string;
+    @Input() trial: Trial;
+    @Input() isLoading: boolean;
     @Input() mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
+    @Input() errorMessage: string;
 
     constructor(@Optional() public dialogRef: MdDialogRef<DetailDialogContent>) {
     }

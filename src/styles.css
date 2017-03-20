@@ -6,12 +6,25 @@
     align-items: center;
 }
 
+div.ellipsis-text {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
 div.smart-padding {
     padding: 20px;
 }
 
 div.smart-padding-without-bottom {
     padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+div.smart-padding-without-top {
+    padding-bottom: 20px;
     padding-left: 20px;
     padding-right: 20px;
 }

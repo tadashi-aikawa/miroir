@@ -31,7 +31,7 @@ export class MergeViewerComponent implements OnChanges {
         this.view.nativeElement.innerHTML = "";
         if (this.config) {
             this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config);
-            this.setHeight(this.height || "80vh");
+            this.setHeight(this.height || "70vh");
             this.instance.editor().setOption("extraKeys", {
                 'Alt-K': cm => {
                     cm.execCommand("goNextDiff");
