@@ -10,10 +10,22 @@ md-sidenav-container {
     min-height: 1024px;
 }
 
-div.smart-div {
-    padding: 20px;
+.summary-card {
+    margin: 10px;
+    transition: all 0.5s ease;
+    box-shadow:2px 2px 5px !important;
+    border:0px solid #000 !important;
+    display: block !important;
 }
 
-md-card {
-    margin: 10px;
+.summary-card:hover {
+    background-color: rgba(29, 202, 27, 0.2);
+}
+
+.summary-card-active {
+    background-color: rgba(29, 202, 27, 0.5);
+}
+
+.action-icon {
+    cursor : pointer;
 }

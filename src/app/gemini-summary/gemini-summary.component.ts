@@ -27,7 +27,10 @@ interface RowData {
 @Component({
     selector: 'gemini-summary',
     templateUrl: './gemini-summary.component.html',
-    styleUrls: ['./gemini-summary.css'],
+    styleUrls: [
+        './gemini-summary.css',
+        '../../../node_modules/hover.css/css/hover.css'
+    ],
     providers: [
         SummaryService
     ]
@@ -40,6 +43,7 @@ export class GeminiSummaryComponent {
     errorMessage: string;
 
     activeReport: Report;
+    loadingKey: string;
     tableSource = new LocalDataSource();
 
     constructor(private service: SummaryService, private _dialog: MdDialog, public snackBar: MdSnackBar) {
@@ -52,8 +56,11 @@ export class GeminiSummaryComponent {
     }
 
     showReport(key: string) {
+        this.loadingKey = key;
         this.service.fetchReport(`${key}/report.json`, this.awsConfig)
             .then((r: Report) => {
+                this.loadingKey = undefined;
+
                 this.activeReport = r;
                 this.settings = {
                     columns: {
@@ -90,13 +97,19 @@ export class GeminiSummaryComponent {
                     requestTime: t.request_time
                 })));
             })
-            .catch(err => this.errorMessage = err);
+            .catch(err => {
+                this.loadingKey = undefined;
+                this.errorMessage = err;
+            });
     }
 
     removeDetail(key: string, event) {
+        const dialogRef = this._dialog.open(DeleteConfirmDialogContent);
+        dialogRef.componentInstance.isLoading = true;
+
         this.service.fetchList(key, this.awsConfig)
             .then((oList: ObjectList) => {
-                const dialogRef = this._dialog.open(DeleteConfirmDialogContent);
+                dialogRef.componentInstance.isLoading = false;
                 dialogRef.componentInstance.keys = oList.map(x => x.Key);
                 dialogRef.afterClosed().subscribe((keysToRemove: string[]) => {
                     if (keysToRemove) {
@@ -117,7 +130,10 @@ export class GeminiSummaryComponent {
                     }
                 })
             })
-            .catch(err => this.errorMessage = err);
+            .catch(err => {
+                dialogRef.componentInstance.isLoading = false;
+                this.errorMessage = err;
+            });
         event.stopPropagation();
     }
 
@@ -173,27 +189,35 @@ export class DetailDialogContent {
     <h2 md-dialog-title>Remove following items... is it really O.K.?</h2>
 
     <md-dialog-content>
-        <ul>
-            <li *ngFor="let key of keys">{{key}}</li>
-        </ul>   
+        <div *ngIf="isLoading" class="center">
+            <md-spinner></md-spinner>
+        </div>
+        <div *ngIf="!isLoading">
+            <ul>
+                <li *ngFor="let key of keys">{{key}}</li>
+            </ul>
+        </div>
     </md-dialog-content>
     
     <md-dialog-actions>
-        <button md-raised-button
-                color="primary"
-                (click)="onClickRemove()">
-            Remove
-        </button>
-        <button md-raised-button
-                color="secondary"
-                md-dialog-close>
-            Cancel
-        </button>
+        <div class="smart-padding-without-bottom">
+            <button md-raised-button
+                    color="primary"
+                    (click)="onClickRemove()">
+                Remove
+            </button>
+            <button md-raised-button
+                    color="secondary"
+                    md-dialog-close>
+                Cancel
+            </button>
+        </div>
     </md-dialog-actions>
   `,
 })
 export class DeleteConfirmDialogContent {
     @Input() keys: string[];
+    @Input() isLoading: boolean;
 
     constructor(@Optional() public dialogRef: MdDialogRef<DeleteConfirmDialogContent>) {
     }

@@ -1,1 +1,17 @@
 @import '~@angular/material/core/theming/prebuilt/deeppurple-amber.css';
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div.smart-padding {
+    padding: 20px;
+}
+
+div.smart-padding-without-bottom {
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}

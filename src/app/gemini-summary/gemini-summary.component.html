@@ -1,31 +1,39 @@
 <md-sidenav-container>
 
     <md-sidenav #sidenav mode="side" class="app-sidenav" align="start">
-        <md-card *ngFor="let row of rows" (click)="showReport(row.hashkey)" class="summary-card hvr-curl-bottom-right">
-            <div *ngIf="row.deleting">
-                <md-spinner></md-spinner>Deleting....
-            </div>
-            <div *ngIf="!row.deleting">
-                <md-card-header>
-                    <md-card-title>{{row.title}}</md-card-title>
-                    <md-icon (click)="removeDetail(row.hashkey, $event)"
-                             class="action-icon hvr-buzz-out">
-                        delete_forever
-                    </md-icon>
-                    <md-card-subtitle>{{row.begin_time}}</md-card-subtitle>
-                </md-card-header>
-                <md-card-content>
-                    <md-chip-list class="mat-chip-list-stacked">
-                        <md-chip color="primary" selected="true">{{row.same_count}}</md-chip>
-                        <md-chip color="accent" selected="true">{{row.different_count}}</md-chip>
-                        <md-chip color="warn" selected="true">{{row.failure_count}}</md-chip>
-                    </md-chip-list>
-                </md-card-content>
-            </div>
+        <md-card *ngFor="let row of rows"
+                 (click)="showReport(row.hashkey)"
+                 [ngClass]="activeReport && row.hashkey == activeReport.key ?
+                    ['hvr-curl-bottom-right', 'summary-card', 'summary-card-active'] :
+                        ['hvr-curl-bottom-right', 'summary-card']"
+        >
+            <md-card-header>
+                <md-card-title>{{row.title}}</md-card-title>
+                <md-icon (click)="removeDetail(row.hashkey, $event)"
+                         class="action-icon hvr-buzz-out">
+                    delete_forever
+                </md-icon>
+                <md-card-subtitle>{{row.begin_time}}</md-card-subtitle>
+            </md-card-header>
+            <md-card-content>
+                <md-chip-list class="mat-chip-list-stacked">
+                    <md-chip color="primary" selected="true">{{row.same_count}}</md-chip>
+                    <md-chip color="accent" selected="true">{{row.different_count}}</md-chip>
+                    <md-chip color="warn" selected="true">{{row.failure_count}}</md-chip>
+                </md-chip-list>
+                <span *ngIf="loadingKey == row.hashkey">
+                    Now Loading...
+                    <md-progress-bar mode="indeterminate"></md-progress-bar>
+                </span>
+                <span *ngIf="row.deleting">
+                    Now Deleting...
+                    <md-progress-bar mode="indeterminate" color="warn"></md-progress-bar>
+                </span>
+            </md-card-content>
         </md-card>
     </md-sidenav>
 
-    <div class="smart-div">
+    <div class="smart-padding">
 
         <md-input-container>
             <input mdInput #keyWord (keyup.enter)="searchReport(keyWord.value); sidenav.open()">
@@ -40,7 +48,7 @@
                 <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}</small>
             </div>
             <h2>{{activeReport.title}}</h2>
-            <div class="smart-div" style="padding-top: 0;">
+            <div class="smart-padding" style="padding-top: 0;">
                 <small><md-chip>Left</md-chip> {{activeReport.summary.one.host}}</small>
                 <small><md-chip>Right</md-chip> {{activeReport.summary.other.host}}</small>
             </div>
