@@ -15,6 +15,7 @@ export class DynamoRow {
     begin_time: string;
     end_time: string;
     deleting?: boolean;
+    deleteErrorMessage?: string;
 }
 
 export class Report {

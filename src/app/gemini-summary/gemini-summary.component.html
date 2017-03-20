@@ -40,6 +40,13 @@
                         Now Deleting...
                         <md-progress-bar mode="indeterminate" color="warn"></md-progress-bar>
                     </span>
+                    <span *ngIf="row.deleteErrorMessage">
+                        <md-chip-list class="smart-padding-without-bottom">
+                            <md-chip color="warn" selected="true" [mdTooltip]="row.deleteErrorMessage" mdTooltipPosition="after">
+                                Fail to delete!!
+                            </md-chip>
+                        </md-chip-list>
+                    </span>
                 </md-card-content>
             </md-card>
         </div>

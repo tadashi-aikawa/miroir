@@ -118,26 +118,29 @@ export class GeminiSummaryComponent {
         const dialogRef = this._dialog.open(DeleteConfirmDialogContent);
         dialogRef.componentInstance.isLoading = true;
 
+        const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey == key);
+
         this.service.fetchList(key, this.awsConfig)
             .then((oList: ObjectList) => {
                 dialogRef.componentInstance.isLoading = false;
                 dialogRef.componentInstance.keys = oList.map(x => x.Key);
                 dialogRef.afterClosed().subscribe((keysToRemove: string[]) => {
                     if (keysToRemove) {
-                        this.rows.find((r: DynamoRow) => r.hashkey == key).deleting = true;
+                        row.deleting = true;
 
-                        Promise.all([
-                            this.service.removeDetails(keysToRemove, this.awsConfig),
-                            this.service.removeReport(key, this.awsConfig)
-                        ]).then(ps => {
-                            this.rows = this.rows.filter((r: DynamoRow) => r.hashkey != key);
-                            if (key == this.activeReport.key) {
-                                // TODO: abnormal
-                                this.showReport(this.rows[0].hashkey);
-                            }
-                        }).catch(err => {
-                            this.errorMessage = err
-                        })
+                        this.service.removeDetails(keysToRemove, this.awsConfig)
+                            .then(p => this.service.removeReport(key, this.awsConfig))
+                            .then(p => {
+                                this.rows = this.rows.filter((r: DynamoRow) => r.hashkey != key);
+                                if (key == this.activeReport.key) {
+                                    // TODO: abnormal
+                                    this.showReport(this.rows[0].hashkey);
+                                }
+                            })
+                            .catch(err => {
+                                row.deleting = false;
+                                row.deleteErrorMessage = err
+                            });
                     }
                 })
             })

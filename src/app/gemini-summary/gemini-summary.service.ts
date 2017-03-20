@@ -56,6 +56,10 @@ export class SummaryService {
 
     removeDetails(keys: string[], awsConfig: AwsConfig): Promise<any> {
         // WARNING: this method is alpha
+        if (keys.length == 0) {
+            return Promise.resolve("ok");
+        }
+
         const s3 = new S3({
             apiVersion: '2006-03-01',
             accessKeyId: awsConfig.accessKeyId,
