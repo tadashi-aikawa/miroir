@@ -15,3 +15,33 @@ div.smart-padding-without-bottom {
     padding-left: 20px;
     padding-right: 20px;
 }
+
+.ng2-smart-row:hover {
+    background-color: rgba(29, 202, 27, 0.2);
+}
+
+.CodeMirror-merge-r-chunk {
+    background-color: rgba(255, 255, 5, 0.5);
+}
+.CodeMirror-merge-r-chunk-start {
+    background-color: rgba(255, 255, 5, 0.5);
+}
+.CodeMirror-merge-r-chunk-end {
+    background-color: rgba(255, 255, 5, 0.5);
+}
+.CodeMirror-linebackground {
+    background-color: rgba(255, 255, 5, 0.5);
+}
+
+.CodeMirror-merge-r-connect {
+    fill: rgba(255, 255, 5, 0.5);
+    stroke: rgba(255, 255, 5, 0.5);
+    stroke-width: 1px;
+}
+
+.CodeMirror-merge-r-inserted,
+.CodeMirror-merge-l-inserted,
+.CodeMirror-merge-r-deleted,
+.CodeMirror-merge-l-deleted  {
+    font-weight: bold;
+}
