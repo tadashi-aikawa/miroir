@@ -1,6 +1,7 @@
 import {DynamoResult, DynamoRow, Report, ResponseSummary, Trial} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
 import {Component, Input, Optional, AfterViewInit, OnInit} from '@angular/core';
+import {ObjectList} from 'aws-sdk/clients/s3'
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import * as CodeMirror from 'codemirror';
 import {MdDialogRef, MdDialog, MdSnackBar, MdSnackBarRef, SimpleSnackBar} from '@angular/material';
@@ -92,6 +93,34 @@ export class GeminiSummaryComponent {
             .catch(err => this.errorMessage = err);
     }
 
+    removeDetail(key: string, event) {
+        this.service.fetchList(key, this.awsConfig)
+            .then((oList: ObjectList) => {
+                const dialogRef = this._dialog.open(DeleteConfirmDialogContent);
+                dialogRef.componentInstance.keys = oList.map(x => x.Key);
+                dialogRef.afterClosed().subscribe((keysToRemove: string[]) => {
+                    if (keysToRemove) {
+                        this.rows.find((r: DynamoRow) => r.hashkey == key).deleting = true;
+
+                        Promise.all([
+                            this.service.removeDetails(keysToRemove, this.awsConfig),
+                            this.service.removeReport(key, this.awsConfig)
+                        ]).then(ps => {
+                            this.rows = this.rows.filter((r: DynamoRow) => r.hashkey != key);
+                            if (key == this.activeReport.key) {
+                                // TODO: abnormal
+                                this.showReport(this.rows[0].hashkey);
+                            }
+                        }).catch(err => {
+                            this.errorMessage = err
+                        })
+                    }
+                })
+            })
+            .catch(err => this.errorMessage = err);
+        event.stopPropagation();
+    }
+
     showDetail(data: RowData) {
         const fetchFile = (file: string) =>
             this.service.fetchDetail(`${this.activeReport.key}/${file}`, this.awsConfig);
@@ -102,7 +131,7 @@ export class GeminiSummaryComponent {
         Promise.all([fetchFile(data.trial.one.file), fetchFile(data.trial.other.file)])
             .then((rs: string[]) => {
                 snack.dismiss();
-                const dialogRef = this._dialog.open(DialogContent, {
+                const dialogRef = this._dialog.open(DetailDialogContent, {
                     width: '80vw',
                     height: '95%'
                 });
@@ -131,11 +160,46 @@ export class GeminiSummaryComponent {
     <merge-viewer [config]="mergeViewConfig"></merge-viewer>
   `,
 })
-export class DialogContent {
+export class DetailDialogContent {
     @Input() title: string;
     @Input() mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
 
-    constructor(@Optional() public dialogRef: MdDialogRef<DialogContent>) {
+    constructor(@Optional() public dialogRef: MdDialogRef<DetailDialogContent>) {
+    }
+}
+
+@Component({
+    template: `    
+    <h2 md-dialog-title>Remove following items... is it really O.K.?</h2>
+
+    <md-dialog-content>
+        <ul>
+            <li *ngFor="let key of keys">{{key}}</li>
+        </ul>   
+    </md-dialog-content>
+    
+    <md-dialog-actions>
+        <button md-raised-button
+                color="primary"
+                (click)="onClickRemove()">
+            Remove
+        </button>
+        <button md-raised-button
+                color="secondary"
+                md-dialog-close>
+            Cancel
+        </button>
+    </md-dialog-actions>
+  `,
+})
+export class DeleteConfirmDialogContent {
+    @Input() keys: string[];
+
+    constructor(@Optional() public dialogRef: MdDialogRef<DeleteConfirmDialogContent>) {
+    }
+
+    onClickRemove() {
+        this.dialogRef.close(this.keys);
     }
 }
 
