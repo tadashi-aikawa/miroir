@@ -36,15 +36,6 @@ div.ellipsis-text {
 .CodeMirror-merge-r-chunk {
     background-color: rgba(255, 255, 5, 0.5);
 }
-.CodeMirror-merge-r-chunk-start {
-    background-color: rgba(255, 255, 5, 0.5);
-}
-.CodeMirror-merge-r-chunk-end {
-    background-color: rgba(255, 255, 5, 0.5);
-}
-.CodeMirror-linebackground {
-    background-color: rgba(255, 255, 5, 0.5);
-}
 
 .CodeMirror-merge-r-connect {
     fill: rgba(255, 255, 5, 0.5);
