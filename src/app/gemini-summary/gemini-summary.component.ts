@@ -175,8 +175,9 @@ export class GeminiSummaryComponent {
                 dialogRef.componentInstance.isLoading = false;
                 dialogRef.componentInstance.errorMessage = undefined;
                 dialogRef.componentInstance.mergeViewConfig = {
-                    value: rs[0],
-                    orig: rs[1],
+                    value: rs[1],
+                    orig: undefined,
+                    origLeft: rs[0],
                     lineNumbers: true,
                     lineWrapping: true,
                     viewportMargin: 10,

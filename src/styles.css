@@ -33,19 +33,29 @@ div.ellipsis-text {
     background-color: rgba(29, 202, 27, 0.2);
 }
 
-.CodeMirror-merge-r-chunk {
-    background-color: rgba(255, 255, 5, 0.5);
+.CodeMirror-merge-l-chunk {
+    background-color: rgba(250, 250, 250, 1.0);
 }
 
-.CodeMirror-merge-r-connect {
-    fill: rgba(255, 255, 5, 0.5);
-    stroke: rgba(255, 255, 5, 0.5);
+.CodeMirror-merge-l-chunk-start {
+    border-top: 1px solid rgb(220, 220, 220);
+}
+
+.CodeMirror-merge-l-chunk-end {
+    border-bottom: 1px solid rgb(220, 220, 220);
+}
+
+.CodeMirror-merge-l-connect {
+    fill: rgba(200, 200, 200, 0.2);
+    stroke: rgba(200, 200, 200, 0.5);
     stroke-width: 1px;
 }
 
-.CodeMirror-merge-r-inserted,
-.CodeMirror-merge-l-inserted,
-.CodeMirror-merge-r-deleted,
+.CodeMirror-merge-l-inserted {
+    background: rgba(210, 210, 255, 1.0) none;
+}
+
 .CodeMirror-merge-l-deleted  {
-    font-weight: bold;
+    text-decoration: line-through;
+    background: rgba(255, 210, 210, 1.0) none;
 }
