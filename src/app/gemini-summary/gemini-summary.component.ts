@@ -152,7 +152,7 @@ export class GeminiSummaryComponent {
     }
 
     onSelectRow(data: RowData) {
-        data.status == "different" ?
+        data.trial.one.file || data.trial.other.file ?
             this.showDetail(data) :
             this.snackBar.open("There are no stored responsies.", "Close", {duration: 3000});
     }
