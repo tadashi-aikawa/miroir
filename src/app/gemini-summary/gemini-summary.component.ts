@@ -58,7 +58,9 @@ export class GeminiSummaryComponent {
         this.service.searchReport(keyWord, this.awsConfig)
             .then((r: DynamoResult) => {
                 this.searchingSummary = false;
-                this.rows = r.Items;
+                this.rows = r.Items.sort(
+                    (a, b) => b.begin_time > a.begin_time ? 1 : -1
+                )
             })
             .catch(err => {
                 this.searchingSummary = false;
