@@ -24,6 +24,10 @@
                              class="action-icon hvr-buzz-out">
                         delete_forever
                     </md-icon>
+                    <md-icon (click)="downloadDetails(row.hashkey, $event)"
+                             class="action-icon hvr-buzz-out">
+                        cloud_download
+                    </md-icon>
                     <md-card-subtitle>{{row.begin_time}}</md-card-subtitle>
                 </md-card-header>
                 <md-card-content>

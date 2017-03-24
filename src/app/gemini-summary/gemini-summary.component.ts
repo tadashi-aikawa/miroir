@@ -6,6 +6,8 @@ import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import * as CodeMirror from 'codemirror';
 import {MdDialogRef, MdDialog, MdSnackBar, MdSnackBarRef, SimpleSnackBar} from '@angular/material';
 import {AwsConfig} from '../models';
+import * as JSZip from 'jszip';
+import * as fileSaver from 'file-saver';
 
 const filterFunction = (v, q) => q.split(" and ").every(x => v.includes(x));
 
@@ -114,6 +116,34 @@ export class GeminiSummaryComponent {
                 this.loadingReportKey = undefined;
                 this.errorMessage = err;
             });
+    }
+
+    downloadDetails(key: string, event) {
+        const fetchFile = (file: string) =>
+            this.service.fetchDetail(`${this.activeReport.key}/${file}`, this.awsConfig);
+
+        const zip = new JSZip();
+        const root = zip.folder(this.activeReport.key);
+        const one = root.folder("one");
+        const other = root.folder("othery");
+
+        this.service.fetchReport(`${key}/report.json`, this.awsConfig)
+            .then((r: Report) => {
+                Promise.all(
+                    r.trials.map((x: Trial) => x.other.file)
+                        .filter(f => f !== undefined)
+                        .map(f => fetchFile(`other/${f}`))
+                ).then(
+                    cs => cs.forEach((c, i) => other.file(r.trials, c))
+                )
+            })
+            .catch(err => {
+                this.errorMessage = err;
+            });
+
+        root.generateAsync({type: "blob"})
+            .then(x => fileSaver.saveAs(x, `${this.activeReport.key}.zip`));
+        event.stopPropagation();
     }
 
     removeDetail(key: string, event) {
