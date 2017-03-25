@@ -44,6 +44,7 @@ export class MergeViewerComponent implements OnChanges {
             this.setHeight(this.height || '70vh');
             this.instance.editor().setOption('extraKeys', EDITOR_KEY_BINDINGS);
             this.instance.leftOriginal().setOption('extraKeys', EDITOR_KEY_BINDINGS);
+            this.instance.leftOriginal().focus();
         }
     }
 

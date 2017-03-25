@@ -210,7 +210,7 @@ export class GeminiSummaryComponent {
 
         const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '80vw',
-            height: '95%'
+            height: '97%'
         });
         dialogRef.componentInstance.isLoading = true;
         dialogRef.componentInstance.title = `${data.name} (${data.path})`;
