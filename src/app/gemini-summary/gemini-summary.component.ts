@@ -91,11 +91,7 @@ export class GeminiSummaryComponent {
                         otherStatus: {title: 'Status ->', type: 'custom', renderComponent: StatusCodeComponent},
                         requestTime: {title: 'Request time'}
                     },
-                    actions: {
-                        add: false,
-                        edit: false,
-                        'delete': false
-                    }
+                    actions: false
                 };
                 this.tableSource.load(r.trials.map(t => (<RowData>{
                     trial: t,

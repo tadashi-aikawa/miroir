@@ -19,11 +19,12 @@ md-sidenav-container {
 }
 
 .summary-card:hover {
-    background-color: rgba(29, 202, 27, 0.2);
+    background-color: rgba(27, 27, 202, 0.15);
+
 }
 
 .summary-card-active {
-    background-color: rgba(29, 202, 27, 0.5);
+    background-color: rgba(27, 27, 202, 0.3);
 }
 
 .action-icon {
