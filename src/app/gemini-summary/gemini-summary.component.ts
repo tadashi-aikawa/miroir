@@ -1,13 +1,15 @@
-import {DynamoResult, DynamoRow, Report, ResponseSummary, Trial} from './gemini-summary';
+import {DynamoResult, DynamoRow, Report, Trial} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
-import {Component, Input, Optional, AfterViewInit, OnInit} from '@angular/core';
-import {ObjectList} from 'aws-sdk/clients/s3'
+import {Component, Input, Optional, OnInit} from '@angular/core';
+import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import * as CodeMirror from 'codemirror';
-import {MdDialogRef, MdDialog, MdSnackBar, MdSnackBarRef, SimpleSnackBar} from '@angular/material';
+import {MdDialogRef, MdDialog, MdSnackBar} from '@angular/material';
 import {AwsConfig} from '../models';
+import * as JSZip from 'jszip';
+import * as fileSaver from 'file-saver';
 
-const filterFunction = (v, q) => q.split(" and ").every(x => v.includes(x));
+const filterFunction = (v, q) => q.split(' and ').every(x => v.includes(x));
 
 interface RowData {
     trial: Trial;
@@ -15,17 +17,17 @@ interface RowData {
     path: string;
     queries: Object;
     status: string;
-    oneByte: number,
-    otherByte: number,
-    oneSec: number,
-    otherSec: number,
-    oneStatus: number,
-    otherStatus: number,
-    requestTime: string
+    oneByte: number;
+    otherByte: number;
+    oneSec: number;
+    otherSec: number;
+    oneStatus: number;
+    otherStatus: number;
+    requestTime: string;
 }
 
 @Component({
-    selector: 'gemini-summary',
+    selector: 'app-gemini-summary',
     templateUrl: './gemini-summary.component.html',
     styleUrls: [
         './gemini-summary.css',
@@ -60,11 +62,11 @@ export class GeminiSummaryComponent {
                 this.searchingSummary = false;
                 this.rows = r.Items.sort(
                     (a, b) => b.begin_time > a.begin_time ? 1 : -1
-                )
+                );
             })
             .catch(err => {
                 this.searchingSummary = false;
-                this.searchErrorMessage = err
+                this.searchErrorMessage = err;
             });
     }
 
@@ -89,18 +91,14 @@ export class GeminiSummaryComponent {
                         otherStatus: {title: 'Status ->', type: 'custom', renderComponent: StatusCodeComponent},
                         requestTime: {title: 'Request time'}
                     },
-                    actions: {
-                        add: false,
-                        edit: false,
-                        "delete": false
-                    }
+                    actions: false
                 };
                 this.tableSource.load(r.trials.map(t => (<RowData>{
                     trial: t,
                     name: t.name,
                     path: t.path,
                     status: t.status,
-                    queries: Object.keys(t.queries).map(k => `${k}: ${t.queries[k]}`).join("&"),
+                    queries: Object.keys(t.queries).map(k => `${k}: ${t.queries[k]}`).join('&'),
                     oneByte: t.one.byte,
                     otherByte: t.other.byte,
                     oneSec: t.one.response_sec,
@@ -116,11 +114,58 @@ export class GeminiSummaryComponent {
             });
     }
 
+    downloadDetails(key: string, event) {
+        /**
+         * Fetch from S3 bucket
+         * @param file
+         * @return contents promise if file is not undefined else undefined promise
+         */
+        const fetchFile = (file: string): Promise<Object> =>
+            file ?
+                this.service.fetchDetail(`${key}/${file}`, this.awsConfig) :
+                Promise.resolve(undefined);
+
+        const fetchFiles = (files: string[]): Promise<Object[]> =>
+            Promise.all(files.map(fetchFile));
+
+        const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
+        row.downloading = true;
+        this.service.fetchReport(`${key}/report.json`, this.awsConfig)
+            .then((r: Report) => {
+                Promise.all([
+                    fetchFiles(r.trials.map((x: Trial) => x.one.file)),
+                    fetchFiles(r.trials.map((x: Trial) => x.other.file))
+                ]).then((cs: Object[][]) => {
+                    row.downloading = false;
+                    const [ones, others] = cs;
+
+                    const root = new JSZip().folder(key);
+                    const one = root.folder('one');
+                    const other = root.folder('other');
+
+                    root.file('report.json', JSON.stringify(r, null, 4));
+                    ones.forEach((c, i) => c && one.file(`${i + 1}-${r.trials[i].name}`, c));
+                    others.forEach((c, i) => c && other.file(`${i + 1}-${r.trials[i].name}`, c));
+                    root.generateAsync({type: 'blob'})
+                        .then(x => fileSaver.saveAs(x, `${row.title}-${key.substring(0, 6)}.zip`));
+                }).catch(err => {
+                    row.downloading = false;
+                    row.downloadErrorMessage = err;
+                });
+            })
+            .catch(err => {
+                row.downloading = false;
+                row.downloadErrorMessage = err;
+            });
+
+        event.stopPropagation();
+    }
+
     removeDetail(key: string, event) {
-        const dialogRef = this._dialog.open(DeleteConfirmDialogContent);
+        const dialogRef = this._dialog.open(DeleteConfirmDialogComponent);
         dialogRef.componentInstance.isLoading = true;
 
-        const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey == key);
+        const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
 
         this.service.fetchList(key, this.awsConfig)
             .then((oList: ObjectList) => {
@@ -133,18 +178,18 @@ export class GeminiSummaryComponent {
                         this.service.removeDetails(keysToRemove, this.awsConfig)
                             .then(p => this.service.removeReport(key, this.awsConfig))
                             .then(p => {
-                                this.rows = this.rows.filter((r: DynamoRow) => r.hashkey != key);
-                                if (key == this.activeReport.key) {
+                                this.rows = this.rows.filter((r: DynamoRow) => r.hashkey !== key);
+                                if (key === this.activeReport.key) {
                                     // TODO: abnormal
                                     this.showReport(this.rows[0].hashkey);
                                 }
                             })
                             .catch(err => {
                                 row.deleting = false;
-                                row.deleteErrorMessage = err
+                                row.deleteErrorMessage = err;
                             });
                     }
-                })
+                });
             })
             .catch(err => {
                 dialogRef.componentInstance.isLoading = false;
@@ -156,14 +201,14 @@ export class GeminiSummaryComponent {
     onSelectRow(data: RowData) {
         data.trial.one.file || data.trial.other.file ?
             this.showDetail(data) :
-            this.snackBar.open("There are no stored responsies.", "Close", {duration: 3000});
+            this.snackBar.open('There are no stored responsies.', 'Close', {duration: 3000});
     }
 
     showDetail(data: RowData) {
         const fetchFile = (file: string) =>
             this.service.fetchDetail(`${this.activeReport.key}/${file}`, this.awsConfig);
 
-        const dialogRef = this._dialog.open(DetailDialogContent, {
+        const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '80vw',
             height: '95%'
         });
@@ -212,21 +257,21 @@ export class GeminiSummaryComponent {
         <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
     </div>
     <div *ngIf="!isLoading">
-        <merge-viewer [config]="mergeViewConfig"></merge-viewer>
+        <app-merge-viewer [config]="mergeViewConfig"></app-merge-viewer>
     </div>
     <div *ngIf="errorMessage">
         {{errorMessage}}
     </div>
   `,
 })
-export class DetailDialogContent {
+export class DetailDialogComponent {
     @Input() title: string;
     @Input() trial: Trial;
     @Input() isLoading: boolean;
     @Input() mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
     @Input() errorMessage: string;
 
-    constructor(@Optional() public dialogRef: MdDialogRef<DetailDialogContent>) {
+    constructor(@Optional() public dialogRef: MdDialogRef<DetailDialogComponent>) {
     }
 }
 
@@ -261,11 +306,11 @@ export class DetailDialogContent {
     </md-dialog-actions>
   `,
 })
-export class DeleteConfirmDialogContent {
+export class DeleteConfirmDialogComponent {
     @Input() keys: string[];
     @Input() isLoading: boolean;
 
-    constructor(@Optional() public dialogRef: MdDialogRef<DeleteConfirmDialogContent>) {
+    constructor(@Optional() public dialogRef: MdDialogRef<DeleteConfirmDialogComponent>) {
     }
 
     onClickRemove() {
@@ -291,8 +336,8 @@ export class StatusCodeComponent implements ViewCell, OnInit {
     ngOnInit(): void {
         const v = String(this.value);
         this.renderValue = v;
-        this.status = v[0] == '5' ? "server-error" :
-            v[0] == '4' ? "client-error" : "success"
+        this.status = v[0] === '5' ? 'server-error' :
+            v[0] === '4' ? 'client-error' : 'success';
     }
 }
 
@@ -307,8 +352,8 @@ export class HoverComponent implements ViewCell, OnInit {
     @Input() value: string|number;
 
     ngOnInit(): void {
-        this.renderValue = `${String(this.value).split("&").length} queries`;
-        this.hoverValue = String(this.value).split("&").join("\n");
+        this.renderValue = `${String(this.value).split('&').length} queries`;
+        this.hoverValue = String(this.value).split('&').join('\n');
     }
 }
 
@@ -327,8 +372,8 @@ export class StatusComponent implements ViewCell, OnInit {
     ngOnInit(): void {
         const v = String(this.value);
         this.renderValue = v;
-        this.kind = v == "same" ? "primary" :
-            v == "different" ? "accent" :
-                v == "failure" ? "warn" : "";
+        this.kind = v === 'same' ? 'primary' :
+            v === 'different' ? 'accent' :
+                v === 'failure' ? 'warn' : '';
     }
 }

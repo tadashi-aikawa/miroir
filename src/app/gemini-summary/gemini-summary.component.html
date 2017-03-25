@@ -24,6 +24,10 @@
                              class="action-icon hvr-buzz-out">
                         delete_forever
                     </md-icon>
+                    <md-icon (click)="downloadDetails(row.hashkey, $event)"
+                             class="action-icon hvr-buzz-out">
+                        cloud_download
+                    </md-icon>
                     <md-card-subtitle>{{row.begin_time}}</md-card-subtitle>
                 </md-card-header>
                 <md-card-content>
@@ -44,6 +48,17 @@
                         <md-chip-list class="smart-padding-without-bottom">
                             <md-chip color="warn" selected="true" [mdTooltip]="row.deleteErrorMessage" mdTooltipPosition="after">
                                 Fail to delete!!
+                            </md-chip>
+                        </md-chip-list>
+                    </span>
+                    <span *ngIf="row.downloading">
+                        Prepare Downloading...
+                        <md-progress-bar mode="indeterminate" color="accent"></md-progress-bar>
+                    </span>
+                    <span *ngIf="row.downloadErrorMessage">
+                        <md-chip-list class="smart-padding-without-bottom">
+                            <md-chip color="warn" selected="true" [mdTooltip]="row.downloadErrorMessage" mdTooltipPosition="after">
+                                Fail to download!!
                             </md-chip>
                         </md-chip-list>
                     </span>

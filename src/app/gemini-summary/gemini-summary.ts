@@ -14,8 +14,11 @@ export class DynamoRow {
     other_host: string;
     begin_time: string;
     end_time: string;
+
     deleting?: boolean;
     deleteErrorMessage?: string;
+    downloading?: boolean;
+    downloadErrorMessage?: string;
 }
 
 export class Report {
@@ -54,7 +57,7 @@ export class Trial {
     other: ResponseSummary;
     path: string;
     request_time: string;
-    status: string
+    status: string;
 }
 
 export class ResponseSummary {
