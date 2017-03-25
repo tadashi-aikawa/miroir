@@ -9,8 +9,8 @@ import 'hammerjs';
 
 import {AppComponent} from './app.component';
 import {
-    GeminiSummaryComponent, DetailDialogContent, HoverComponent, StatusCodeComponent,
-    StatusComponent, DeleteConfirmDialogContent
+    GeminiSummaryComponent, DetailDialogComponent, HoverComponent, StatusCodeComponent,
+    StatusComponent, DeleteConfirmDialogComponent
 } from './gemini-summary/gemini-summary.component';
 import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
 
@@ -19,8 +19,8 @@ import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
         AppComponent,
         GeminiSummaryComponent,
         MergeViewerComponent,
-        DetailDialogContent,
-        DeleteConfirmDialogContent,
+        DetailDialogComponent,
+        DeleteConfirmDialogComponent,
         HoverComponent,
         StatusCodeComponent,
         StatusComponent
@@ -37,8 +37,8 @@ import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
         })
     ],
     entryComponents: [
-        DetailDialogContent,
-        DeleteConfirmDialogContent,
+        DetailDialogComponent,
+        DeleteConfirmDialogComponent,
         HoverComponent,
         StatusCodeComponent,
         StatusComponent

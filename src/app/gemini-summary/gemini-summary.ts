@@ -57,7 +57,7 @@ export class Trial {
     other: ResponseSummary;
     path: string;
     request_time: string;
-    status: string
+    status: string;
 }
 
 export class ResponseSummary {

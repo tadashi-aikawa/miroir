@@ -2,19 +2,18 @@ import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges} from '@an
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/merge/merge';
-//import 'mergely';
 
 
 function scrollToCenter(cm) {
-    const {line, ch} = cm.getCursor();
+    const {line} = cm.getCursor();
 
-    const top = cm.charCoords({line: line, ch: 0}, "local").top;
+    const top = cm.charCoords({line: line, ch: 0}, 'local').top;
     const halfWindowHeight = cm.getWrapperElement().offsetHeight / 2;
     cm.scrollTo(null, top - halfWindowHeight);
 }
 
 @Component({
-    selector: 'merge-viewer',
+    selector: 'app-merge-viewer',
     styleUrls: ['./merge-viewer.css'],
     template: `<div #view></div>`,
 })
@@ -27,18 +26,18 @@ export class MergeViewerComponent implements OnChanges {
     @ViewChild('view') view;
 
     ngOnChanges(changes: SimpleChanges): void {
-        this.config = changes["config"]["currentValue"];
-        this.view.nativeElement.innerHTML = "";
+        this.config = changes['config']['currentValue'];
+        this.view.nativeElement.innerHTML = '';
         if (this.config) {
             this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config);
-            this.setHeight(this.height || "70vh");
-            this.instance.editor().setOption("extraKeys", {
+            this.setHeight(this.height || '70vh');
+            this.instance.editor().setOption('extraKeys', {
                 'Alt-K': cm => {
-                    cm.execCommand("goNextDiff");
+                    cm.execCommand('goNextDiff');
                     scrollToCenter(cm);
                 },
                 'Alt-I': cm => {
-                    cm.execCommand("goPrevDiff");
+                    cm.execCommand('goPrevDiff');
                     scrollToCenter(cm)
 ;                },
             });
@@ -49,7 +48,11 @@ export class MergeViewerComponent implements OnChanges {
         const instanceAny: any = this.instance;
         instanceAny.wrap.style.height = height;
         this.instance.editor().setSize(null, height);
-        this.instance.leftOriginal() && this.instance.leftOriginal().setSize(null, height);
-        this.instance.rightOriginal() && this.instance.rightOriginal().setSize(null, height);
+        if (this.instance.leftOriginal()) {
+            this.instance.leftOriginal().setSize(null, height);
+        }
+        if (this.instance.rightOriginal()) {
+            this.instance.rightOriginal().setSize(null, height);
+        }
     }
 }

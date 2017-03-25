@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
-import {S3, DynamoDB} from 'aws-sdk'
-import {ObjectList} from 'aws-sdk/clients/s3'
+import {S3, DynamoDB} from 'aws-sdk';
+import {ObjectList} from 'aws-sdk/clients/s3';
 import {DynamoResult, Report} from './gemini-summary';
 import {AwsConfig} from '../models';
 
@@ -56,8 +56,8 @@ export class SummaryService {
 
     removeDetails(keys: string[], awsConfig: AwsConfig): Promise<any> {
         // WARNING: this method is alpha
-        if (keys.length == 0) {
-            return Promise.resolve("ok");
+        if (keys.length === 0) {
+            return Promise.resolve('ok');
         }
 
         const s3 = new S3({
@@ -92,7 +92,7 @@ export class SummaryService {
             };
 
             db.delete(params, (err, data) => {
-                return err ? reject(err.message) : resolve(data)
+                return err ? reject(err.message) : resolve(data);
             });
         });
     }
@@ -110,25 +110,25 @@ export class SummaryService {
             const params = {
                 TableName: awsConfig.table,
                 FilterExpression: [
-                    "contains(hashkey, :hashkey)",
-                    "contains(title, :title)",
-                    "contains(one_host, :one_host)",
-                    "contains(other_host, :other_host)",
-                    "contains(begin_time, :begin_time)",
-                    "contains(paths, :paths)"
-                ].join(" OR "),
+                    'contains(hashkey, :hashkey)',
+                    'contains(title, :title)',
+                    'contains(one_host, :one_host)',
+                    'contains(other_host, :other_host)',
+                    'contains(begin_time, :begin_time)',
+                    'contains(paths, :paths)'
+                ].join(' OR '),
                 ExpressionAttributeValues: {
-                    ":hashkey": keyWord,
-                    ":title": keyWord,
-                    ":one_host": keyWord,
-                    ":other_host": keyWord,
-                    ":begin_time": keyWord,
-                    ":paths": keyWord
+                    ':hashkey': keyWord,
+                    ':title': keyWord,
+                    ':one_host': keyWord,
+                    ':other_host': keyWord,
+                    ':begin_time': keyWord,
+                    ':paths': keyWord
                 }
             };
 
             db.scan(params, (err, data) => {
-                return err ? reject(err.message) : resolve(data)
+                return err ? reject(err.message) : resolve(data);
             });
         });
     }

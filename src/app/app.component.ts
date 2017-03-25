@@ -7,18 +7,18 @@ import { LocalStorageService } from 'angular-2-local-storage';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-    region: string = "ap-northeast-1";
-    accessKeyId: string = "";
-    secretAccessKey: string = "";
-    table: string = this.localStorageService.get<string>("table");
-    bucket: string = this.localStorageService.get<string>("bucket");
+    region = 'ap-northeast-1';
+    accessKeyId = '';
+    secretAccessKey = '';
+    table: string = this.localStorageService.get<string>('table');
+    bucket: string = this.localStorageService.get<string>('bucket');
 
-    constructor(private localStorageService: LocalStorageService){
+    constructor(private localStorageService: LocalStorageService) {
         // DO NOTHING
     }
 
     updateLocalStorage() {
-        this.localStorageService.set("table", this.table);
-        this.localStorageService.set("bucket", this.bucket);
+        this.localStorageService.set('table', this.table);
+        this.localStorageService.set('bucket', this.bucket);
     }
 }
