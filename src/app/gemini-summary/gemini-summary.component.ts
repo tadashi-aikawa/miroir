@@ -1,7 +1,7 @@
 import {DynamoResult, DynamoRow, Report, ResponseSummary, Trial} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
 import {Component, Input, Optional, AfterViewInit, OnInit} from '@angular/core';
-import {ObjectList} from 'aws-sdk/clients/s3'
+import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import * as CodeMirror from 'codemirror';
 import {MdDialogRef, MdDialog, MdSnackBar, MdSnackBarRef, SimpleSnackBar} from '@angular/material';
@@ -119,30 +119,49 @@ export class GeminiSummaryComponent {
     }
 
     downloadDetails(key: string, event) {
-        const fetchFile = (file: string) =>
-            this.service.fetchDetail(`${this.activeReport.key}/${file}`, this.awsConfig);
+        /**
+         * Fetch from S3 bucket
+         * @param file
+         * @return contents promise if file is not undefined else undefined promise
+         */
+        const fetchFile = (file: string): Promise<Object> =>
+            file ?
+                this.service.fetchDetail(`${key}/${file}`, this.awsConfig) :
+                Promise.resolve(undefined);
 
-        const zip = new JSZip();
-        const root = zip.folder(this.activeReport.key);
-        const one = root.folder("one");
-        const other = root.folder("othery");
+        const fetchFiles = (files: string[]): Promise<Object[]> =>
+            Promise.all(files.map(fetchFile));
 
+        const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey == key);
+        row.downloading = true;
         this.service.fetchReport(`${key}/report.json`, this.awsConfig)
             .then((r: Report) => {
-                Promise.all(
-                    r.trials.map((x: Trial) => x.other.file)
-                        .filter(f => f !== undefined)
-                        .map(f => fetchFile(`other/${f}`))
-                ).then(
-                    cs => cs.forEach((c, i) => other.file(r.trials, c))
-                )
+                Promise.all([
+                    fetchFiles(r.trials.map((x: Trial) => x.one.file)),
+                    fetchFiles(r.trials.map((x: Trial) => x.other.file))
+                ]).then((cs: Object[][]) => {
+                    row.downloading = false;
+                    const [ones, others] = cs;
+
+                    const root = new JSZip().folder(key);
+                    const one = root.folder("one");
+                    const other = root.folder("other");
+
+                    root.file("report.json", JSON.stringify(r, null, 4));
+                    ones.forEach((c, i) => c && one.file(`${i+1}-${r.trials[i].name}`, c));
+                    others.forEach((c, i) => c && other.file(`${i+1}-${r.trials[i].name}`, c));
+                    root.generateAsync({type: "blob"})
+                        .then(x => fileSaver.saveAs(x, `${row.title}-${key.substring(0,6)}.zip`));
+                }).catch(err => {
+                    row.downloading = false;
+                    row.downloadErrorMessage = err;
+                });
             })
             .catch(err => {
-                this.errorMessage = err;
+                row.downloading = false;
+                row.downloadErrorMessage = err;
             });
 
-        root.generateAsync({type: "blob"})
-            .then(x => fileSaver.saveAs(x, `${this.activeReport.key}.zip`));
         event.stopPropagation();
     }
 

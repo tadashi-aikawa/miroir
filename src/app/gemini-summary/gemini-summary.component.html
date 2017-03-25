@@ -51,6 +51,17 @@
                             </md-chip>
                         </md-chip-list>
                     </span>
+                    <span *ngIf="row.downloading">
+                        Prepare Downloading...
+                        <md-progress-bar mode="indeterminate" color="accent"></md-progress-bar>
+                    </span>
+                    <span *ngIf="row.downloadErrorMessage">
+                        <md-chip-list class="smart-padding-without-bottom">
+                            <md-chip color="warn" selected="true" [mdTooltip]="row.downloadErrorMessage" mdTooltipPosition="after">
+                                Fail to download!!
+                            </md-chip>
+                        </md-chip-list>
+                    </span>
                 </md-card-content>
             </md-card>
         </div>
