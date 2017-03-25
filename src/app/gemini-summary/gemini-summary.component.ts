@@ -243,14 +243,26 @@ export class GeminiSummaryComponent {
 @Component({
     template: `
     <h2>{{title}}</h2>
+    <div style="padding-bottom: 5px;">
+        <span *ngFor="let q of displayedQueries" color="primary" selected="true">
+            <md-chip color="primary" selected="true">
+                {{q.key}}
+            </md-chip>
+            <small>{{q.value}}</small>
+        </span>
+    </div>
     <div class="smart-padding-without-top">
+        <md-chip>Left</md-chip>
         <small>
-            <md-chip>Left</md-chip>
-            <div class="ellipsis-text" style="width: 30vw">{{trial.one.url}}</div>
+            <a [href]="trial.one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                {{trial.one.url}}
+            </a>
         </small>
+        <md-chip>Right</md-chip>
         <small>
-            <md-chip>Right</md-chip>
-            <div class="ellipsis-text" style="width: 30vw">{{trial.other.url}}</div>
+            <a [href]="trial.other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                {{trial.other.url}}
+            </a>
         </small>
     </div>
     <div *ngIf="isLoading" class="center" style="height: 50vh;">
@@ -264,14 +276,21 @@ export class GeminiSummaryComponent {
     </div>
   `,
 })
-export class DetailDialogComponent {
+export class DetailDialogComponent implements OnInit {
     @Input() title: string;
     @Input() trial: Trial;
     @Input() isLoading: boolean;
     @Input() mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
     @Input() errorMessage: string;
 
+    displayedQueries: {key: string, value: string}[];
+
     constructor(@Optional() public dialogRef: MdDialogRef<DetailDialogComponent>) {
+    }
+
+    ngOnInit(): void {
+        this.displayedQueries = Object.keys(this.trial.queries)
+            .map(k => ({key: k, value: this.trial.queries[k].join(', ')}));
     }
 }
 

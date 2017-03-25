@@ -4,6 +4,17 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/merge/merge';
 
 
+const EDITOR_KEY_BINDINGS = {
+    'K': cm => {
+        cm.execCommand('goNextDiff');
+        scrollToCenter(cm);
+    },
+    'I': cm => {
+        cm.execCommand('goPrevDiff');
+        scrollToCenter(cm);
+    }
+};
+
 function scrollToCenter(cm) {
     const {line} = cm.getCursor();
 
@@ -31,26 +42,8 @@ export class MergeViewerComponent implements OnChanges {
         if (this.config) {
             this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config);
             this.setHeight(this.height || '70vh');
-            this.instance.editor().setOption('extraKeys', {
-                'K': cm => {
-                    cm.execCommand('goNextDiff');
-                    scrollToCenter(cm);
-                },
-                'I': cm => {
-                    cm.execCommand('goPrevDiff');
-                    scrollToCenter(cm)
-;                },
-            });
-            this.instance.leftOriginal().setOption('extraKeys', {
-                'K': cm => {
-                    cm.execCommand('goNextDiff');
-                    scrollToCenter(cm);
-                },
-                'I': cm => {
-                    cm.execCommand('goPrevDiff');
-                    scrollToCenter(cm)
-                    ;                },
-            });
+            this.instance.editor().setOption('extraKeys', EDITOR_KEY_BINDINGS);
+            this.instance.leftOriginal().setOption('extraKeys', EDITOR_KEY_BINDINGS);
         }
     }
 
