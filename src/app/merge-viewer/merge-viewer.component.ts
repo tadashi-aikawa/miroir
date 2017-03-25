@@ -32,14 +32,24 @@ export class MergeViewerComponent implements OnChanges {
             this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config);
             this.setHeight(this.height || '70vh');
             this.instance.editor().setOption('extraKeys', {
-                'Alt-K': cm => {
+                'K': cm => {
                     cm.execCommand('goNextDiff');
                     scrollToCenter(cm);
                 },
-                'Alt-I': cm => {
+                'I': cm => {
                     cm.execCommand('goPrevDiff');
                     scrollToCenter(cm)
 ;                },
+            });
+            this.instance.leftOriginal().setOption('extraKeys', {
+                'K': cm => {
+                    cm.execCommand('goNextDiff');
+                    scrollToCenter(cm);
+                },
+                'I': cm => {
+                    cm.execCommand('goPrevDiff');
+                    scrollToCenter(cm)
+                    ;                },
             });
         }
     }
