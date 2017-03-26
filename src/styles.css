@@ -29,12 +29,10 @@ div.ellipsis-text {
     padding-right: 20px;
 }
 
-tr.ng2-smart-row:hover {
-    background-color: rgba(27, 27, 202, 0.15);
-}
 
-table.ng2-smart-table .ng2-smart-row.selected {
-    background: rgba(27, 27, 202, 0.3) !important;
+table.ng2-smart-table tr.ng2-smart-row:hover,
+table.ng2-smart-table tr.ng2-smart-row.selected:hover {
+    background-color: rgba(27, 27, 202, 0.15);
 }
 
 .CodeMirror-merge-l-chunk {

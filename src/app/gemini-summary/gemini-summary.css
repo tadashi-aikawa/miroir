@@ -10,12 +10,12 @@ md-sidenav-container {
     min-height: 1024px;
 }
 
-.summary-card {
+.summary-card.mat-card {
     margin: 10px;
     transition: all 0.5s ease;
-    box-shadow:2px 2px 5px !important;
-    border:0 solid #000 !important;
-    display: block !important;
+    box-shadow:2px 2px 5px;
+    border:0 solid #000;
+    display: block;
 }
 
 .summary-card:hover {
