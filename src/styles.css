@@ -29,6 +29,12 @@ div.ellipsis-text {
     padding-right: 20px;
 }
 
+.smart-padding-without-left {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+}
+
 
 table.ng2-smart-table tr.ng2-smart-row:hover,
 table.ng2-smart-table tr.ng2-smart-row.selected:hover {

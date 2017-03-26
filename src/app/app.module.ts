@@ -5,6 +5,7 @@ import {HttpModule} from '@angular/http';
 import {MaterialModule} from '@angular/material';
 import {Ng2SmartTableModule} from 'ng2-smart-table';
 import {LocalStorageModule} from 'angular-2-local-storage';
+import {SelectModule} from 'ng-select';
 import 'hammerjs';
 
 import {AppComponent} from './app.component';
@@ -31,6 +32,7 @@ import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
         HttpModule,
         MaterialModule,
         Ng2SmartTableModule,
+        SelectModule,
         LocalStorageModule.withConfig({
             prefix: 'gemini-viewer',
             storageType: 'localStorage'

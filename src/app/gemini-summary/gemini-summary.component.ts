@@ -8,6 +8,7 @@ import {MdDialogRef, MdDialog, MdSnackBar} from '@angular/material';
 import {AwsConfig} from '../models';
 import * as JSZip from 'jszip';
 import * as fileSaver from 'file-saver';
+import {IOption} from 'ng-select';
 
 const filterFunction = (v, q) => q.split(' and ').every(x => v.includes(x));
 
@@ -205,44 +206,32 @@ export class GeminiSummaryComponent {
     }
 
     showDetail(data: RowData) {
-        const fetchFile = (file: string) =>
-            this.service.fetchDetail(`${this.activeReport.key}/${file}`, this.awsConfig);
-
         const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '80vw',
             height: '97%'
         });
-        dialogRef.componentInstance.isLoading = true;
-        dialogRef.componentInstance.title = `${data.name} (${data.path})`;
+        dialogRef.componentInstance.reportKey = this.activeReport.key;
+        dialogRef.componentInstance.awsConfig = this.awsConfig;
         dialogRef.componentInstance.trial = data.trial;
-
-        // viewportMaring <==> search
-        Promise.all([fetchFile(data.trial.one.file), fetchFile(data.trial.other.file)])
-            .then((rs: string[]) => {
-                dialogRef.componentInstance.isLoading = false;
-                dialogRef.componentInstance.errorMessage = undefined;
-                dialogRef.componentInstance.mergeViewConfig = {
-                    value: rs[1],
-                    orig: undefined,
-                    origLeft: rs[0],
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    viewportMargin: 10,
-                    collapseIdentical: 30,
-                    readOnly: true
-                };
-            })
-            .catch(err => {
-                dialogRef.componentInstance.isLoading = false;
-                dialogRef.componentInstance.errorMessage = err;
-            });
+        this.tableSource.getElements()
+            .then(es => dialogRef.componentInstance.trials = es.map(x => x.trial));
     }
 
 }
 
 @Component({
-    template: `
-    <h2>{{title}}</h2>
+    template: `        
+    <ng-select
+        [options]="options"
+        [(ngModel)]="activeIndex"
+        [ngStyle]="{
+            'z-index': '99',
+            'font-size': '1.2rem'
+        }"
+        [className]="'smart-padding-without-left'"
+        (selected)="showTrial(trials[activeIndex])"
+    >
+    </ng-select>
     <div style="padding-bottom: 5px;">
         <span *ngFor="let q of displayedQueries" color="primary" selected="true">
             <md-chip color="primary" selected="true">
@@ -268,30 +257,73 @@ export class GeminiSummaryComponent {
     <div *ngIf="isLoading" class="center" style="height: 50vh;">
         <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
     </div>
-    <div *ngIf="!isLoading">
+    <div *ngIf="!isLoading && !errorMessage">
         <app-merge-viewer [config]="mergeViewConfig"></app-merge-viewer>
     </div>
     <div *ngIf="errorMessage">
         {{errorMessage}}
     </div>
   `,
+    providers: [
+        SummaryService
+    ]
 })
 export class DetailDialogComponent implements OnInit {
-    @Input() title: string;
+    @Input() reportKey: string;
     @Input() trial: Trial;
-    @Input() isLoading: boolean;
-    @Input() mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
-    @Input() errorMessage: string;
+    @Input() trials: Trial[];
+    @Input() awsConfig: AwsConfig;
 
+    activeIndex: string;
+    options: IOption[];
+    isLoading: boolean;
+    errorMessage: string;
+    mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
     displayedQueries: {key: string, value: string}[];
 
-    constructor(@Optional() public dialogRef: MdDialogRef<DetailDialogComponent>) {
+    constructor(private service: SummaryService, @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>) {
     }
 
     ngOnInit(): void {
-        this.displayedQueries = Object.keys(this.trial.queries)
-            .map(k => ({key: k, value: this.trial.queries[k].join(', ')}));
+        // value is index of trial
+        this.options = this.trials.map((t, i) => ({
+            label: `${i + 1}. ${t.name} (${t.path})`,
+            value: String(i)
+        }));
+        this.activeIndex = String(this.trials.findIndex(t => t === this.trial));
+        this.showTrial(this.trial);
     }
+
+    showTrial(trial: Trial): void {
+        this.displayedQueries = Object.keys(trial.queries)
+            .map(k => ({key: k, value: trial.queries[k].join(', ')}));
+        this.isLoading = true;
+
+        const fetchFile = (file: string) =>
+            this.service.fetchDetail(`${this.reportKey}/${file}`, this.awsConfig);
+
+        // viewportMaring <==> search
+        Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
+            .then((rs: string[]) => {
+                this.isLoading = false;
+                this.errorMessage = undefined;
+                this.mergeViewConfig = {
+                    value: rs[1],
+                    orig: undefined,
+                    origLeft: rs[0],
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    viewportMargin: 10,
+                    collapseIdentical: 30,
+                    readOnly: true
+                };
+            })
+            .catch(err => {
+                this.isLoading = false;
+                this.errorMessage = err;
+            });
+    }
+
 }
 
 @Component({
