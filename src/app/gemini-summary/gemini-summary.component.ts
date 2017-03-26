@@ -2,7 +2,7 @@ import {DynamoResult, DynamoRow, Report, Trial} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
 import {Component, Input, Optional, OnInit} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
-import {LocalDataSource, ViewCell} from 'ng2-smart-table';
+import {LocalDataSource, ViewCell} from 'ng2-smart-table/ng2-smart-table';
 import * as CodeMirror from 'codemirror';
 import {MdDialogRef, MdDialog, MdSnackBar} from '@angular/material';
 import {AwsConfig} from '../models';
@@ -213,7 +213,7 @@ export class GeminiSummaryComponent {
         dialogRef.componentInstance.reportKey = this.activeReport.key;
         dialogRef.componentInstance.awsConfig = this.awsConfig;
         dialogRef.componentInstance.trial = data.trial;
-        this.tableSource.getElements()
+        this.tableSource.getFilteredAndSorted()
             .then(es => dialogRef.componentInstance.trials = es.map(x => x.trial));
     }
 
