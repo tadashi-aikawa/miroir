@@ -262,6 +262,7 @@ export class GeminiSummaryComponent {
         <app-merge-viewer [config]="mergeViewConfig"
                           (onClickJ)="showPreviousTrial()"
                           (onClickL)="showNextTrial()"
+                          (onClickSlash)="openSelector()"
         >
         </app-merge-viewer>
     </div>
@@ -292,7 +293,8 @@ export class DetailDialogComponent implements OnInit {
                 private _hotkeysService: HotkeysService) {
         this._hotkeysService.add([
             new Hotkey('l', e => {this.showNextTrial(); return false; }),
-            new Hotkey('j', e => {this.showPreviousTrial(); return false; })
+            new Hotkey('j', e => {this.showPreviousTrial(); return false; }),
+            new Hotkey('/', e => {this.openSelector(); return false; })
         ]);
     }
 
@@ -324,6 +326,10 @@ export class DetailDialogComponent implements OnInit {
 
         this.showTrial(this.trials[index - 1]);
         this.activeIndex = String(index - 1);
+    }
+
+    openSelector(): void {
+        this.selector.open();
     }
 
     showTrial(trial: Trial): void {

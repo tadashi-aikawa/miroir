@@ -24,6 +24,7 @@ export class MergeViewerComponent implements OnChanges {
     @Output() instance: CodeMirror.MergeView.MergeViewEditor;
     @Output() onClickJ = new EventEmitter<void>();
     @Output() onClickL = new EventEmitter<void>();
+    @Output() onClickSlash = new EventEmitter<void>();
 
     @ViewChild('view') view;
 
@@ -38,7 +39,8 @@ export class MergeViewerComponent implements OnChanges {
                 scrollToCenter(cm);
             },
             'J': cm => this.onClickJ.emit(),
-            'L': cm => this.onClickL.emit()
+            'L': cm => this.onClickL.emit(),
+            '/': cm => this.onClickSlash.emit()
         };
 
         this.config = changes['config']['currentValue'];
