@@ -23,23 +23,25 @@ export class MergeViewerComponent implements OnChanges {
     @Input() height?: string;
 
     @Output() instance: CodeMirror.MergeView.MergeViewEditor;
-    @Output() onClickI = new EventEmitter<boolean>();
-    @Output() onClickK = new EventEmitter<boolean>();
-    @Output() onClickJ = new EventEmitter<void>();
-    @Output() onClickL = new EventEmitter<void>();
-    @Output() onClickSlash = new EventEmitter<void>();
-    @Output() onClickQuestion = new EventEmitter<void>();
+    @Output() onKeyI = new EventEmitter<boolean>();
+    @Output() onKeyK = new EventEmitter<boolean>();
+    @Output() onKeyJ = new EventEmitter<void>();
+    @Output() onKeyL = new EventEmitter<void>();
+    @Output() onKeyQ = new EventEmitter<void>();
+    @Output() onKeySlash = new EventEmitter<void>();
+    @Output() onKeyQuestion = new EventEmitter<void>();
 
     @ViewChild('view') view;
 
     ngOnChanges(changes: SimpleChanges): void {
         const editorKeyBinding = (isOrigin: boolean) => ({
-            'K': cm => this.onClickK.emit(isOrigin),
-            'I': cm => this.onClickI.emit(isOrigin),
-            'J': cm => this.onClickJ.emit(),
-            'L': cm => this.onClickL.emit(),
-            '/': cm => this.onClickSlash.emit(),
-            'Shift-/': cm => this.onClickQuestion.emit()
+            'K': cm => this.onKeyK.emit(isOrigin),
+            'I': cm => this.onKeyI.emit(isOrigin),
+            'J': cm => this.onKeyJ.emit(),
+            'L': cm => this.onKeyL.emit(),
+            'Q': cm => this.onKeyQ.emit(),
+            '/': cm => this.onKeySlash.emit(),
+            'Shift-/': cm => this.onKeyQuestion.emit()
         });
 
         this.config = changes['config']['currentValue'];
