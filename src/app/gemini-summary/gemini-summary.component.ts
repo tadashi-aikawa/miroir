@@ -303,10 +303,7 @@ export class DetailDialogComponent implements OnInit {
         dialogRef.config = {disableClose: true};
 
         // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
-        const hs = _hotkeysService.hotkeys.splice(0);
-        for (const h of hs) {
-            _hotkeysService.remove(h);
-        }
+        _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
         _hotkeysService.add([
             new Hotkey('k', e => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
