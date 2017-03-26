@@ -6,6 +6,7 @@ import {MaterialModule} from '@angular/material';
 import {Ng2SmartTableModule} from 'ng2-smart-table/ng2-smart-table';
 import {LocalStorageModule} from 'angular-2-local-storage';
 import {SelectModule} from 'ng-select';
+import {HotkeyModule} from 'angular2-hotkeys';
 import 'hammerjs';
 
 import {AppComponent} from './app.component';
@@ -14,6 +15,7 @@ import {
     StatusComponent, DeleteConfirmDialogComponent
 } from './gemini-summary/gemini-summary.component';
 import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
+import {CommonModule} from '@angular/common';
 
 @NgModule({
     declarations: [
@@ -33,6 +35,8 @@ import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
         MaterialModule,
         Ng2SmartTableModule,
         SelectModule,
+        CommonModule,
+        HotkeyModule.forRoot(),
         LocalStorageModule.withConfig({
             prefix: 'gemini-viewer',
             storageType: 'localStorage'

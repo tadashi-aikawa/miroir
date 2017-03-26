@@ -1,19 +1,8 @@
-import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges, EventEmitter} from '@angular/core';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/merge/merge';
 
-
-const EDITOR_KEY_BINDINGS = {
-    'K': cm => {
-        cm.execCommand('goNextDiff');
-        scrollToCenter(cm);
-    },
-    'I': cm => {
-        cm.execCommand('goPrevDiff');
-        scrollToCenter(cm);
-    }
-};
 
 function scrollToCenter(cm) {
     const {line} = cm.getCursor();
@@ -33,17 +22,32 @@ export class MergeViewerComponent implements OnChanges {
     @Input() config: CodeMirror.MergeView.MergeViewEditorConfiguration;
     @Input() height?: string;
     @Output() instance: CodeMirror.MergeView.MergeViewEditor;
+    @Output() onClickJ = new EventEmitter<void>();
+    @Output() onClickL = new EventEmitter<void>();
 
     @ViewChild('view') view;
 
     ngOnChanges(changes: SimpleChanges): void {
+        const editorKeyBinding = {
+            'K': cm => {
+                cm.execCommand('goNextDiff');
+                scrollToCenter(cm);
+            },
+            'I': cm => {
+                cm.execCommand('goPrevDiff');
+                scrollToCenter(cm);
+            },
+            'J': cm => this.onClickJ.emit(),
+            'L': cm => this.onClickL.emit()
+        };
+
         this.config = changes['config']['currentValue'];
         this.view.nativeElement.innerHTML = '';
         if (this.config) {
             this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config);
             this.setHeight(this.height || '70vh');
-            this.instance.editor().setOption('extraKeys', EDITOR_KEY_BINDINGS);
-            this.instance.leftOriginal().setOption('extraKeys', EDITOR_KEY_BINDINGS);
+            this.instance.editor().setOption('extraKeys', editorKeyBinding);
+            this.instance.leftOriginal().setOption('extraKeys', editorKeyBinding);
             this.instance.leftOriginal().focus();
         }
     }

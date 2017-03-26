@@ -1,6 +1,6 @@
 import {DynamoResult, DynamoRow, Report, Trial} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
-import {Component, Input, Optional, OnInit} from '@angular/core';
+import {Component, Input, Optional, OnInit, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table/ng2-smart-table';
 import * as CodeMirror from 'codemirror';
@@ -9,6 +9,7 @@ import {AwsConfig} from '../models';
 import * as JSZip from 'jszip';
 import * as fileSaver from 'file-saver';
 import {IOption} from 'ng-select';
+import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 
 const filterFunction = (v, q) => q.split(' and ').every(x => v.includes(x));
 
@@ -221,7 +222,7 @@ export class GeminiSummaryComponent {
 
 @Component({
     template: `        
-    <ng-select
+    <ng-select #selector
         [options]="options"
         [(ngModel)]="activeIndex"
         [ngStyle]="{
@@ -258,7 +259,11 @@ export class GeminiSummaryComponent {
         <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
     </div>
     <div *ngIf="!isLoading && !errorMessage">
-        <app-merge-viewer [config]="mergeViewConfig"></app-merge-viewer>
+        <app-merge-viewer [config]="mergeViewConfig"
+                          (onClickJ)="showPreviousTrial()"
+                          (onClickL)="showNextTrial()"
+        >
+        </app-merge-viewer>
     </div>
     <div *ngIf="errorMessage">
         {{errorMessage}}
@@ -273,6 +278,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() trial: Trial;
     @Input() trials: Trial[];
     @Input() awsConfig: AwsConfig;
+    @ViewChild('selector') selector;
 
     activeIndex: string;
     options: IOption[];
@@ -281,7 +287,13 @@ export class DetailDialogComponent implements OnInit {
     mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
     displayedQueries: {key: string, value: string}[];
 
-    constructor(private service: SummaryService, @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>) {
+    constructor(private service: SummaryService,
+                @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
+                private _hotkeysService: HotkeysService) {
+        this._hotkeysService.add([
+            new Hotkey('l', e => {this.showNextTrial(); return false; }),
+            new Hotkey('j', e => {this.showPreviousTrial(); return false; })
+        ]);
     }
 
     ngOnInit(): void {
@@ -292,6 +304,26 @@ export class DetailDialogComponent implements OnInit {
         }));
         this.activeIndex = String(this.trials.findIndex(t => t === this.trial));
         this.showTrial(this.trial);
+    }
+
+    showNextTrial(): boolean {
+        const index: number = Number(this.activeIndex);
+        if (index === this.trials.length - 1) {
+            return false;
+        }
+
+        this.showTrial(this.trials[index + 1]);
+        this.activeIndex = String(index + 1);
+    }
+
+    showPreviousTrial(): boolean {
+        const index: number = Number(this.activeIndex);
+        if (index === 0) {
+            return false;
+        }
+
+        this.showTrial(this.trials[index - 1]);
+        this.activeIndex = String(index - 1);
     }
 
     showTrial(trial: Trial): void {
