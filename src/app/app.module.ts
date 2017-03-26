@@ -36,7 +36,7 @@ import {CommonModule} from '@angular/common';
         Ng2SmartTableModule,
         SelectModule,
         CommonModule,
-        HotkeyModule.forRoot(),
+        HotkeyModule.forRoot({disableCheatSheet: true}),
         LocalStorageModule.withConfig({
             prefix: 'gemini-viewer',
             storageType: 'localStorage'

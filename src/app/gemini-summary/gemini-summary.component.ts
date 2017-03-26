@@ -259,16 +259,21 @@ export class GeminiSummaryComponent {
         <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
     </div>
     <div *ngIf="!isLoading && !errorMessage">
-        <app-merge-viewer [config]="mergeViewConfig"
+        <app-merge-viewer #mergeView
+                          [config]="mergeViewConfig"
+                          (onClickI)="mergeView.moveToPreviousDiff($event)"
+                          (onClickK)="mergeView.moveToNextDiff($event)"
                           (onClickJ)="showPreviousTrial()"
                           (onClickL)="showNextTrial()"
                           (onClickSlash)="openSelector()"
+                          (onClickQuestion)="toggleCheatSheet()"
         >
         </app-merge-viewer>
     </div>
     <div *ngIf="errorMessage">
         {{errorMessage}}
     </div>
+    <hotkeys-cheatsheet></hotkeys-cheatsheet>
   `,
     providers: [
         SummaryService
@@ -279,7 +284,9 @@ export class DetailDialogComponent implements OnInit {
     @Input() trial: Trial;
     @Input() trials: Trial[];
     @Input() awsConfig: AwsConfig;
+
     @ViewChild('selector') selector;
+    @ViewChild('mergeView') mergeView;
 
     activeIndex: string;
     options: IOption[];
@@ -291,10 +298,18 @@ export class DetailDialogComponent implements OnInit {
     constructor(private service: SummaryService,
                 @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService) {
-        this._hotkeysService.add([
-            new Hotkey('l', e => {this.showNextTrial(); return false; }),
-            new Hotkey('j', e => {this.showPreviousTrial(); return false; }),
-            new Hotkey('/', e => {this.openSelector(); return false; })
+        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
+        const hs = _hotkeysService.hotkeys.splice(0);
+        for (const h of hs) {
+            _hotkeysService.remove(h);
+        }
+        _hotkeysService.add([
+            new Hotkey('k', e => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
+            new Hotkey('i', e => {this.mergeView.moveToPreviousDiff(true); return false; }, null, 'Move to next diff.'),
+            new Hotkey('l', e => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
+            new Hotkey('j', e => {this.showPreviousTrial(); return false; }, null, 'Show previous trial.'),
+            new Hotkey('/', e => {this.openSelector(); return false; }, null, 'Open trial list'),
+            new Hotkey('?', e => {this.toggleCheatSheet(); return false; }, null, 'Open cheat sheet')
         ]);
     }
 
@@ -306,6 +321,10 @@ export class DetailDialogComponent implements OnInit {
         }));
         this.activeIndex = String(this.trials.findIndex(t => t === this.trial));
         this.showTrial(this.trial);
+    }
+
+    toggleCheatSheet(): void {
+        this._hotkeysService.cheatSheetToggle.next({});
     }
 
     showNextTrial(): boolean {
