@@ -1,4 +1,4 @@
-import {DynamoResult, DynamoRow, Report, Trial} from './gemini-summary';
+import {DynamoResult, DynamoRow, Report, Summary, Trial} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
 import {Component, Input, Optional, OnInit, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
@@ -200,22 +200,23 @@ export class GeminiSummaryComponent {
         event.stopPropagation();
     }
 
-    onSelectRow(data: RowData) {
-        data.trial.one.file || data.trial.other.file ?
-            this.showDetail(data) :
-            this.snackBar.open('There are no stored responsies.', 'Close', {duration: 3000});
+    onSelectRow(event: any) {
+        event.source.getFilteredAndSorted().then(es => {
+            this.showDetail(es.map(x => x.trial), es.findIndex(t => t === event.data));
+        });
     }
 
-    showDetail(data: RowData) {
+    showDetail(trials: Trial[], index: number) {
         const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '80vw',
             height: '97%'
         });
         dialogRef.componentInstance.reportKey = this.activeReport.key;
+        dialogRef.componentInstance.oneAccessPoint = this.activeReport.summary.one;
+        dialogRef.componentInstance.otherAccessPoint = this.activeReport.summary.other;
         dialogRef.componentInstance.awsConfig = this.awsConfig;
-        dialogRef.componentInstance.trial = data.trial;
-        this.tableSource.getFilteredAndSorted()
-            .then(es => dialogRef.componentInstance.trials = es.map(x => x.trial));
+        dialogRef.componentInstance.activeIndex = String(index);
+        dialogRef.componentInstance.trials = trials;
     }
 
 }
@@ -230,7 +231,7 @@ export class GeminiSummaryComponent {
             'font-size': '1.2rem'
         }"
         [className]="'smart-padding-without-left'"
-        (selected)="showTrial(trials[activeIndex])"
+        (selected)="showTrial(getActiveTrial())"
     >
     </ng-select>
     <div style="padding-bottom: 5px;">
@@ -241,19 +242,23 @@ export class GeminiSummaryComponent {
             <small>{{q.value}}</small>
         </span>
     </div>
-    <div class="smart-padding-without-top">
-        <md-chip>Left</md-chip>
-        <small>
-            <a [href]="trial.one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                {{trial.one.url}}
-            </a>
-        </small>
-        <md-chip>Right</md-chip>
-        <small>
-            <a [href]="trial.other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                {{trial.other.url}}
-            </a>
-        </small>
+    <div class="smart-padding-small" style="display: flex; justify-content: space-around">
+        <div>
+            <md-chip>{{oneAccessPoint.name}}</md-chip>
+            <small>
+                <a [href]="getActiveTrial().one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                    {{oneAccessPoint.host}}.....
+                </a>
+            </small>
+        </div>
+        <div>
+            <md-chip>{{otherAccessPoint.name}}</md-chip>
+            <small>
+                <a [href]="getActiveTrial().other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                    {{otherAccessPoint.host}}.....
+                </a>
+            </small>
+        </div>
     </div>
     <div *ngIf="isLoading" class="center" style="height: 50vh;">
         <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
@@ -282,7 +287,8 @@ export class GeminiSummaryComponent {
 })
 export class DetailDialogComponent implements OnInit {
     @Input() reportKey: string;
-    @Input() trial: Trial;
+    @Input() oneAccessPoint: AccessPoint;
+    @Input() otherAccessPoint: AccessPoint;
     @Input() trials: Trial[];
     @Input() awsConfig: AwsConfig;
 
@@ -322,8 +328,7 @@ export class DetailDialogComponent implements OnInit {
             label: `${i + 1}. ${t.name} (${t.path})`,
             value: String(i)
         }));
-        this.activeIndex = String(this.trials.findIndex(t => t === this.trial));
-        this.showTrial(this.trial);
+        this.showTrial(this.getActiveTrial());
     }
 
     toggleCheatSheet(): void {
@@ -332,6 +337,10 @@ export class DetailDialogComponent implements OnInit {
 
     closeDialog(): void {
         this.dialogRef.close();
+    }
+
+    getActiveTrial(): Trial {
+        return this.trials[this.activeIndex];
     }
 
     showNextTrial(): boolean {

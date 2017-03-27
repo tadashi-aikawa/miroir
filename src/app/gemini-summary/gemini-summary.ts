@@ -38,7 +38,8 @@ export class Summary {
   };
 }
 
-class AccessPoint {
+export class AccessPoint {
+  name: string;
   host: string;
   proxy?: String;
 }
