@@ -39,6 +39,21 @@ export class SummaryService {
         });
     }
 
+    fetchArchive(key: string, awsConfig: AwsConfig): Promise<Blob> {
+        return new Promise((resolve, reject) => {
+            const s3 = new S3({
+                apiVersion: '2006-03-01',
+                accessKeyId: awsConfig.accessKeyId,
+                secretAccessKey: awsConfig.secretAccessKey
+            });
+
+            s3.getObject(
+                {Key: key, Bucket: awsConfig.bucket},
+                (err, data) => err ? reject(err.message) : resolve(new Blob([data.Body]))
+            );
+        });
+    }
+
     fetchList(key: string, awsConfig: AwsConfig): Promise<ObjectList> {
         const s3 = new S3({
             apiVersion: '2006-03-01',

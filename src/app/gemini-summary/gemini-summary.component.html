@@ -24,7 +24,8 @@
                              class="action-icon hvr-buzz-out">
                         delete_forever
                     </md-icon>
-                    <md-icon (click)="downloadDetails(row.hashkey, $event)"
+                    <md-icon *ngIf="row.with_zip"
+                             (click)="downloadArchive(row.hashkey, $event)"
                              class="action-icon hvr-buzz-out">
                         cloud_download
                     </md-icon>

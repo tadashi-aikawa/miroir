@@ -14,6 +14,7 @@ export class DynamoRow {
     other_host: string;
     begin_time: string;
     end_time: string;
+    with_zip: boolean;
 
     deleting?: boolean;
     deleteErrorMessage?: string;
