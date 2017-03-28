@@ -80,6 +80,7 @@ export class GeminiSummaryComponent {
                 this.activeReport = r;
                 this.settings = {
                     columns: {
+                        seq: {title: 'Seq'},
                         name: {title: 'Name', filterFunction},
                         path: {title: 'Path', filterFunction},
                         status: {title: 'Status', type: 'custom', renderComponent: StatusComponent, filterFunction},
@@ -96,6 +97,7 @@ export class GeminiSummaryComponent {
                 };
                 this.tableSource.load(r.trials.map(t => (<RowData>{
                     trial: t,
+                    seq: t.seq,
                     name: t.name,
                     path: t.path,
                     status: t.status,
@@ -123,7 +125,7 @@ export class GeminiSummaryComponent {
         this.service.fetchArchive(`${key}/${zipName}`, this.awsConfig)
             .then(x => {
                 row.downloading = false;
-                fileSaver.saveAs(x, `${row.title}-${zipName}`)
+                fileSaver.saveAs(x, `${row.title}-${zipName}`);
             })
             .catch(err => {
                 row.downloading = false;
@@ -172,7 +174,7 @@ export class GeminiSummaryComponent {
 
     onSelectRow(event: any) {
         event.source.getFilteredAndSorted().then(es => {
-            this.showDetail(es.map(x => x.trial), es.findIndex(t => t === event.data));
+            this.showDetail(es.map(x => x.trial), es.findIndex(e => e === event.data));
         });
     }
 
@@ -295,7 +297,7 @@ export class DetailDialogComponent implements OnInit {
     ngOnInit(): void {
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
-            label: `${i + 1}. ${t.name} (${t.path})`,
+            label: `${t.seq}. ${t.name} (${t.path})`,
             value: String(i)
         }));
         this.showTrial(this.getActiveTrial());

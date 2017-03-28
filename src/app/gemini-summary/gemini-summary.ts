@@ -52,6 +52,7 @@ class Time {
 }
 
 export class Trial {
+    seq: number;
     name: string;
     headers: any;
     queries: any;
