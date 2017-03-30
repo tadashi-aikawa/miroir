@@ -1,10 +1,10 @@
-import {AccessPoint, DynamoResult, DynamoRow, Report, Summary, Trial} from './gemini-summary';
+import {AccessPoint, DynamoResult, DynamoRow, Report, Trial} from './gemini-summary';
 import {SummaryService} from './gemini-summary.service';
 import {Component, Input, Optional, OnInit, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
-import {LocalDataSource, ViewCell} from 'ng2-smart-table/ng2-smart-table';
+import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import * as CodeMirror from 'codemirror';
-import {MdDialogRef, MdDialog, MdSnackBar} from '@angular/material';
+import {MdDialogRef, MdDialog} from '@angular/material';
 import {AwsConfig} from '../models';
 import * as fileSaver from 'file-saver';
 import {IOption} from 'ng-select';
@@ -51,7 +51,7 @@ export class GeminiSummaryComponent {
     loadingReportKey: string;
     tableSource = new LocalDataSource();
 
-    constructor(private service: SummaryService, private _dialog: MdDialog, public snackBar: MdSnackBar) {
+    constructor(private service: SummaryService, private _dialog: MdDialog) {
     }
 
     searchReport(keyWord: string) {

@@ -3,7 +3,7 @@ import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {MaterialModule} from '@angular/material';
-import {Ng2SmartTableModule} from 'ng2-smart-table/ng2-smart-table';
+import {Ng2SmartTableModule} from 'ng2-smart-table';
 import {LocalStorageModule} from 'angular-2-local-storage';
 import {SelectModule} from 'ng-select';
 import {HotkeyModule} from 'angular2-hotkeys';
