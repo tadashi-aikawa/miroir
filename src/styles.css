@@ -71,3 +71,7 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
     text-decoration: line-through;
     background: rgba(255, 170, 170, 1.0) none;
 }
+
+.action-icon {
+    cursor : pointer;
+}

@@ -12,6 +12,17 @@ function scrollToCenter(cm) {
     cm.scrollTo(null, top - halfWindowHeight);
 }
 
+function optimizeFormat(value: string): string {
+    // TODO: Not json case
+    return JSON.stringify(
+        JSON.parse(value),
+        (_, v) => (!(v instanceof Array || v === null) && typeof v === 'object') ?
+            Object.keys(v).sort().reduce((r, k) => { r[k] = v[k]; return r; }, {}) :
+            v,
+        4
+    );
+}
+
 @Component({
     selector: 'app-merge-viewer',
     styleUrls: ['./merge-viewer.css'],
@@ -35,6 +46,13 @@ export class MergeViewerComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         const editorKeyBinding = (isOrigin: boolean) => ({
+            'F': cm => {
+                cm.setValue(optimizeFormat(cm.getValue()));
+
+                const another = cm === this.instance.editor() ? this.instance.leftOriginal() : this.instance.editor();
+                // To reset the collapsed state
+                another.setValue(another.getValue());
+            },
             'K': cm => this.onKeyK.emit(isOrigin),
             'I': cm => this.onKeyI.emit(isOrigin),
             'J': cm => this.onKeyJ.emit(),
@@ -70,12 +88,11 @@ export class MergeViewerComponent implements OnChanges {
     private setHeight(height: string) {
         const instanceAny: any = this.instance;
         instanceAny.wrap.style.height = height;
+
         this.instance.editor().setSize(null, height);
-        if (this.instance.leftOriginal()) {
-            this.instance.leftOriginal().setSize(null, height);
-        }
-        if (this.instance.rightOriginal()) {
-            this.instance.rightOriginal().setSize(null, height);
-        }
+        this.instance.editor().setOption('readOnly', false);
+
+        this.instance.leftOriginal().setSize(null, height);
+        this.instance.leftOriginal().setOption('readOnly', false);
     }
 }

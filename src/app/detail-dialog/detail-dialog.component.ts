@@ -40,6 +40,7 @@ export class DetailDialogComponent implements OnInit {
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
         _hotkeysService.add([
+            new Hotkey('f', e => { return false; }, null, 'Formatting text in active editor.'),
             new Hotkey('k', e => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
             new Hotkey('i', e => {this.mergeView.moveToPreviousDiff(true); return false; }, null, 'Move to next diff.'),
             new Hotkey('l', e => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
