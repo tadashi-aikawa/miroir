@@ -19,16 +19,10 @@
                             ['hvr-curl-bottom-right', 'summary-card']"
             >
                 <md-card-header>
-                    <md-card-title>{{row.title}}</md-card-title>
-                    <md-icon (click)="removeDetail(row.hashkey, $event)"
-                             class="action-icon hvr-buzz-out">
-                        delete_forever
-                    </md-icon>
-                    <md-icon *ngIf="row.with_zip"
-                             (click)="downloadArchive(row.hashkey, $event)"
-                             class="action-icon hvr-buzz-out">
-                        cloud_download
-                    </md-icon>
+                    <md-card-title>
+                        {{row.title}}
+                        <span class="card-hashkey-text">({{row.hashkey.substring(0, 6)}})</span>
+                    </md-card-title>
                     <md-card-subtitle>{{row.begin_time}}</md-card-subtitle>
                 </md-card-header>
                 <md-card-content>
@@ -64,6 +58,17 @@
                         </md-chip-list>
                     </span>
                 </md-card-content>
+                <md-card-actions>
+                    <md-icon (click)="removeDetail(row.hashkey, $event)"
+                             class="action-icon hvr-buzz-out">
+                        delete_forever
+                    </md-icon>
+                    <md-icon *ngIf="row.with_zip"
+                             (click)="downloadArchive(row.hashkey, $event)"
+                             class="action-icon hvr-buzz-out">
+                        cloud_download
+                    </md-icon>
+                </md-card-actions>
             </md-card>
         </div>
     </md-sidenav>
@@ -82,7 +87,10 @@
                 <md-icon>access_time</md-icon>
                 <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}</small>
             </div>
-            <h2>{{activeReport.title}}</h2>
+            <h2>
+                {{activeReport.title}}
+                <span class="hashkey-text">({{activeReport.key.substring(0, 6)}})</span>
+            </h2>
             <div class="smart-padding-without-top">
                 <small><md-chip>Left</md-chip> {{activeReport.summary.one.host}}</small>
                 <small><md-chip>Right</md-chip> {{activeReport.summary.other.host}}</small>

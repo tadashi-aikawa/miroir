@@ -30,3 +30,13 @@ md-sidenav-container {
 .action-icon {
     cursor : pointer;
 }
+
+.card-hashkey-text {
+    color: gray;
+    font-size: 80%;
+}
+
+.hashkey-text {
+    color: gray;
+    font-size: 50%;
+}
