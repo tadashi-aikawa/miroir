@@ -47,7 +47,8 @@ export class MergeViewerComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         const editorKeyBinding = (isOrigin: boolean) => ({
             'F': cm => {
-                cm.setValue(optimizeFormat(cm.getValue()));
+                // Support for response of JSONView extension
+                cm.setValue(optimizeFormat(cm.getValue().replace(/^([^":\[\]{},]+):/mg, '"$1":')));
 
                 const another = cm === this.instance.editor() ? this.instance.leftOriginal() : this.instance.editor();
                 // To reset the collapsed state
