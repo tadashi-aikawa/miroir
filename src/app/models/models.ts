@@ -78,3 +78,8 @@ export class ResponseSummary {
     url: string;
     file?: string;
 }
+
+export class Pair<T> {
+    one: T;
+    other: T;
+}

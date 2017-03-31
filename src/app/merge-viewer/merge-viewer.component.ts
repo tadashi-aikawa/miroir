@@ -2,6 +2,7 @@ import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges, EventEmit
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/merge/merge';
+import {Pair} from '../models/models';
 
 
 function scrollToCenter(cm) {
@@ -12,7 +13,7 @@ function scrollToCenter(cm) {
     cm.scrollTo(null, top - halfWindowHeight);
 }
 
-function optimizeFormat(value: string): string {
+function pretty(value: string): string {
     // TODO: Not json case
     return JSON.stringify(
         JSON.parse(value),
@@ -34,6 +35,7 @@ export class MergeViewerComponent implements OnChanges {
     @Input() height?: string;
 
     @Output() instance: CodeMirror.MergeView.MergeViewEditor;
+    @Output() onKeyF = new EventEmitter<Pair<string>>();
     @Output() onKeyI = new EventEmitter<boolean>();
     @Output() onKeyK = new EventEmitter<boolean>();
     @Output() onKeyJ = new EventEmitter<void>();
@@ -48,11 +50,12 @@ export class MergeViewerComponent implements OnChanges {
         const editorKeyBinding = (isOrigin: boolean) => ({
             'F': cm => {
                 // Support for response of JSONView extension
-                cm.setValue(optimizeFormat(cm.getValue().replace(/^([^":\[\]{},]+):/mg, '"$1":')));
+                const optimizeFormat = (target) => pretty(target.replace(/^([^":\[\]{},]+):/mg, '"$1":'));
 
-                const another = cm === this.instance.editor() ? this.instance.leftOriginal() : this.instance.editor();
-                // To reset the collapsed state
-                another.setValue(another.getValue());
+                const one = optimizeFormat(this.instance.leftOriginal().getValue());
+                const other = optimizeFormat(this.instance.editor().getValue());
+
+                this.onKeyF.emit({one, other});
             },
             'K': cm => this.onKeyK.emit(isOrigin),
             'I': cm => this.onKeyI.emit(isOrigin),

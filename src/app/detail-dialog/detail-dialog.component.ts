@@ -1,10 +1,24 @@
-import {AccessPoint, AwsConfig, Trial} from '../models/models';
+import {AccessPoint, AwsConfig, Pair, Trial} from '../models/models';
 import {AwsService} from '../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
 import {MdDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
+
+
+function createConfig(one: string, other: string): CodeMirror.MergeView.MergeViewEditorConfiguration {
+    return {
+        value: other,
+        orig: undefined,
+        origLeft: one,
+        lineNumbers: true,
+        lineWrapping: true,
+        viewportMargin: 10,
+        collapseIdentical: 30,
+        readOnly: true
+    };
+}
 
 
 @Component({
@@ -96,6 +110,10 @@ export class DetailDialogComponent implements OnInit {
         this.selector.open();
     }
 
+    updateValues(pair: Pair<string>): void {
+        this.mergeViewConfig = createConfig(pair.one, pair.other);
+    }
+
     showTrial(trial: Trial): void {
         this.displayedQueries = Object.keys(trial.queries)
             .map(k => ({key: k, value: trial.queries[k].join(', ')}));
@@ -109,16 +127,7 @@ export class DetailDialogComponent implements OnInit {
             .then((rs: string[]) => {
                 this.isLoading = false;
                 this.errorMessage = undefined;
-                this.mergeViewConfig = {
-                    value: rs[1],
-                    orig: undefined,
-                    origLeft: rs[0],
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    viewportMargin: 10,
-                    collapseIdentical: 30,
-                    readOnly: true
-                };
+                this.mergeViewConfig = createConfig(rs[0], rs[1]);
             })
             .catch(err => {
                 this.isLoading = false;

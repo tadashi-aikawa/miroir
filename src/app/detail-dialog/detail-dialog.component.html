@@ -41,6 +41,7 @@
 <div *ngIf="!isLoading && !errorMessage">
     <app-merge-viewer #mergeView
                       [config]="mergeViewConfig"
+                      (onKeyF)="updateValues($event)"
                       (onKeyI)="mergeView.moveToPreviousDiff($event)"
                       (onKeyK)="mergeView.moveToNextDiff($event)"
                       (onKeyJ)="showPreviousTrial()"
