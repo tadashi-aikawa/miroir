@@ -1,0 +1,57 @@
+<ng-select #selector
+           [options]="options"
+           [(ngModel)]="activeIndex"
+           [ngStyle]="{
+            'z-index': '99',
+            'font-size': '1.2rem'
+        }"
+           [className]="'smart-padding-without-left'"
+           (selected)="showTrial(getActiveTrial())"
+>
+</ng-select>
+<div style="padding-bottom: 5px;">
+        <span *ngFor="let q of displayedQueries" color="primary" selected="true">
+            <md-chip color="primary" selected="true">
+                {{q.key}}
+            </md-chip>
+            <small>{{q.value}}</small>
+        </span>
+</div>
+<div class="smart-padding-small" style="display: flex; justify-content: space-around">
+    <div>
+        <md-chip>{{oneAccessPoint.name}}</md-chip>
+        <small>
+            <a [href]="getActiveTrial().one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                {{oneAccessPoint.host}}.....
+            </a>
+        </small>
+    </div>
+    <div>
+        <md-chip>{{otherAccessPoint.name}}</md-chip>
+        <small>
+            <a [href]="getActiveTrial().other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                {{otherAccessPoint.host}}.....
+            </a>
+        </small>
+    </div>
+</div>
+<div *ngIf="isLoading" class="center" style="height: 50vh;">
+    <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
+</div>
+<div *ngIf="!isLoading && !errorMessage">
+    <app-merge-viewer #mergeView
+                      [config]="mergeViewConfig"
+                      (onKeyI)="mergeView.moveToPreviousDiff($event)"
+                      (onKeyK)="mergeView.moveToNextDiff($event)"
+                      (onKeyJ)="showPreviousTrial()"
+                      (onKeyL)="showNextTrial()"
+                      (onKeySlash)="openSelector()"
+                      (onKeyQ)="closeDialog()"
+                      (onKeyQuestion)="toggleCheatSheet()"
+    >
+    </app-merge-viewer>
+</div>
+<div *ngIf="errorMessage">
+    {{errorMessage}}
+</div>
+<hotkeys-cheatsheet></hotkeys-cheatsheet>

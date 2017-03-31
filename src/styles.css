@@ -40,9 +40,9 @@ div.ellipsis-text {
 }
 
 
-table.ng2-smart-table tr.ng2-smart-row:hover,
-table.ng2-smart-table tr.ng2-smart-row.selected:hover {
-    background-color: rgba(27, 27, 202, 0.15);
+tr.ng2-smart-row:hover,
+div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.selected:hover {
+    background: rgba(27, 27, 202, 0.15);
 }
 
 .CodeMirror-merge-l-chunk {

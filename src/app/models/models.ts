@@ -1,3 +1,11 @@
+export class AwsConfig {
+    region: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+    table: string;
+    bucket: string;
+}
+
 export class DynamoResult {
     Count: number;
     ScannedCount: number;
@@ -30,25 +38,25 @@ export class Report {
 }
 
 export class Summary {
-  one: AccessPoint;
-  other: AccessPoint;
-  time: Time;
-  status: {
-      same: number;
-      different: number;
-  };
+    one: AccessPoint;
+    other: AccessPoint;
+    time: Time;
+    status: {
+        same: number;
+        different: number;
+    };
 }
 
 export class AccessPoint {
-  name: string;
-  host: string;
-  proxy?: String;
+    name: string;
+    host: string;
+    proxy?: String;
 }
 
 class Time {
-  elapsed_sec: number;
-  start: string;
-  end: string;
+    elapsed_sec: number;
+    start: string;
+    end: string;
 }
 
 export class Trial {

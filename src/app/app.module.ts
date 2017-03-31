@@ -11,11 +11,15 @@ import 'hammerjs';
 
 import {AppComponent} from './app.component';
 import {
-    GeminiSummaryComponent, DetailDialogComponent, HoverComponent, StatusCodeComponent,
-    StatusComponent, DeleteConfirmDialogComponent
+    DeleteConfirmDialogComponent,
+    GeminiSummaryComponent,
+    HoverComponent,
+    StatusCodeComponent,
+    StatusComponent
 } from './gemini-summary/gemini-summary.component';
 import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
 import {CommonModule} from '@angular/common';
+import {DetailDialogComponent} from './detail-dialog/detail-dialog.component';
 
 @NgModule({
     declarations: [

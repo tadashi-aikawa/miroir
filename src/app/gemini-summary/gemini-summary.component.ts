@@ -1,14 +1,11 @@
-import {AccessPoint, DynamoResult, DynamoRow, Report, Trial} from './gemini-summary';
-import {SummaryService} from './gemini-summary.service';
-import {Component, Input, Optional, OnInit, ViewChild} from '@angular/core';
+import {AwsConfig, DynamoResult, DynamoRow, Report, Trial} from '../models/models';
+import {AwsService} from '../services/aws-service';
+import {Component, Input, OnInit, Optional} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
-import * as CodeMirror from 'codemirror';
-import {MdDialogRef, MdDialog} from '@angular/material';
-import {AwsConfig} from '../models';
+import {MdDialog, MdDialogRef} from '@angular/material';
 import * as fileSaver from 'file-saver';
-import {IOption} from 'ng-select';
-import {Hotkey, HotkeysService} from 'angular2-hotkeys';
+import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 
 const filterFunction = (v, q) => q.split(' and ').every(x => v.includes(x));
 
@@ -35,7 +32,7 @@ interface RowData {
         '../../../node_modules/hover.css/css/hover.css'
     ],
     providers: [
-        SummaryService
+        AwsService
     ]
 })
 export class GeminiSummaryComponent {
@@ -51,7 +48,7 @@ export class GeminiSummaryComponent {
     loadingReportKey: string;
     tableSource = new LocalDataSource();
 
-    constructor(private service: SummaryService, private _dialog: MdDialog) {
+    constructor(private service: AwsService, private _dialog: MdDialog) {
     }
 
     searchReport(keyWord: string) {
@@ -193,183 +190,6 @@ export class GeminiSummaryComponent {
 
 }
 
-@Component({
-    template: `        
-    <ng-select #selector
-        [options]="options"
-        [(ngModel)]="activeIndex"
-        [ngStyle]="{
-            'z-index': '99',
-            'font-size': '1.2rem'
-        }"
-        [className]="'smart-padding-without-left'"
-        (selected)="showTrial(getActiveTrial())"
-    >
-    </ng-select>
-    <div style="padding-bottom: 5px;">
-        <span *ngFor="let q of displayedQueries" color="primary" selected="true">
-            <md-chip color="primary" selected="true">
-                {{q.key}}
-            </md-chip>
-            <small>{{q.value}}</small>
-        </span>
-    </div>
-    <div class="smart-padding-small" style="display: flex; justify-content: space-around">
-        <div>
-            <md-chip>{{oneAccessPoint.name}}</md-chip>
-            <small>
-                <a [href]="getActiveTrial().one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                    {{oneAccessPoint.host}}.....
-                </a>
-            </small>
-        </div>
-        <div>
-            <md-chip>{{otherAccessPoint.name}}</md-chip>
-            <small>
-                <a [href]="getActiveTrial().other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                    {{otherAccessPoint.host}}.....
-                </a>
-            </small>
-        </div>
-    </div>
-    <div *ngIf="isLoading" class="center" style="height: 50vh;">
-        <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
-    </div>
-    <div *ngIf="!isLoading && !errorMessage">
-        <app-merge-viewer #mergeView
-                          [config]="mergeViewConfig"
-                          (onKeyI)="mergeView.moveToPreviousDiff($event)"
-                          (onKeyK)="mergeView.moveToNextDiff($event)"
-                          (onKeyJ)="showPreviousTrial()"
-                          (onKeyL)="showNextTrial()"
-                          (onKeySlash)="openSelector()"
-                          (onKeyQ)="closeDialog()"
-                          (onKeyQuestion)="toggleCheatSheet()"
-        >
-        </app-merge-viewer>
-    </div>
-    <div *ngIf="errorMessage">
-        {{errorMessage}}
-    </div>
-    <hotkeys-cheatsheet></hotkeys-cheatsheet>
-  `,
-    providers: [
-        SummaryService
-    ]
-})
-export class DetailDialogComponent implements OnInit {
-    @Input() reportKey: string;
-    @Input() oneAccessPoint: AccessPoint;
-    @Input() otherAccessPoint: AccessPoint;
-    @Input() trials: Trial[];
-    @Input() awsConfig: AwsConfig;
-
-    @ViewChild('selector') selector;
-    @ViewChild('mergeView') mergeView;
-
-    activeIndex: string;
-    options: IOption[];
-    isLoading: boolean;
-    errorMessage: string;
-    mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
-    displayedQueries: {key: string, value: string}[];
-
-    constructor(private service: SummaryService,
-                @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
-                private _hotkeysService: HotkeysService) {
-        // To prevent from unexpected close
-        dialogRef.config = {disableClose: true};
-
-        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
-        _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
-
-        _hotkeysService.add([
-            new Hotkey('k', e => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
-            new Hotkey('i', e => {this.mergeView.moveToPreviousDiff(true); return false; }, null, 'Move to next diff.'),
-            new Hotkey('l', e => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
-            new Hotkey('j', e => {this.showPreviousTrial(); return false; }, null, 'Show previous trial.'),
-            new Hotkey('/', e => {this.openSelector(); return false; }, null, 'Open trial list'),
-            new Hotkey('q', e => {this.closeDialog(); return false; }, null, 'Close this dialog'),
-            new Hotkey('?', e => {this.toggleCheatSheet(); return false; }, null, 'Open cheat sheet')
-        ]);
-    }
-
-    ngOnInit(): void {
-        // value is index of trial
-        this.options = this.trials.map((t, i) => ({
-            label: `${t.seq}. ${t.name} (${t.path})`,
-            value: String(i)
-        }));
-        this.showTrial(this.getActiveTrial());
-    }
-
-    toggleCheatSheet(): void {
-        this._hotkeysService.cheatSheetToggle.next({});
-    }
-
-    closeDialog(): void {
-        this.dialogRef.close();
-    }
-
-    getActiveTrial(): Trial {
-        return this.trials[this.activeIndex];
-    }
-
-    showNextTrial(): boolean {
-        const index: number = Number(this.activeIndex);
-        if (index === this.trials.length - 1) {
-            return false;
-        }
-
-        this.showTrial(this.trials[index + 1]);
-        this.activeIndex = String(index + 1);
-    }
-
-    showPreviousTrial(): boolean {
-        const index: number = Number(this.activeIndex);
-        if (index === 0) {
-            return false;
-        }
-
-        this.showTrial(this.trials[index - 1]);
-        this.activeIndex = String(index - 1);
-    }
-
-    openSelector(): void {
-        this.selector.open();
-    }
-
-    showTrial(trial: Trial): void {
-        this.displayedQueries = Object.keys(trial.queries)
-            .map(k => ({key: k, value: trial.queries[k].join(', ')}));
-        this.isLoading = true;
-
-        const fetchFile = (file: string) =>
-            this.service.fetchDetail(`${this.reportKey}/${file}`, this.awsConfig);
-
-        // viewportMaring <==> search
-        Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
-            .then((rs: string[]) => {
-                this.isLoading = false;
-                this.errorMessage = undefined;
-                this.mergeViewConfig = {
-                    value: rs[1],
-                    orig: undefined,
-                    origLeft: rs[0],
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    viewportMargin: 10,
-                    collapseIdentical: 30,
-                    readOnly: true
-                };
-            })
-            .catch(err => {
-                this.isLoading = false;
-                this.errorMessage = err;
-            });
-    }
-
-}
 
 @Component({
     template: `    

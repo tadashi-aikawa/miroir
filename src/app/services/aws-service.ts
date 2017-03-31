@@ -3,11 +3,11 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import {S3, DynamoDB} from 'aws-sdk';
 import {ObjectList} from 'aws-sdk/clients/s3';
-import {DynamoResult, Report} from './gemini-summary';
-import {AwsConfig} from '../models';
+import {DynamoResult, Report} from '../models/models';
+import {AwsConfig} from '../models/models';
 
 @Injectable()
-export class SummaryService {
+export class AwsService {
 
     fetchDetail(key: string, awsConfig: AwsConfig): Promise<Object> {
         return new Promise((resolve, reject) => {
