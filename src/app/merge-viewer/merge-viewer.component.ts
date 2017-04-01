@@ -89,6 +89,11 @@ export class MergeViewerComponent implements OnChanges {
         scrollToCenter(cm);
     }
 
+    updateView() {
+        this.instance.leftOriginal().refresh();
+        this.instance.editor().refresh();
+    }
+
     private setHeight(height: string) {
         const instanceAny: any = this.instance;
         instanceAny.wrap.style.height = height;

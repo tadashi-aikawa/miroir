@@ -93,7 +93,7 @@ export class GeminiSummaryComponent {
                     actions: false
                 };
                 this.tableSource.load(r.trials.map(t => (<RowData>{
-                    trial: t,
+                    trial: Object.assign(new Trial(), t),
                     seq: t.seq,
                     name: t.name,
                     path: t.path,

@@ -69,6 +69,10 @@ export class Trial {
     path: string;
     request_time: string;
     status: string;
+
+    hasResponse(): boolean {
+        return this.one.file !== undefined && this.other.file !== undefined;
+    }
 }
 
 export class ResponseSummary {

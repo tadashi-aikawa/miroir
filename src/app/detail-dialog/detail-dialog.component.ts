@@ -2,10 +2,16 @@ import {AccessPoint, AwsConfig, Pair, Trial} from '../models/models';
 import {AwsService} from '../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
-import {MdDialogRef} from '@angular/material';
+import {MdDialogRef, MdTabChangeEvent} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
+import {LocalDataSource} from 'ng2-smart-table';
 
+
+interface RowData {
+    key: string;
+    value: string;
+}
 
 function createConfig(one: string, other: string): CodeMirror.MergeView.MergeViewEditorConfiguration {
     return {
@@ -20,9 +26,11 @@ function createConfig(one: string, other: string): CodeMirror.MergeView.MergeVie
     };
 }
 
-
 @Component({
     templateUrl: './detail-dialog.component.html',
+    styleUrls: [
+        './detail-dialog.css'
+    ],
     providers: [
         AwsService
     ]
@@ -36,6 +44,9 @@ export class DetailDialogComponent implements OnInit {
 
     @ViewChild('selector') selector;
     @ViewChild('mergeView') mergeView;
+
+    tableSettings: any;
+    tableSource = new LocalDataSource();
 
     activeIndex: string;
     options: IOption[];
@@ -71,6 +82,14 @@ export class DetailDialogComponent implements OnInit {
             label: `${t.seq}. ${t.name} (${t.path})`,
             value: String(i)
         }));
+
+        this.tableSettings = {
+            columns: {
+                key: {title: 'Key'},
+                value: {title: 'Value'}
+            },
+            actions: false
+        };
         this.showTrial(this.getActiveTrial());
     }
 
@@ -115,24 +134,35 @@ export class DetailDialogComponent implements OnInit {
     }
 
     showTrial(trial: Trial): void {
-        this.displayedQueries = Object.keys(trial.queries)
-            .map(k => ({key: k, value: trial.queries[k].join(', ')}));
-        this.isLoading = true;
-
         const fetchFile = (file: string) =>
             this.service.fetchDetail(`${this.reportKey}/${file}`, this.awsConfig);
 
-        // viewportMaring <==> search
-        Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
-            .then((rs: string[]) => {
-                this.isLoading = false;
-                this.errorMessage = undefined;
-                this.mergeViewConfig = createConfig(rs[0], rs[1]);
-            })
-            .catch(err => {
-                this.isLoading = false;
-                this.errorMessage = err;
-            });
+        this.displayedQueries = Object.keys(trial.queries)
+            .map(k => ({key: k, value: trial.queries[k].join(', ')}));
+        this.tableSource.load(this.displayedQueries.map(t => (<RowData>{
+            key: t.key,
+            value: t.value
+        })));
+
+        if (trial.hasResponse()) {
+            this.isLoading = true;
+            Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
+                .then((rs: string[]) => {
+                    this.isLoading = false;
+                    this.errorMessage = undefined;
+                    this.mergeViewConfig = createConfig(rs[0], rs[1]);
+                })
+                .catch(err => {
+                    this.isLoading = false;
+                    this.errorMessage = err;
+                });
+        }
+    }
+
+    changeTab(event: MdTabChangeEvent): void {
+        if (event.index === 0) {
+            this.mergeView.updateView();
+        }
     }
 
 }
