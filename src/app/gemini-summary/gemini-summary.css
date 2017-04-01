@@ -27,6 +27,12 @@ md-sidenav-container {
     background-color: rgba(27, 27, 202, 0.3);
 }
 
-.action-icon {
-    cursor : pointer;
+.card-hashkey-text {
+    color: gray;
+    font-size: 80%;
+}
+
+.hashkey-text {
+    color: gray;
+    font-size: 50%;
 }

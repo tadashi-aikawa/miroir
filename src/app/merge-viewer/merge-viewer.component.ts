@@ -2,6 +2,7 @@ import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges, EventEmit
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/merge/merge';
+import {Pair} from '../models/models';
 
 
 function scrollToCenter(cm) {
@@ -10,6 +11,17 @@ function scrollToCenter(cm) {
     const top = cm.charCoords({line: line, ch: 0}, 'local').top;
     const halfWindowHeight = cm.getWrapperElement().offsetHeight / 2;
     cm.scrollTo(null, top - halfWindowHeight);
+}
+
+function pretty(value: string): string {
+    // TODO: Not json case
+    return JSON.stringify(
+        JSON.parse(value),
+        (_, v) => (!(v instanceof Array || v === null) && typeof v === 'object') ?
+            Object.keys(v).sort().reduce((r, k) => { r[k] = v[k]; return r; }, {}) :
+            v,
+        4
+    );
 }
 
 @Component({
@@ -23,6 +35,7 @@ export class MergeViewerComponent implements OnChanges {
     @Input() height?: string;
 
     @Output() instance: CodeMirror.MergeView.MergeViewEditor;
+    @Output() onKeyF = new EventEmitter<Pair<string>>();
     @Output() onKeyI = new EventEmitter<boolean>();
     @Output() onKeyK = new EventEmitter<boolean>();
     @Output() onKeyJ = new EventEmitter<void>();
@@ -35,6 +48,15 @@ export class MergeViewerComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         const editorKeyBinding = (isOrigin: boolean) => ({
+            'F': cm => {
+                // Support for response of JSONView extension
+                const optimizeFormat = (target) => pretty(target.replace(/^([^":\[\]{},]+):/mg, '"$1":'));
+
+                const one = optimizeFormat(this.instance.leftOriginal().getValue());
+                const other = optimizeFormat(this.instance.editor().getValue());
+
+                this.onKeyF.emit({one, other});
+            },
             'K': cm => this.onKeyK.emit(isOrigin),
             'I': cm => this.onKeyI.emit(isOrigin),
             'J': cm => this.onKeyJ.emit(),
@@ -67,15 +89,19 @@ export class MergeViewerComponent implements OnChanges {
         scrollToCenter(cm);
     }
 
+    updateView() {
+        this.instance.leftOriginal().refresh();
+        this.instance.editor().refresh();
+    }
+
     private setHeight(height: string) {
         const instanceAny: any = this.instance;
         instanceAny.wrap.style.height = height;
+
         this.instance.editor().setSize(null, height);
-        if (this.instance.leftOriginal()) {
-            this.instance.leftOriginal().setSize(null, height);
-        }
-        if (this.instance.rightOriginal()) {
-            this.instance.rightOriginal().setSize(null, height);
-        }
+        this.instance.editor().setOption('readOnly', false);
+
+        this.instance.leftOriginal().setSize(null, height);
+        this.instance.leftOriginal().setOption('readOnly', false);
     }
 }

@@ -1,0 +1,65 @@
+<ng-select #selector
+           [options]="options"
+           [(ngModel)]="activeIndex"
+           [ngStyle]="{
+            'z-index': '99',
+            'font-size': '1.2rem'
+        }"
+           [className]="'smart-padding-without-left'"
+           (selected)="showTrial(getActiveTrial())"
+>
+</ng-select>
+<md-tab-group (selectChange)="changeTab($event)">
+    <md-tab label="Diff viewer">
+        <div class="smart-padding-small" style="display: flex; justify-content: space-around">
+            <div>
+                <md-chip>{{oneAccessPoint.name}}</md-chip>
+                <small>
+                    <a [href]="getActiveTrial().one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                        {{oneAccessPoint.host}}.....
+                    </a>
+                </small>
+            </div>
+            <div>
+                <md-chip>{{otherAccessPoint.name}}</md-chip>
+                <small>
+                    <a [href]="getActiveTrial().other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                        {{otherAccessPoint.host}}.....
+                    </a>
+                </small>
+            </div>
+        </div>
+        <div *ngIf="isLoading" class="center" style="height: 50vh;">
+            <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
+        </div>
+        <div *ngIf="!isLoading && !errorMessage && getActiveTrial().hasResponse()">
+            <app-merge-viewer #mergeView
+                              [config]="mergeViewConfig"
+                              (onKeyF)="updateValues($event)"
+                              (onKeyI)="mergeView.moveToPreviousDiff($event)"
+                              (onKeyK)="mergeView.moveToNextDiff($event)"
+                              (onKeyJ)="showPreviousTrial()"
+                              (onKeyL)="showNextTrial()"
+                              (onKeySlash)="openSelector()"
+                              (onKeyQ)="closeDialog()"
+                              (onKeyQuestion)="toggleCheatSheet()"
+            >
+            </app-merge-viewer>
+        </div>
+        <div *ngIf="!getActiveTrial().hasResponse()" class="center" style="height: 50vh;">
+            No responses.
+        </div>
+        <div *ngIf="errorMessage">
+            {{errorMessage}}
+        </div>
+    </md-tab>
+    <md-tab label="Query parameters">
+        <div class="shape-margin">
+            <ng2-smart-table [settings]="tableSettings"
+                             [source]="tableSource"
+            >
+            </ng2-smart-table>
+        </div>
+    </md-tab>
+</md-tab-group>
+<hotkeys-cheatsheet></hotkeys-cheatsheet>
