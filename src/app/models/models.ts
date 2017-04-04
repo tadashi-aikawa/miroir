@@ -59,6 +59,12 @@ class Time {
     end: string;
 }
 
+class DiffKeys {
+    added: string[];
+    changed: string[];
+    removed: string[];
+}
+
 export class Trial {
     seq: number;
     name: string;
@@ -69,6 +75,7 @@ export class Trial {
     path: string;
     request_time: string;
     status: string;
+    diff_keys: DiffKeys;
 
     hasResponse(): boolean {
         return this.one.file !== undefined && this.other.file !== undefined;
