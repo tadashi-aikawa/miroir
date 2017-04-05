@@ -1,4 +1,4 @@
-import {AccessPoint, AwsConfig, Pair, Trial} from '../models/models';
+import {AccessPoint, AwsConfig, Ignore, Pair, Trial} from '../models/models';
 import {AwsService} from '../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
@@ -6,6 +6,7 @@ import {MdDialogRef, MdTabChangeEvent} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
+import * as _ from 'lodash';
 
 
 interface RowData {
@@ -40,13 +41,16 @@ export class DetailDialogComponent implements OnInit {
     @Input() oneAccessPoint: AccessPoint;
     @Input() otherAccessPoint: AccessPoint;
     @Input() trials: Trial[];
+    @Input() ignores: Ignore[];
     @Input() awsConfig: AwsConfig;
 
     @ViewChild('selector') selector;
     @ViewChild('mergeView') mergeView;
 
-    tableSettings: any;
-    tableSource = new LocalDataSource();
+    queryTableSettings: any;
+    queryTableSource = new LocalDataSource();
+    propertyTableSettings: any;
+    propertyTableSource = new LocalDataSource();
 
     activeIndex: string;
     options: IOption[];
@@ -83,10 +87,19 @@ export class DetailDialogComponent implements OnInit {
             value: String(i)
         }));
 
-        this.tableSettings = {
+        this.queryTableSettings = {
             columns: {
                 key: {title: 'Key'},
                 value: {title: 'Value'}
+            },
+            actions: false
+        };
+        this.propertyTableSettings = {
+            columns: {
+                pattern: {title: 'Pattern'},
+                type: {title: 'Type'},
+                ignore: {title: 'Ignore'},
+                note: {title: 'Note'}
             },
             actions: false
         };
@@ -139,10 +152,30 @@ export class DetailDialogComponent implements OnInit {
 
         this.displayedQueries = Object.keys(trial.queries)
             .map(k => ({key: k, value: trial.queries[k].join(', ')}));
-        this.tableSource.load(this.displayedQueries.map(t => (<RowData>{
+        this.queryTableSource.load(this.displayedQueries.map(t => (<RowData>{
             key: t.key,
             value: t.value
         })));
+
+        const added_rows = trial.diff_keys.added.map((x: string) => ({
+            pattern: x,
+            type: 'add',
+            ignore: this.isIgnoreAddedProperty(x, trial),
+            note: 'NOTENOTE'
+        }));
+        const changed_rows = trial.diff_keys.changed.map((x: string) => ({
+            pattern: x,
+            type: 'change',
+            ignore: this.isIgnoreChangedProperty(x, trial),
+            note: 'NOTENOTE'
+        }));
+        const removed_rows = trial.diff_keys.removed.map((x: string) => ({
+            pattern: x,
+            type: 'remove',
+            ignore: this.isIgnoreRemovedProperty(x, trial),
+            note: 'NOTENOTE'
+        }));
+        this.propertyTableSource.load([...added_rows, ...changed_rows, ...removed_rows]);
 
         if (trial.hasResponse()) {
             this.isLoading = true;
@@ -163,6 +196,36 @@ export class DetailDialogComponent implements OnInit {
         if (event.index === 0) {
             this.mergeView.updateView();
         }
+    }
+
+    private isIgnoreAddedProperty(property: string, trial: Trial): boolean {
+        // TODO: refactoring
+        return _(this.ignores)
+            .filter(x => x.path.added)
+            .filter(x => trial.path.match(new RegExp(x.path.pattern)) !== null)
+            .map(x => x.path.added.pattern)
+            .flatten()
+            .some(pattern => property.match(new RegExp(pattern)) !== null);
+    }
+
+    private isIgnoreRemovedProperty(property: string, trial: Trial): boolean {
+        // TODO: refactoring
+        return _(this.ignores)
+            .filter(x => x.path.removed)
+            .filter(x => trial.path.match(new RegExp(x.path.pattern)) !== null)
+            .map(x => x.path.removed.pattern)
+            .flatten()
+            .some(pattern => property.match(new RegExp(pattern)) !== null);
+    }
+
+    private isIgnoreChangedProperty(property: string, trial: Trial): boolean {
+        // TODO: refactoring
+        return _(this.ignores)
+            .filter(x => x.path.changed)
+            .filter(x => trial.path.match(new RegExp(x.path.pattern)) !== null)
+            .map(x => x.path.changed.pattern)
+            .flatten()
+            .some(pattern => property.match(new RegExp(pattern)) !== null);
     }
 
 }

@@ -5,6 +5,7 @@ import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import {MdDialog, MdDialogRef} from '@angular/material';
 import * as fileSaver from 'file-saver';
+import * as _ from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 
 const filterFunction = (v, q) => q.split(' and ').every(x => v.includes(x));
@@ -186,6 +187,9 @@ export class GeminiSummaryComponent {
         dialogRef.componentInstance.awsConfig = this.awsConfig;
         dialogRef.componentInstance.activeIndex = String(index);
         dialogRef.componentInstance.trials = trials;
+        dialogRef.componentInstance.ignores = _(this.activeReport.addons.judgement)
+            .find(x => x.name.match(/ignore_property_addon/gi) !== null)
+            .config.ignores;
     }
 
 }

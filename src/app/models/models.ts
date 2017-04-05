@@ -30,11 +30,36 @@ export class DynamoRow {
     downloadErrorMessage?: string;
 }
 
+export class RegExpMathers {
+    pattern: string;
+    note?: string;
+}
+
+// TODO define needed parameters
+export class Ignore {
+    path: {
+        pattern: string;
+        added?: RegExpMathers[];
+        changed?: RegExpMathers[];
+        removed?: RegExpMathers[];
+    };
+}
+
+// TODO define needed parameters
+export class Addons {
+    judgement: {
+        config: {
+            ignores: Ignore[]
+        }
+    };
+}
+
 export class Report {
     key: string;
     title: string;
     summary: Summary;
     trials: Trial[];
+    addons?: Addons;
 }
 
 export class Summary {

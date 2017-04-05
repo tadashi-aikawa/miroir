@@ -55,31 +55,19 @@
     </md-tab>
     <md-tab label="Query parameters">
         <div class="shape-margin">
-            <ng2-smart-table [settings]="tableSettings"
-                             [source]="tableSource"
+            <ng2-smart-table [settings]="queryTableSettings"
+                             [source]="queryTableSource"
             >
             </ng2-smart-table>
         </div>
     </md-tab>
     <md-tab label="Property diffs">
-        <h3>Added</h3>
-        <ul>
-            <li *ngFor="let p of getActiveTrial().diff_keys.added">
-                <small>{{p}}</small>
-            </li>
-        </ul>
-        <h3>Changed</h3>
-        <ul>
-            <li *ngFor="let p of getActiveTrial().diff_keys.changed">
-                <small>{{p}}</small>
-            </li>
-        </ul>
-        <h3>Removed</h3>
-        <ul>
-            <li *ngFor="let p of getActiveTrial().diff_keys.removed">
-                <small>{{p}}</small>
-            </li>
-        </ul>
+        <div class="shape-margin">
+            <ng2-smart-table [settings]="propertyTableSettings"
+                             [source]="propertyTableSource"
+            >
+            </ng2-smart-table>
+        </div>
     </md-tab>
 </md-tab-group>
 <hotkeys-cheatsheet></hotkeys-cheatsheet>
