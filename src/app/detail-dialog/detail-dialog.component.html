@@ -59,12 +59,32 @@
         </div>
     </md-tab>
     <md-tab label="Property diffs">
-        <div class="shape-margin">
-            <ng2-smart-table [settings]="propertyTableSettings"
-                             [source]="propertyTableSource"
-            >
-            </ng2-smart-table>
-        </div>
+        <h2 class="center-vertical">
+            <md-icon>report_problem</md-icon>&nbsp;Attention!!
+        </h2>
+        <table>
+            <tr *ngFor="let p of getNoticedPropertyDiffs()">
+                <td class={{p.type}}>
+                    <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}</md-icon>
+                </td>
+                <td class="property-diffs">{{p.pattern}}</td>
+            </tr>
+        </table>
+        <h2 class="center-vertical">
+            <md-icon>thumb_up</md-icon>&nbsp;No problem
+        </h2>
+        <h2 class="center-vertical">
+            <md-icon>visibility_off</md-icon>&nbsp;Ignored
+        </h2>
+        <table>
+            <tr *ngFor="let p of getIgnoredPropertyDiffs()" class="centering-vertical">
+                <td class={{p.type}}>
+                    <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}</md-icon>
+                </td>
+                <td class="property-diffs">{{p.pattern}}</td>
+                <td class="comment">{{p.note}}</td>
+            </tr>
+        </table>
     </md-tab>
 </md-tab-group>
 <hotkeys-cheatsheet></hotkeys-cheatsheet>

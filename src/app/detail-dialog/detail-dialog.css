@@ -1,3 +1,24 @@
 :host >>> th.ng2-smart-th.key {
     width: 200px;
 }
+
+.property-diffs {
+    font-size: 75%;
+}
+
+.comment {
+    color: gray;
+    font-size: 50%;
+}
+
+.added {
+    color: green;
+}
+
+.removed {
+    color: red;
+}
+
+.changed {
+    color: cornflowerblue;
+}

@@ -6,6 +6,12 @@
     align-items: center;
 }
 
+.center-vertical {
+    display: flex;
+    align-items: center;
+}
+
+
 div.ellipsis-text {
     display: inline-block;
     overflow: hidden;

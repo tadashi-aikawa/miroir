@@ -1,4 +1,4 @@
-import {AccessPoint, AwsConfig, Ignore, Pair, Trial} from '../models/models';
+import {AccessPoint, AwsConfig, Ignore, Pair, RegExpMatcher, Trial} from '../models/models';
 import {AwsService} from '../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
@@ -49,8 +49,7 @@ export class DetailDialogComponent implements OnInit {
 
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
-    propertyTableSettings: any;
-    propertyTableSource = new LocalDataSource();
+    propertyDiffs: any[];
 
     activeIndex: string;
     options: IOption[];
@@ -92,16 +91,10 @@ export class DetailDialogComponent implements OnInit {
                 key: {title: 'Key'},
                 value: {title: 'Value'}
             },
-            actions: false
-        };
-        this.propertyTableSettings = {
-            columns: {
-                pattern: {title: 'Pattern'},
-                type: {title: 'Type'},
-                ignore: {title: 'Ignore'},
-                note: {title: 'Note'}
-            },
-            actions: false
+            actions: false,
+            pager: {
+                display: false
+            }
         };
         this.showTrial(this.getActiveTrial());
     }
@@ -157,25 +150,34 @@ export class DetailDialogComponent implements OnInit {
             value: t.value
         })));
 
-        const added_rows = trial.diff_keys.added.map((x: string) => ({
-            pattern: x,
-            type: 'add',
-            ignore: this.isIgnoreAddedProperty(x, trial),
-            note: 'NOTENOTE'
-        }));
-        const changed_rows = trial.diff_keys.changed.map((x: string) => ({
-            pattern: x,
-            type: 'change',
-            ignore: this.isIgnoreChangedProperty(x, trial),
-            note: 'NOTENOTE'
-        }));
-        const removed_rows = trial.diff_keys.removed.map((x: string) => ({
-            pattern: x,
-            type: 'remove',
-            ignore: this.isIgnoreRemovedProperty(x, trial),
-            note: 'NOTENOTE'
-        }));
-        this.propertyTableSource.load([...added_rows, ...changed_rows, ...removed_rows]);
+        const added_rows = trial.diff_keys.added.map((x: string) => {
+            const m: RegExpMatcher = this.findIgnoreAddedRegExpMatcher(x, trial);
+            return {
+                pattern: x,
+                type: 'added',
+                ignore: !!m,
+                note: m ? m.note : ''
+            };
+        });
+        const changed_rows = trial.diff_keys.changed.map((x: string) => {
+            const m: RegExpMatcher = this.findIgnoreChangedRegExpMatcher(x, trial);
+            return {
+                pattern: x,
+                type: 'changed',
+                ignore: !!m,
+                note: m ? m.note : ''
+            };
+        });
+        const removed_rows = trial.diff_keys.removed.map((x: string) => {
+            const m: RegExpMatcher = this.findIgnoreRemovedRegExpMatcher(x, trial);
+            return {
+                pattern: x,
+                type: 'removed',
+                ignore: !!m,
+                note: m ? m.note : ''
+            };
+        });
+        this.propertyDiffs = [...added_rows, ...changed_rows, ...removed_rows];
 
         if (trial.hasResponse()) {
             this.isLoading = true;
@@ -201,34 +203,42 @@ export class DetailDialogComponent implements OnInit {
         }
     }
 
-    private isIgnoreAddedProperty(property: string, trial: Trial): boolean {
+    getIgnoredPropertyDiffs() {
+        return this.propertyDiffs.filter(x => x.ignore);
+    }
+
+    getNoticedPropertyDiffs() {
+        return this.propertyDiffs.filter(x => !x.ignore);
+    }
+
+    private findIgnoreAddedRegExpMatcher(property: string, trial: Trial): RegExpMatcher {
         // TODO: refactoring
         return _(this.ignores)
             .filter(x => x.path.added)
             .filter(x => trial.path.match(new RegExp(x.path.pattern)) !== null)
-            .map(x => x.path.added.pattern)
+            .map(x => x.path.added)
             .flatten()
-            .some(pattern => property.match(new RegExp(pattern)) !== null);
+            .find(matcher => property.match(new RegExp(matcher.pattern)) !== null);
     }
 
-    private isIgnoreRemovedProperty(property: string, trial: Trial): boolean {
+    private findIgnoreRemovedRegExpMatcher(property: string, trial: Trial): RegExpMatcher {
         // TODO: refactoring
         return _(this.ignores)
             .filter(x => x.path.removed)
             .filter(x => trial.path.match(new RegExp(x.path.pattern)) !== null)
-            .map(x => x.path.removed.pattern)
+            .map(x => x.path.removed)
             .flatten()
-            .some(pattern => property.match(new RegExp(pattern)) !== null);
+            .find(matcher => property.match(new RegExp(matcher.pattern)) !== null);
     }
 
-    private isIgnoreChangedProperty(property: string, trial: Trial): boolean {
+    private findIgnoreChangedRegExpMatcher(property: string, trial: Trial): RegExpMatcher {
         // TODO: refactoring
         return _(this.ignores)
             .filter(x => x.path.changed)
             .filter(x => trial.path.match(new RegExp(x.path.pattern)) !== null)
-            .map(x => x.path.changed.pattern)
+            .map(x => x.path.changed)
             .flatten()
-            .some(pattern => property.match(new RegExp(pattern)) !== null);
+            .find(matcher => property.match(new RegExp(matcher.pattern)) !== null);
     }
 
 }

@@ -30,7 +30,7 @@ export class DynamoRow {
     downloadErrorMessage?: string;
 }
 
-export class RegExpMathers {
+export class RegExpMatcher {
     pattern: string;
     note?: string;
 }
@@ -39,9 +39,9 @@ export class RegExpMathers {
 export class Ignore {
     path: {
         pattern: string;
-        added?: RegExpMathers[];
-        changed?: RegExpMathers[];
-        removed?: RegExpMathers[];
+        added?: RegExpMatcher[];
+        changed?: RegExpMatcher[];
+        removed?: RegExpMatcher[];
     };
 }
 
