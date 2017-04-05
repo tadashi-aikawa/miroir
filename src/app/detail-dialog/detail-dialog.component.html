@@ -32,7 +32,7 @@
         <div *ngIf="isLoading" class="center" style="height: 50vh;">
             <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
         </div>
-        <div *ngIf="!isLoading && !errorMessage && getActiveTrial().hasResponse()">
+        <div *ngIf="!isLoading && !errorMessage">
             <app-merge-viewer #mergeView
                               [config]="mergeViewConfig"
                               (onKeyF)="updateValues($event)"
@@ -45,9 +45,6 @@
                               (onKeyQuestion)="toggleCheatSheet()"
             >
             </app-merge-viewer>
-        </div>
-        <div *ngIf="!getActiveTrial().hasResponse()" class="center" style="height: 50vh;">
-            No responses.
         </div>
         <div *ngIf="errorMessage">
             {{errorMessage}}

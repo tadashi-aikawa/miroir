@@ -189,6 +189,9 @@ export class DetailDialogComponent implements OnInit {
                     this.isLoading = false;
                     this.errorMessage = err;
                 });
+        } else {
+            this.errorMessage = undefined;
+            this.mergeViewConfig = createConfig('No file', 'No file');
         }
     }
 
