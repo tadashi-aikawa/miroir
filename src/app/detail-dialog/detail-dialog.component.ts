@@ -68,13 +68,14 @@ export class DetailDialogComponent implements OnInit {
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
         _hotkeysService.add([
-            new Hotkey('f', e => { return false; }, null, 'Formatting text in active editor.'),
-            new Hotkey('k', e => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
+            new Hotkey('f', e => { return false; }, null, 'Find patterns in active editor.'),
             new Hotkey('i', e => {this.mergeView.moveToPreviousDiff(true); return false; }, null, 'Move to next diff.'),
-            new Hotkey('l', e => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
             new Hotkey('j', e => {this.showPreviousTrial(); return false; }, null, 'Show previous trial.'),
-            new Hotkey('/', e => {this.openSelector(); return false; }, null, 'Open trial list'),
+            new Hotkey('k', e => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
+            new Hotkey('l', e => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
+            new Hotkey('p', e => { return false; }, null, 'Format the text of the active editor pretty.'),
             new Hotkey('q', e => {this.closeDialog(); return false; }, null, 'Close this dialog'),
+            new Hotkey('/', e => {this.openSelector(); return false; }, null, 'Open trial list'),
             new Hotkey('?', e => {this.toggleCheatSheet(); return false; }, null, 'Open cheat sheet')
         ]);
     }

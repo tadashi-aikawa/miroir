@@ -35,13 +35,13 @@
         <div *ngIf="!isLoading && !errorMessage">
             <app-merge-viewer #mergeView
                               [config]="mergeViewConfig"
-                              (onKeyF)="updateValues($event)"
                               (onKeyI)="mergeView.moveToPreviousDiff($event)"
-                              (onKeyK)="mergeView.moveToNextDiff($event)"
                               (onKeyJ)="showPreviousTrial()"
+                              (onKeyK)="mergeView.moveToNextDiff($event)"
                               (onKeyL)="showNextTrial()"
-                              (onKeySlash)="openSelector()"
+                              (onKeyP)="updateValues($event)"
                               (onKeyQ)="closeDialog()"
+                              (onKeySlash)="openSelector()"
                               (onKeyQuestion)="toggleCheatSheet()"
             >
             </app-merge-viewer>
