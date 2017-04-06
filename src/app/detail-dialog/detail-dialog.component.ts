@@ -151,7 +151,7 @@ export class DetailDialogComponent implements OnInit {
             value: t.value
         })));
 
-        const added_rows = trial.diff_keys.added.map((x: string) => {
+        const added_rows = !trial.diff_keys ? [] : trial.diff_keys.added.map((x: string) => {
             const m: RegExpMatcher = this.findIgnoreAddedRegExpMatcher(x, trial);
             return {
                 pattern: x,
@@ -160,7 +160,7 @@ export class DetailDialogComponent implements OnInit {
                 note: m ? m.note : ''
             };
         });
-        const changed_rows = trial.diff_keys.changed.map((x: string) => {
+        const changed_rows = !trial.diff_keys ? [] : trial.diff_keys.changed.map((x: string) => {
             const m: RegExpMatcher = this.findIgnoreChangedRegExpMatcher(x, trial);
             return {
                 pattern: x,
@@ -169,7 +169,7 @@ export class DetailDialogComponent implements OnInit {
                 note: m ? m.note : ''
             };
         });
-        const removed_rows = trial.diff_keys.removed.map((x: string) => {
+        const removed_rows = !trial.diff_keys ? [] : trial.diff_keys.removed.map((x: string) => {
             const m: RegExpMatcher = this.findIgnoreRemovedRegExpMatcher(x, trial);
             return {
                 pattern: x,
