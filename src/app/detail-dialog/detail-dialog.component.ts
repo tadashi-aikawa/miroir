@@ -1,6 +1,6 @@
 import {AccessPoint, AwsConfig, Ignore, Pair, RegExpMatcher, Trial} from '../models/models';
 import {AwsService} from '../services/aws-service';
-import {Component, Input, OnInit, Optional, Output, ViewChild} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, Optional, Output, SimpleChanges, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
 import {MdDialogRef, MdTabChangeEvent} from '@angular/material';
 import {IOption} from 'ng-select';
@@ -204,11 +204,11 @@ export class DetailDialogComponent implements OnInit {
 
     changeTab(index: number): void {
         this.activeTabIndex = String(index);
-        this.didChangeTab(index);
+        this.afterChangeTab(index);
     }
 
-    didChangeTab(index: number): void {
-        if (index === 0) {
+    afterChangeTab(index: number): void {
+        if (index === 0 && this.mergeView) {
             this.mergeView.updateView();
         }
     }
