@@ -222,33 +222,30 @@ export class DetailDialogComponent implements OnInit {
     }
 
     private findIgnoreAddedRegExpMatcher(property: string, trial: Trial): RegExpMatcher {
-        // TODO: refactoring
         return _(this.ignores)
+            .filter(x => new RegExp(x.path.pattern).test(trial.path))
             .filter(x => x.path.added)
-            .filter(x => trial.path.match(new RegExp(x.path.pattern)) !== null)
             .map(x => x.path.added)
             .flatten()
-            .find(matcher => property.match(new RegExp(matcher.pattern)) !== null);
+            .find(matcher => new RegExp(matcher.pattern).test(property));
     }
 
     private findIgnoreRemovedRegExpMatcher(property: string, trial: Trial): RegExpMatcher {
-        // TODO: refactoring
         return _(this.ignores)
+            .filter(x => new RegExp(x.path.pattern).test(trial.path))
             .filter(x => x.path.removed)
-            .filter(x => trial.path.match(new RegExp(x.path.pattern)) !== null)
             .map(x => x.path.removed)
             .flatten()
-            .find(matcher => property.match(new RegExp(matcher.pattern)) !== null);
+            .find(matcher => new RegExp(matcher.pattern).test(property));
     }
 
     private findIgnoreChangedRegExpMatcher(property: string, trial: Trial): RegExpMatcher {
-        // TODO: refactoring
         return _(this.ignores)
+            .filter(x => new RegExp(x.path.pattern).test(trial.path))
             .filter(x => x.path.changed)
-            .filter(x => trial.path.match(new RegExp(x.path.pattern)) !== null)
             .map(x => x.path.changed)
             .flatten()
-            .find(matcher => property.match(new RegExp(matcher.pattern)) !== null);
+            .find(matcher => new RegExp(matcher.pattern).test(property));
     }
 
 }
