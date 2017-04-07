@@ -41,13 +41,16 @@ export class MergeViewerComponent implements OnChanges {
     @Input() height?: string;
 
     @Output() instance: CodeMirror.MergeView.MergeViewEditor;
+    @Output() onKeyD = new EventEmitter<void>();
+    @Output() onKeyQ = new EventEmitter<void>();
+    @Output() onKeyP = new EventEmitter<void>();
     @Output() onKeyF = new EventEmitter<void>();
     @Output() onKeyI = new EventEmitter<boolean>();
     @Output() onKeyJ = new EventEmitter<void>();
     @Output() onKeyK = new EventEmitter<boolean>();
     @Output() onKeyL = new EventEmitter<void>();
-    @Output() onKeyP = new EventEmitter<Pair<string>>();
-    @Output() onKeyQ = new EventEmitter<void>();
+    @Output() onKeyX = new EventEmitter<Pair<string>>();
+    @Output() onKeyW = new EventEmitter<void>();
     @Output() onKeySlash = new EventEmitter<void>();
     @Output() onKeyQuestion = new EventEmitter<void>();
 
@@ -55,6 +58,9 @@ export class MergeViewerComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         const editorKeyBinding = (isOrigin: boolean) => ({
+            'D': cm => this.onKeyD.emit(),
+            'Q': cm => this.onKeyQ.emit(),
+            'P': cm => this.onKeyP.emit(),
             'F': cm => {
                 cm.execCommand('findPersistent');
                 this.onKeyF.emit();
@@ -63,16 +69,16 @@ export class MergeViewerComponent implements OnChanges {
             'J': cm => this.onKeyJ.emit(),
             'K': cm => this.onKeyK.emit(isOrigin),
             'L': cm => this.onKeyL.emit(),
-            'P': cm => {
+            'X': cm => {
                 // Support for response of JSONView extension
                 const optimizeFormat = (target) => pretty(target.replace(/^([^":\[\]{},]+):/mg, '"$1":'));
 
                 const one = optimizeFormat(this.instance.leftOriginal().getValue());
                 const other = optimizeFormat(this.instance.editor().getValue());
 
-                this.onKeyP.emit({one, other});
+                this.onKeyX.emit({one, other});
             },
-            'Q': cm => this.onKeyQ.emit(),
+            'W': cm => this.onKeyW.emit(),
             '/': cm => this.onKeySlash.emit(),
             'Shift-/': cm => this.onKeyQuestion.emit()
         });

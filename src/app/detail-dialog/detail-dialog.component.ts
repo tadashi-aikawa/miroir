@@ -1,6 +1,6 @@
 import {AccessPoint, AwsConfig, Ignore, Pair, RegExpMatcher, Trial} from '../models/models';
 import {AwsService} from '../services/aws-service';
-import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, Optional, Output, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
 import {MdDialogRef, MdTabChangeEvent} from '@angular/material';
 import {IOption} from 'ng-select';
@@ -43,6 +43,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() trials: Trial[];
     @Input() ignores: Ignore[];
     @Input() awsConfig: AwsConfig;
+    @Input() activeTabIndex: string;
 
     @ViewChild('selector') selector;
     @ViewChild('mergeView') mergeView;
@@ -68,15 +69,18 @@ export class DetailDialogComponent implements OnInit {
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
         _hotkeysService.add([
+            new Hotkey('d', e => {this.changeTab(0); return false; }, null, 'Move `Diff viewer` tab.'),
+            new Hotkey('q', e => {this.changeTab(1); return false; }, null, 'Move `Query parameters` tab.'),
+            new Hotkey('p', e => {this.changeTab(2); return false; }, null, 'Move `Property diffs` tab.'),
             new Hotkey('f', e => { return false; }, null, 'Find patterns in active editor.'),
             new Hotkey('i', e => {this.mergeView.moveToPreviousDiff(true); return false; }, null, 'Move to next diff.'),
             new Hotkey('j', e => {this.showPreviousTrial(); return false; }, null, 'Show previous trial.'),
             new Hotkey('k', e => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
             new Hotkey('l', e => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
-            new Hotkey('p', e => { return false; }, null, 'Format the text of the active editor pretty.'),
-            new Hotkey('q', e => {this.closeDialog(); return false; }, null, 'Close this dialog'),
+            new Hotkey('x', e => { return false; }, null, 'Format the text of the active editor pretty.'),
+            new Hotkey('w', e => {this.closeDialog(); return false; }, null, 'Close this dialog'),
             new Hotkey('/', e => {this.openSelector(); return false; }, null, 'Open trial list'),
-            new Hotkey('?', e => {this.toggleCheatSheet(); return false; }, null, 'Open cheat sheet')
+            new Hotkey('?', e => {this.toggleCheatSheet(); return false; }, null, 'Open/Close cheat sheet')
         ]);
     }
 
@@ -198,8 +202,13 @@ export class DetailDialogComponent implements OnInit {
         }
     }
 
-    changeTab(event: MdTabChangeEvent): void {
-        if (event.index === 0) {
+    changeTab(index: number): void {
+        this.activeTabIndex = String(index);
+        this.didChangeTab(index);
+    }
+
+    didChangeTab(index: number): void {
+        if (index === 0) {
             this.mergeView.updateView();
         }
     }
