@@ -2,6 +2,7 @@ import {AccessPoint, AwsConfig, Condition, Pair, PropertyDiff, RegExpMatcher, Tr
 import {AwsService} from '../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
+import * as YAML from 'yamljs';
 import {MdDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
@@ -89,16 +90,13 @@ export class DetailDialogComponent implements OnInit {
 
     ngOnInit(): void {
         // FIXME
-        this.noProblems = [
-            {
-                path: {
-                    pattern: '.+',
-                    removed: [
-                        {pattern: "root<'items'><[0-9]><'color'>", note: 'test'}
-                    ]
-                }
-            }
-        ];
+        this.noProblems = YAML.parse(`
+- path:
+    pattern: '.+'
+    removed:
+      - pattern: root<'items'><[0-9]><'color'>
+        note: test for times
+          `);
 
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
