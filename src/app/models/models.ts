@@ -1,3 +1,6 @@
+import DiffType from '../constants/DiffType';
+import DiffCognition from '../constants/DiffCognition';
+
 export class AwsConfig {
     region: string;
     accessKeyId: string;
@@ -35,8 +38,15 @@ export class RegExpMatcher {
     note?: string;
 }
 
+export class PropertyDiff {
+    pattern: string;
+    type: DiffType;
+    cognition: DiffCognition;
+    note: string;
+}
+
 // TODO define needed parameters
-export class Ignore {
+export class Condition {
     path: {
         pattern: string;
         added?: RegExpMatcher[];
@@ -49,7 +59,7 @@ export class Ignore {
 export class Addons {
     judgement: {
         config: {
-            ignores: Ignore[]
+            ignores: Condition[]
         }
     };
 }

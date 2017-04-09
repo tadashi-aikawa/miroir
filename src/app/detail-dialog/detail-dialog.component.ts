@@ -1,12 +1,14 @@
-import {AccessPoint, AwsConfig, Ignore, Pair, RegExpMatcher, Trial} from '../models/models';
+import {AccessPoint, AwsConfig, Condition, Pair, PropertyDiff, RegExpMatcher, Trial} from '../models/models';
 import {AwsService} from '../services/aws-service';
-import {Component, Input, OnChanges, OnInit, Optional, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
-import {MdDialogRef, MdTabChangeEvent} from '@angular/material';
+import {MdDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
 import * as _ from 'lodash';
+import DiffType from '../constants/DiffType';
+import DiffCognition from '../constants/DiffCognition';
 
 
 interface RowData {
@@ -41,7 +43,8 @@ export class DetailDialogComponent implements OnInit {
     @Input() oneAccessPoint: AccessPoint;
     @Input() otherAccessPoint: AccessPoint;
     @Input() trials: Trial[];
-    @Input() ignores: Ignore[];
+    @Input() ignores: Condition[];
+    @Input() noProblems: Condition[];
     @Input() awsConfig: AwsConfig;
     @Input() activeTabIndex: string;
 
@@ -50,7 +53,7 @@ export class DetailDialogComponent implements OnInit {
 
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
-    propertyDiffs: any[];
+    propertyDiffs: PropertyDiff[];
 
     activeIndex: string;
     options: IOption[];
@@ -85,6 +88,18 @@ export class DetailDialogComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        // FIXME
+        this.noProblems = [
+            {
+                path: {
+                    pattern: '.+',
+                    removed: [
+                        {pattern: "root<'items'><[0-9]><'color'>", note: 'test'}
+                    ]
+                }
+            }
+        ];
+
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
             label: `${t.seq}. ${t.name} (${t.path})`,
@@ -145,47 +160,12 @@ export class DetailDialogComponent implements OnInit {
     }
 
     showTrial(trial: Trial): void {
-        const fetchFile = (file: string) =>
-            this.service.fetchDetail(`${this.reportKey}/${file}`, this.awsConfig);
-
-        this.displayedQueries = Object.keys(trial.queries)
-            .map(k => ({key: k, value: trial.queries[k].join(', ')}));
-        this.queryTableSource.load(this.displayedQueries.map(t => (<RowData>{
-            key: t.key,
-            value: t.value
-        })));
-
-        const added_rows = !trial.diff_keys ? [] : trial.diff_keys.added.map((x: string) => {
-            const m: RegExpMatcher = this.findIgnoreAddedRegExpMatcher(x, trial);
-            return {
-                pattern: x,
-                type: 'added',
-                ignore: !!m,
-                note: m ? m.note : ''
-            };
-        });
-        const changed_rows = !trial.diff_keys ? [] : trial.diff_keys.changed.map((x: string) => {
-            const m: RegExpMatcher = this.findIgnoreChangedRegExpMatcher(x, trial);
-            return {
-                pattern: x,
-                type: 'changed',
-                ignore: !!m,
-                note: m ? m.note : ''
-            };
-        });
-        const removed_rows = !trial.diff_keys ? [] : trial.diff_keys.removed.map((x: string) => {
-            const m: RegExpMatcher = this.findIgnoreRemovedRegExpMatcher(x, trial);
-            return {
-                pattern: x,
-                type: 'removed',
-                ignore: !!m,
-                note: m ? m.note : ''
-            };
-        });
-        this.propertyDiffs = [...added_rows, ...changed_rows, ...removed_rows];
-
+        // Diff viewer
         if (trial.hasResponse()) {
             this.isLoading = true;
+
+            const fetchFile = (file: string) =>
+                this.service.fetchDetail(`${this.reportKey}/${file}`, this.awsConfig);
             Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
                 .then((rs: string[]) => {
                     this.isLoading = false;
@@ -200,6 +180,47 @@ export class DetailDialogComponent implements OnInit {
             this.errorMessage = undefined;
             this.mergeViewConfig = createConfig('No file', 'No file');
         }
+
+        // Query parameters
+        this.displayedQueries = Object.keys(trial.queries)
+            .map(k => ({key: k, value: trial.queries[k].join(', ')}));
+        this.queryTableSource.load(this.displayedQueries.map(t => (<RowData>{
+            key: t.key,
+            value: t.value
+        })));
+
+        // Property diffs
+        const added_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.added.map((x: string) => {
+            const ig: RegExpMatcher = this.findAddedMatcher(this.ignores, x, trial);
+            const noP: RegExpMatcher = this.findAddedMatcher(this.noProblems, x, trial);
+            return {
+                pattern: x,
+                type: DiffType.ADDED,
+                cognition: ig ? DiffCognition.IGNORED : noP ? DiffCognition.NO_PROBLEM : DiffCognition.ATTENTION,
+                note: ig ? ig.note : noP ? noP.note : ''
+            };
+        });
+        const changed_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.changed.map((x: string) => {
+            const ig: RegExpMatcher = this.findChangedMatcher(this.ignores, x, trial);
+            const noP: RegExpMatcher = this.findChangedMatcher(this.noProblems, x, trial);
+            return {
+                pattern: x,
+                type: DiffType.CHANGED,
+                cognition: ig ? DiffCognition.IGNORED : noP ? DiffCognition.NO_PROBLEM : DiffCognition.ATTENTION,
+                note: ig ? ig.note : noP ? noP.note : ''
+            };
+        });
+        const removed_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.removed.map((x: string) => {
+            const ig: RegExpMatcher = this.findRemovedMatcher(this.ignores, x, trial);
+            const noP: RegExpMatcher = this.findRemovedMatcher(this.noProblems, x, trial);
+            return {
+                pattern: x,
+                type: DiffType.REMOVED,
+                cognition: ig ? DiffCognition.IGNORED : noP ? DiffCognition.NO_PROBLEM : DiffCognition.ATTENTION,
+                note: ig ? ig.note : noP ? noP.note : ''
+            };
+        });
+        this.propertyDiffs = [...added_rows, ...changed_rows, ...removed_rows];
     }
 
     changeTab(index: number): void {
@@ -213,16 +234,24 @@ export class DetailDialogComponent implements OnInit {
         }
     }
 
-    getIgnoredPropertyDiffs() {
-        return this.propertyDiffs.filter(x => x.ignore);
+    findAttentionPropertyDiffs(): PropertyDiff[] {
+        return this.findPropertyDiffs(DiffCognition.ATTENTION);
     }
 
-    getNoticedPropertyDiffs() {
-        return this.propertyDiffs.filter(x => !x.ignore);
+    findNoProblemPropertyDiffs(): PropertyDiff[] {
+        return this.findPropertyDiffs(DiffCognition.NO_PROBLEM);
     }
 
-    private findIgnoreAddedRegExpMatcher(property: string, trial: Trial): RegExpMatcher {
-        return _(this.ignores)
+    findIgnoredPropertyDiffs(): PropertyDiff[] {
+        return this.findPropertyDiffs(DiffCognition.IGNORED);
+    }
+
+    private findPropertyDiffs(cognition: DiffCognition): PropertyDiff[] {
+        return this.propertyDiffs.filter(x => x.cognition === cognition);
+    }
+
+    private findAddedMatcher(conditions: Condition[], property: string, trial: Trial): RegExpMatcher {
+        return _(conditions)
             .filter(x => new RegExp(x.path.pattern).test(trial.path))
             .filter(x => x.path.added)
             .map(x => x.path.added)
@@ -230,8 +259,8 @@ export class DetailDialogComponent implements OnInit {
             .find(matcher => new RegExp(matcher.pattern).test(property));
     }
 
-    private findIgnoreRemovedRegExpMatcher(property: string, trial: Trial): RegExpMatcher {
-        return _(this.ignores)
+    private findRemovedMatcher(conditions: Condition[], property: string, trial: Trial): RegExpMatcher {
+        return _(conditions)
             .filter(x => new RegExp(x.path.pattern).test(trial.path))
             .filter(x => x.path.removed)
             .map(x => x.path.removed)
@@ -239,8 +268,8 @@ export class DetailDialogComponent implements OnInit {
             .find(matcher => new RegExp(matcher.pattern).test(property));
     }
 
-    private findIgnoreChangedRegExpMatcher(property: string, trial: Trial): RegExpMatcher {
-        return _(this.ignores)
+    private findChangedMatcher(conditions: Condition[], property: string, trial: Trial): RegExpMatcher {
+        return _(conditions)
             .filter(x => new RegExp(x.path.pattern).test(trial.path))
             .filter(x => x.path.changed)
             .map(x => x.path.changed)
