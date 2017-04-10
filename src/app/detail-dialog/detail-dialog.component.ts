@@ -51,6 +51,7 @@ export class DetailDialogComponent implements OnInit {
 
     @ViewChild('selector') selector;
     @ViewChild('mergeView') mergeView;
+    @ViewChild('editor') editor;
 
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
@@ -61,6 +62,7 @@ export class DetailDialogComponent implements OnInit {
     isLoading: boolean;
     errorMessage: string;
     mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
+    editorConfig: CodeMirror.EditorConfiguration;
     displayedQueries: {key: string, value: string}[];
 
     constructor(private service: AwsService,
@@ -90,13 +92,19 @@ export class DetailDialogComponent implements OnInit {
 
     ngOnInit(): void {
         // FIXME
-        this.noProblems = YAML.parse(`
+        this.editorConfig = {
+            value: `
 - path:
     pattern: '.+'
     removed:
       - pattern: root<'items'><[0-9]><'color'>
         note: test for times
-          `);
+          `,
+            lineNumbers: true,
+            viewportMargin: 10
+        };
+
+        this.noProblems = YAML.parse(this.editorConfig.value);
 
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
@@ -188,6 +196,11 @@ export class DetailDialogComponent implements OnInit {
         })));
 
         // Property diffs
+        this.updatePropertyDiffs(trial);
+        // TODO: Assign no problem diffs to codemirror
+    }
+
+    private updatePropertyDiffs(trial: Trial) {
         const added_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.added.map((x: string) => {
             const ig: RegExpMatcher = this.findAddedMatcher(this.ignores, x, trial);
             const noP: RegExpMatcher = this.findAddedMatcher(this.noProblems, x, trial);
@@ -230,6 +243,15 @@ export class DetailDialogComponent implements OnInit {
         if (index === 0 && this.mergeView) {
             this.mergeView.updateView();
         }
+
+        if (index === 2 && this.editor) {
+            this.editor.updateView();
+        }
+    }
+
+    updateEditorConfig(e) {
+        this.noProblems = YAML.parse(this.editor.instance.getValue());
+        this.updatePropertyDiffs(this.getActiveTrial());
     }
 
     findAttentionPropertyDiffs(): PropertyDiff[] {

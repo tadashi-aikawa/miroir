@@ -191,7 +191,6 @@ export class GeminiSummaryComponent {
             .find(x => x.name.match(/ignore_property_addon/gi) !== null)
             .config.ignores;
     }
-
 }
 
 

@@ -62,41 +62,54 @@
         </div>
     </md-tab>
     <md-tab label="Property diffs">
-        <h2 class="center-vertical">
-            <md-icon>report_problem</md-icon>&nbsp;Attention!!
-        </h2>
-        <table>
-            <tr *ngFor="let p of findAttentionPropertyDiffs()" class="centering-vertical">
-                <td class={{p.type}}>
-                    <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}</md-icon>
-                </td>
-                <td class="property-diffs">{{p.pattern}}</td>
-            </tr>
-        </table>
-        <h2 class="center-vertical">
-            <md-icon>thumb_up</md-icon>&nbsp;No problem
-        </h2>
-        <table>
-            <tr *ngFor="let p of findNoProblemPropertyDiffs()" class="centering-vertical">
-                <td class={{p.type}}>
-                    <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}</md-icon>
-                </td>
-                <td class="property-diffs">{{p.pattern}}</td>
-                <td class="comment">{{p.note}}</td>
-            </tr>
-        </table>
-        <h2 class="center-vertical">
-            <md-icon>visibility_off</md-icon>&nbsp;Ignored
-        </h2>
-        <table>
-            <tr *ngFor="let p of findIgnoredPropertyDiffs()" class="centering-vertical">
-                <td class={{p.type}}>
-                    <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}</md-icon>
-                </td>
-                <td class="property-diffs">{{p.pattern}}</td>
-                <td class="comment">{{p.note}}</td>
-            </tr>
-        </table>
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <h2 class="center-vertical">
+                    <md-icon>report_problem</md-icon>&nbsp;Attention!!
+                </h2>
+                <table>
+                    <tr *ngFor="let p of findAttentionPropertyDiffs()" class="centering-vertical">
+                        <td class={{p.type}}>
+                            <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}
+                            </md-icon>
+                        </td>
+                        <td class="property-diffs">{{p.pattern}}</td>
+                    </tr>
+                </table>
+                <h2 class="center-vertical">
+                    <md-icon>thumb_up</md-icon>&nbsp;No problem
+                </h2>
+                <table>
+                    <tr *ngFor="let p of findNoProblemPropertyDiffs()" class="centering-vertical">
+                        <td class={{p.type}}>
+                            <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}
+                            </md-icon>
+                        </td>
+                        <td class="property-diffs">{{p.pattern}}</td>
+                        <td class="comment">{{p.note}}</td>
+                    </tr>
+                </table>
+                <h2 class="center-vertical">
+                    <md-icon>visibility_off</md-icon>&nbsp;Ignored
+                </h2>
+                <table>
+                    <tr *ngFor="let p of findIgnoredPropertyDiffs()" class="centering-vertical">
+                        <td class={{p.type}}>
+                            <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}
+                            </md-icon>
+                        </td>
+                        <td class="property-diffs">{{p.pattern}}</td>
+                        <td class="comment">{{p.note}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="flex-basis: 40%">
+                <button md-button (click)="updateEditorConfig($event)">Save</button>
+                <app-editor #editor
+                            [config]="editorConfig">
+                </app-editor>
+            </div>
+        </div>
     </md-tab>
 </md-tab-group>
 <hotkeys-cheatsheet></hotkeys-cheatsheet>

@@ -21,6 +21,7 @@ import {
 import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
 import {CommonModule} from '@angular/common';
 import {DetailDialogComponent} from './detail-dialog/detail-dialog.component';
+import {EditorComponent} from './editor/editor.component';
 
 @NgModule({
     declarations: [
@@ -29,6 +30,7 @@ import {DetailDialogComponent} from './detail-dialog/detail-dialog.component';
         MergeViewerComponent,
         DetailDialogComponent,
         DeleteConfirmDialogComponent,
+        EditorComponent,
         HoverComponent,
         StatusCodeComponent,
         StatusComponent
@@ -50,6 +52,7 @@ import {DetailDialogComponent} from './detail-dialog/detail-dialog.component';
     ],
     entryComponents: [
         DetailDialogComponent,
+        EditorComponent,
         DeleteConfirmDialogComponent,
         HoverComponent,
         StatusCodeComponent,
