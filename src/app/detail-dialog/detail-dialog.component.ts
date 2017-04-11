@@ -17,6 +17,15 @@ interface RowData {
     value: string;
 }
 
+const filterFunction = (v, q) =>
+    q.split(' and ').every(x => {
+        try {
+            return new RegExp(x).test(v);
+        } catch (e) {
+            return false;
+        }
+    });
+
 function createConfig(one: string, other: string): CodeMirror.MergeView.MergeViewEditorConfiguration {
     return {
         value: other,
@@ -114,13 +123,10 @@ export class DetailDialogComponent implements OnInit {
 
         this.queryTableSettings = {
             columns: {
-                key: {title: 'Key'},
-                value: {title: 'Value'}
+                key: {title: 'Key', filterFunction: filterFunction},
+                value: {title: 'Value', filterFunction: filterFunction}
             },
-            actions: false,
-            pager: {
-                display: false
-            }
+            actions: false
         };
         this.showTrial(this.getActiveTrial());
     }

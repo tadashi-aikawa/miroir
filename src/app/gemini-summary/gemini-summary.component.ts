@@ -8,7 +8,14 @@ import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 
-const filterFunction = (v, q) => q.split(' and ').every(x => v.includes(x));
+const filterFunction = (v, q) =>
+    q.split(' and ').every(x => {
+        try {
+            return new RegExp(x).test(v);
+        } catch (e) {
+            return false;
+        }
+    });
 
 interface RowData {
     trial: Trial;
@@ -78,18 +85,18 @@ export class GeminiSummaryComponent {
                 this.activeReport = r;
                 this.settings = {
                     columns: {
-                        seq: {title: 'Seq'},
+                        seq: {title: 'Seq', filterFunction},
                         name: {title: 'Name', filterFunction},
                         path: {title: 'Path', filterFunction},
                         status: {title: 'Status', type: 'custom', renderComponent: StatusComponent, filterFunction},
                         queries: {title: 'Queries', type: 'custom', renderComponent: HoverComponent, filterFunction},
-                        oneByte: {title: '<- Byte'},
-                        otherByte: {title: 'Byte ->'},
-                        oneSec: {title: '<- Sec'},
-                        otherSec: {title: 'Sec ->'},
-                        oneStatus: {title: '<- Status', type: 'custom', renderComponent: StatusCodeComponent},
-                        otherStatus: {title: 'Status ->', type: 'custom', renderComponent: StatusCodeComponent},
-                        requestTime: {title: 'Request time'}
+                        oneByte: {title: '<- Byte', filterFunction},
+                        otherByte: {title: 'Byte ->', filterFunction},
+                        oneSec: {title: '<- Sec', filterFunction},
+                        otherSec: {title: 'Sec ->', filterFunction},
+                        oneStatus: {title: '<- Status', type: 'custom', renderComponent: StatusCodeComponent, filterFunction},
+                        otherStatus: {title: 'Status ->', type: 'custom', renderComponent: StatusCodeComponent, filterFunction},
+                        requestTime: {title: 'Request time', filterFunction}
                     },
                     actions: false
                 };
