@@ -110,7 +110,9 @@ export class DetailDialogComponent implements OnInit {
         note: test for times
           `,
             lineNumbers: true,
-            viewportMargin: 10
+            viewportMargin: 10,
+            mode: 'yaml',
+            theme: 'monokai'
         };
 
         this.noProblems = YAML.parse(this.editorConfig.value);
