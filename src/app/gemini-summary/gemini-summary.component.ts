@@ -195,7 +195,7 @@ export class GeminiSummaryComponent {
         dialogRef.componentInstance.activeIndex = String(index);
         dialogRef.componentInstance.trials = trials;
         dialogRef.componentInstance.ignores = _(this.activeReport.addons.judgement)
-            .find(x => x.name.match(/ignore_property_addon/gi) !== null)
+            .find(x => x.name.match(/ignore_properties/gi) !== null)
             .config.ignores;
     }
 }

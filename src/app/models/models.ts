@@ -55,13 +55,17 @@ export class Condition {
     };
 }
 
+export class IgnorePropertiesConfig {
+    ignores: Condition[];
+}
+
+export class JudgementAddon {
+    config: object;
+}
+
 // TODO define needed parameters
 export class Addons {
-    judgement: {
-        config: {
-            ignores: Condition[]
-        }
-    };
+    judgement: JudgementAddon[];
 }
 
 export class Report {
