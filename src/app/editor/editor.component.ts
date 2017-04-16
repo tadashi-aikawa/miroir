@@ -27,6 +27,9 @@ export class EditorComponent implements OnChanges {
         if (this.config) {
             this.instance = CodeMirror(this.view.nativeElement, this.config);
         }
+        if (this.height) {
+            this.instance.setSize(null, this.height);
+        }
     }
 
     updateView() {

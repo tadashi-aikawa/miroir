@@ -87,10 +87,21 @@
                 <md-icon>access_time</md-icon>
                 <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}</small>
             </div>
-            <h2>
-                {{activeReport.title}}
-                <span class="hashkey-text">({{activeReport.key.substring(0, 6)}})</span>
-            </h2>
+            <div class="center-vertical">
+                <button md-icon-button [mdMenuTriggerFor]="menu">
+                    <md-icon>more_vert</md-icon>
+                </button>
+                <md-menu #menu="mdMenu" [overlapTrigger]="false">
+                    <button md-menu-item (click)="showRequestsAsJson()">
+                        <md-icon>open_in_new</md-icon>
+                        <span>Show requests as logs</span>
+                    </button>
+                </md-menu>
+                <h2>
+                    {{activeReport.title}}
+                    <span class="hashkey-text">({{activeReport.key.substring(0, 6)}})</span>
+                </h2>
+            </div>
             <div class="smart-padding-without-top">
                 <small><md-chip>{{activeReport.summary.one.name}}</md-chip> {{activeReport.summary.one.host}}</small>
                 <small><md-chip>{{activeReport.summary.other.name}}</md-chip> {{activeReport.summary.other.host}}</small>

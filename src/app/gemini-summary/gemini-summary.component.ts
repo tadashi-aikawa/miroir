@@ -6,6 +6,8 @@ import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import {MdDialog, MdDialogRef} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
+import * as CodeMirror from 'codemirror';
+import 'codemirror/mode/javascript/javascript';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 
 const filterFunction = (v, q) =>
@@ -178,7 +180,7 @@ export class GeminiSummaryComponent {
     }
 
     onSelectRow(event: any) {
-        event.source.getFilteredAndSorted().then(es => {
+        event.source.getFilteredAndSorted().then((es: RowData[]) => {
             this.showDetail(es.map(x => x.trial), es.findIndex(e => e === event.data));
         });
     }
@@ -197,6 +199,16 @@ export class GeminiSummaryComponent {
         dialogRef.componentInstance.ignores = _(this.activeReport.addons.judgement)
             .find(x => x.name.match(/ignore_properties/gi) !== null)
             .config.ignores;
+    }
+
+    showRequestsAsJson() {
+        this.tableSource.getFilteredAndSorted().then((rs: RowData[]) => {
+            const dialogRef = this._dialog.open(RequestLogsDialogComponent, {
+                width: '80vw',
+                height: '97%'
+            });
+            dialogRef.componentInstance.trials = rs.map(x => x.trial);
+        });
     }
 }
 
@@ -241,6 +253,43 @@ export class DeleteConfirmDialogComponent {
 
     onClickRemove() {
         this.dialogRef.close(this.keys);
+    }
+}
+
+@Component({
+    template: `
+        <h2 md-dialog-title>Requests which can used on gemini</h2>
+        <app-editor #editor
+                    [config]="editorConfig"
+                    height='85vh'
+        >
+        </app-editor>
+    `,
+})
+export class RequestLogsDialogComponent implements OnInit {
+    @Input() trials: Trial[];
+    editorConfig: CodeMirror.EditorConfiguration;
+
+    constructor(@Optional() public dialogRef: MdDialogRef<RequestLogsDialogComponent>) {
+    }
+
+    ngOnInit(): void {
+        this.editorConfig = {
+            value: JSON.stringify(
+                this.trials.map((x: Trial) => ({
+                    name: x.name,
+                    path: x.path,
+                    qs: x.queries,
+                    headers: x.headers
+                })),
+                null,
+                4
+            ),
+            lineNumbers: true,
+            viewportMargin: 10,
+            mode: 'javascript',
+            theme: 'monokai'
+        };
     }
 }
 
