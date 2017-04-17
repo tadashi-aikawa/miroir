@@ -203,12 +203,40 @@ export class GeminiSummaryComponent {
 
     showRequestsAsJson() {
         this.tableSource.getFilteredAndSorted().then((rs: RowData[]) => {
-            const dialogRef = this._dialog.open(RequestLogsDialogComponent, {
+            const dialogRef = this._dialog.open(EditorDialogComponent, {
                 width: '80vw',
                 height: '97%'
             });
-            dialogRef.componentInstance.trials = rs.map(x => x.trial);
+            dialogRef.componentInstance.mode = 'javascript';
+            dialogRef.componentInstance.title = 'Requests which can used on gemini';
+            dialogRef.componentInstance.value = JSON.stringify(
+                    rs.map((x: RowData) => ({
+                        name: x.trial.name,
+                        path: x.trial.path,
+                        qs: x.trial.queries,
+                        headers: x.trial.headers
+                    })),
+                    null,
+                    4
+                );
         });
+    }
+
+    showSummaryAsJson() {
+        const dialogRef = this._dialog.open(EditorDialogComponent, {
+            width: '80vw',
+            height: '97%'
+        });
+        dialogRef.componentInstance.mode = 'javascript';
+        dialogRef.componentInstance.title = 'Summary';
+        dialogRef.componentInstance.value = JSON.stringify(
+            {
+                summary: this.activeReport.summary,
+                addons: this.activeReport.addons
+            },
+            null,
+            4
+        );
     }
 }
 
@@ -258,7 +286,7 @@ export class DeleteConfirmDialogComponent {
 
 @Component({
     template: `
-        <h2 md-dialog-title>Requests which can used on gemini</h2>
+        <h2 md-dialog-title>{{title}}</h2>
         <app-editor #editor
                     [config]="editorConfig"
                     height='85vh'
@@ -266,28 +294,21 @@ export class DeleteConfirmDialogComponent {
         </app-editor>
     `,
 })
-export class RequestLogsDialogComponent implements OnInit {
-    @Input() trials: Trial[];
+export class EditorDialogComponent implements OnInit {
+    @Input() mode: string;
+    @Input() title: string;
+    @Input() value: string;
     editorConfig: CodeMirror.EditorConfiguration;
 
-    constructor(@Optional() public dialogRef: MdDialogRef<RequestLogsDialogComponent>) {
+    constructor(@Optional() public dialogRef: MdDialogRef<EditorDialogComponent>) {
     }
 
     ngOnInit(): void {
         this.editorConfig = {
-            value: JSON.stringify(
-                this.trials.map((x: Trial) => ({
-                    name: x.name,
-                    path: x.path,
-                    qs: x.queries,
-                    headers: x.headers
-                })),
-                null,
-                4
-            ),
+            value: this.value,
             lineNumbers: true,
             viewportMargin: 10,
-            mode: 'javascript',
+            mode: this.mode,
             theme: 'monokai'
         };
     }

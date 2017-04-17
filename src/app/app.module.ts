@@ -13,7 +13,7 @@ import 'hammerjs';
 import {AppComponent} from './app.component';
 import {
     DeleteConfirmDialogComponent,
-    RequestLogsDialogComponent,
+    EditorDialogComponent,
     GeminiSummaryComponent,
     HoverComponent,
     StatusCodeComponent,
@@ -31,7 +31,7 @@ import {EditorComponent} from './editor/editor.component';
         MergeViewerComponent,
         DetailDialogComponent,
         DeleteConfirmDialogComponent,
-        RequestLogsDialogComponent,
+        EditorDialogComponent,
         EditorComponent,
         HoverComponent,
         StatusCodeComponent,
@@ -56,7 +56,7 @@ import {EditorComponent} from './editor/editor.component';
         DetailDialogComponent,
         EditorComponent,
         DeleteConfirmDialogComponent,
-        RequestLogsDialogComponent,
+        EditorDialogComponent,
         HoverComponent,
         StatusCodeComponent,
         StatusComponent
