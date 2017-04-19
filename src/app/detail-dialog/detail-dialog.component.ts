@@ -54,7 +54,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() otherAccessPoint: AccessPoint;
     @Input() trials: Trial[];
     @Input() ignores: Condition[];
-    @Input() noProblems: Condition[];
+    @Input() checkedAlready: Condition[];
     @Input() awsConfig: AwsConfig;
     @Input() activeTabIndex: string;
 
@@ -115,7 +115,7 @@ export class DetailDialogComponent implements OnInit {
             theme: 'monokai'
         };
 
-        this.noProblems = YAML.parse(this.editorConfig.value);
+        this.checkedAlready = YAML.parse(this.editorConfig.value);
 
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
@@ -205,38 +205,38 @@ export class DetailDialogComponent implements OnInit {
 
         // Property diffs
         this.updatePropertyDiffs(trial);
-        // TODO: Assign no problem diffs to codemirror
+        // TODO: Assign checked already diffs to codemirror
     }
 
     private updatePropertyDiffs(trial: Trial) {
         const added_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.added.map((x: string) => {
             const ig: RegExpMatcher = this.findAddedMatcher(this.ignores, x, trial);
-            const noP: RegExpMatcher = this.findAddedMatcher(this.noProblems, x, trial);
+            const ca: RegExpMatcher = this.findAddedMatcher(this.checkedAlready, x, trial);
             return {
                 pattern: x,
                 type: DiffType.ADDED,
-                cognition: ig ? DiffCognition.IGNORED : noP ? DiffCognition.NO_PROBLEM : DiffCognition.ATTENTION,
-                note: ig ? ig.note : noP ? noP.note : ''
+                cognition: ig ? DiffCognition.IGNORED : ca ? DiffCognition.CHECKED_ALREADY : DiffCognition.UNKNOWN,
+                note: ig ? ig.note : ca ? ca.note : ''
             };
         });
         const changed_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.changed.map((x: string) => {
             const ig: RegExpMatcher = this.findChangedMatcher(this.ignores, x, trial);
-            const noP: RegExpMatcher = this.findChangedMatcher(this.noProblems, x, trial);
+            const ca: RegExpMatcher = this.findChangedMatcher(this.checkedAlready, x, trial);
             return {
                 pattern: x,
                 type: DiffType.CHANGED,
-                cognition: ig ? DiffCognition.IGNORED : noP ? DiffCognition.NO_PROBLEM : DiffCognition.ATTENTION,
-                note: ig ? ig.note : noP ? noP.note : ''
+                cognition: ig ? DiffCognition.IGNORED : ca ? DiffCognition.CHECKED_ALREADY : DiffCognition.UNKNOWN,
+                note: ig ? ig.note : ca ? ca.note : ''
             };
         });
         const removed_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.removed.map((x: string) => {
             const ig: RegExpMatcher = this.findRemovedMatcher(this.ignores, x, trial);
-            const noP: RegExpMatcher = this.findRemovedMatcher(this.noProblems, x, trial);
+            const ca: RegExpMatcher = this.findRemovedMatcher(this.checkedAlready, x, trial);
             return {
                 pattern: x,
                 type: DiffType.REMOVED,
-                cognition: ig ? DiffCognition.IGNORED : noP ? DiffCognition.NO_PROBLEM : DiffCognition.ATTENTION,
-                note: ig ? ig.note : noP ? noP.note : ''
+                cognition: ig ? DiffCognition.IGNORED : ca ? DiffCognition.CHECKED_ALREADY : DiffCognition.UNKNOWN,
+                note: ig ? ig.note : ca ? ca.note : ''
             };
         });
         this.propertyDiffs = [...added_rows, ...changed_rows, ...removed_rows];
@@ -258,16 +258,16 @@ export class DetailDialogComponent implements OnInit {
     }
 
     updateEditorConfig(e) {
-        this.noProblems = YAML.parse(this.editor.instance.getValue());
+        this.checkedAlready = YAML.parse(this.editor.instance.getValue());
         this.updatePropertyDiffs(this.getActiveTrial());
     }
 
-    findAttentionPropertyDiffs(): PropertyDiff[] {
-        return this.findPropertyDiffs(DiffCognition.ATTENTION);
+    findUnknownPropertyDiffs(): PropertyDiff[] {
+        return this.findPropertyDiffs(DiffCognition.UNKNOWN);
     }
 
-    findNoProblemPropertyDiffs(): PropertyDiff[] {
-        return this.findPropertyDiffs(DiffCognition.NO_PROBLEM);
+    findCheckedAlreadyPropertyDiffs(): PropertyDiff[] {
+        return this.findPropertyDiffs(DiffCognition.CHECKED_ALREADY);
     }
 
     findIgnoredPropertyDiffs(): PropertyDiff[] {

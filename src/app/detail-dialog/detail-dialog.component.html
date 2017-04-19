@@ -65,10 +65,10 @@
         <div style="display: flex; justify-content: space-between;">
             <div>
                 <h2 class="center-vertical">
-                    <md-icon>report_problem</md-icon>&nbsp;Attention!!
+                    <md-icon>report_problem</md-icon>&nbsp;Unknown!!
                 </h2>
                 <table>
-                    <tr *ngFor="let p of findAttentionPropertyDiffs()" class="centering-vertical">
+                    <tr *ngFor="let p of findUnknownPropertyDiffs()" class="centering-vertical">
                         <td class={{p.type}}>
                             <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}
                             </md-icon>
@@ -77,10 +77,10 @@
                     </tr>
                 </table>
                 <h2 class="center-vertical">
-                    <md-icon>thumb_up</md-icon>&nbsp;No problem
+                    <md-icon>thumb_up</md-icon>&nbsp;Checked already
                 </h2>
                 <table>
-                    <tr *ngFor="let p of findNoProblemPropertyDiffs()" class="centering-vertical">
+                    <tr *ngFor="let p of findCheckedAlreadyPropertyDiffs()" class="centering-vertical">
                         <td class={{p.type}}>
                             <md-icon>{{p.type === 'added' ? 'add' : p.type === 'removed' ? 'remove' : 'autorenew'}}
                             </md-icon>

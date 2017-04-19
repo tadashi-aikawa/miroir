@@ -1,7 +1,7 @@
-type DiffCognition = 'attention' | 'no problem' | 'ignored';
+type DiffCognition = 'unknown' | 'checked already' | 'ignored';
 namespace DiffCognition {
-    export const ATTENTION: DiffCognition = 'attention';
-    export const NO_PROBLEM: DiffCognition = 'no problem';
+    export const UNKNOWN: DiffCognition = 'unknown';
+    export const CHECKED_ALREADY: DiffCognition = 'checked already';
     export const IGNORED: DiffCognition = 'ignored';
 }
 
