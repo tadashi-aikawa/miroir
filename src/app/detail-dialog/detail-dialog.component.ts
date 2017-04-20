@@ -65,6 +65,8 @@ export class DetailDialogComponent implements OnInit {
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
     propertyDiffs: PropertyDiff[];
+    oneExpectedEncoding: string;
+    otherExpectedEncoding: string;
 
     activeIndex: string;
     options: IOption[];
@@ -181,10 +183,12 @@ export class DetailDialogComponent implements OnInit {
             const fetchFile = (file: string) =>
                 this.service.fetchDetail(`${this.reportKey}/${file}`, this.awsConfig);
             Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
-                .then((rs: string[]) => {
+                .then((rs: {encoding: string, body: string}[]) => {
                     this.isLoading = false;
                     this.errorMessage = undefined;
-                    this.mergeViewConfig = createConfig(rs[0], rs[1]);
+                    this.mergeViewConfig = createConfig(rs[0].body, rs[1].body);
+                    this.oneExpectedEncoding = rs[0].encoding;
+                    this.otherExpectedEncoding = rs[1].encoding;
                 })
                 .catch(err => {
                     this.isLoading = false;

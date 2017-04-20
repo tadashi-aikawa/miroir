@@ -48,6 +48,10 @@
                               (onKeyQuestion)="toggleCheatSheet()"
             >
             </app-merge-viewer>
+            <div class="smart-padding-small" style="display: flex; justify-content: space-around">
+                <small>{{oneExpectedEncoding}}</small>
+                <small>{{otherExpectedEncoding}}</small>
+            </div>
         </div>
         <div *ngIf="errorMessage">
             {{errorMessage}}

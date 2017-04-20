@@ -5,11 +5,12 @@ import {S3, DynamoDB} from 'aws-sdk';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {DynamoResult, Report} from '../models/models';
 import {AwsConfig} from '../models/models';
+import * as Encoding from 'encoding-japanese';
 
 @Injectable()
 export class AwsService {
 
-    fetchDetail(key: string, awsConfig: AwsConfig): Promise<Object> {
+    fetchDetail(key: string, awsConfig: AwsConfig): Promise<{encoding: string, body: string}> {
         return new Promise((resolve, reject) => {
             const s3 = new S3({
                 apiVersion: '2006-03-01',
@@ -19,7 +20,17 @@ export class AwsService {
 
             s3.getObject(
                 {Key: key, Bucket: awsConfig.bucket},
-                (err, data) => err ? reject(err.message) : resolve(data.Body.toString())
+                (err, data) => {
+                    if (err) {
+                        return reject(err.message);
+                    } else {
+                        const encoding: string = Encoding.detect(data.Body);
+                        const body: string = Encoding.codeToString(
+                            Encoding.convert(data.Body, {from: encoding, to: 'UNICODE'})
+                        );
+                        return resolve({encoding, body});
+                    }
+                }
             );
         });
     }
