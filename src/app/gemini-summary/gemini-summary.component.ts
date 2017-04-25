@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
+import {Options} from 'highcharts';
 
 const filterFunction = (v, q) =>
     q.split(' and ').every(x => {
@@ -57,6 +58,8 @@ export class GeminiSummaryComponent {
     activeReport: Report;
     loadingReportKey: string;
     tableSource = new LocalDataSource();
+
+    chartOptions: Options;
 
     constructor(private service: AwsService, private _dialog: MdDialog) {
     }
@@ -117,6 +120,43 @@ export class GeminiSummaryComponent {
                     otherStatus: t.other.status_code,
                     requestTime: t.request_time
                 })));
+
+                this.chartOptions = {
+                    chart: {
+                        type: 'spline',
+                        zoomType: 'x'
+                    },
+                    title: {
+                        text: 'Response time'
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'msec'
+                        }
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle'
+                    },
+                    tooltip: {
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    },
+                    series: [{
+                        name: r.summary.one.name,
+                        data: r.trials.map(x => x.one.response_sec)
+                    }, {
+                        name: r.summary.other.name,
+                        data: r.trials.map(x => x.other.response_sec)
+                    }]
+                };
             })
             .catch(err => {
                 this.loadingReportKey = undefined;
