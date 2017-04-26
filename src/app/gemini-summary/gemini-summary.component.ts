@@ -97,6 +97,7 @@ export class GeminiSummaryComponent {
             .then((r: Report) => {
                 this.loadingReportKey = undefined;
 
+                r.trials = r.trials.map(t => Object.assign(new Trial(), t));
                 this.activeReport = r;
                 this.settings = {
                     columns: {
@@ -116,7 +117,7 @@ export class GeminiSummaryComponent {
                     actions: false
                 };
                 this.tableSource.load(r.trials.map(t => (<RowData>{
-                    trial: Object.assign(new Trial(), t),
+                    trial: t,
                     seq: t.seq,
                     name: t.name,
                     path: t.path,
@@ -167,7 +168,14 @@ export class GeminiSummaryComponent {
                             color: 'rgba(100,100,255,0.5)',
                             data: r.trials.map(x => ({
                                 y: x.one.response_sec,
-                                marker: statusToMarker(x.one.status_code)
+                                name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                                marker: statusToMarker(x.one.status_code),
+                                events: {
+                                    click: e => {
+                                        this.showDetail(this.activeReport.trials, e.point.index);
+                                        return false;
+                                    }
+                                }
                             }))
                         },
                         {
@@ -175,7 +183,14 @@ export class GeminiSummaryComponent {
                             color: 'rgba(255,100,100,0.5)',
                             data: r.trials.map(x => ({
                                 y: x.other.response_sec,
-                                marker: statusToMarker(x.other.status_code)
+                                name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                                marker: statusToMarker(x.other.status_code),
+                                events: {
+                                    click: e => {
+                                        this.showDetail(this.activeReport.trials, e.point.index);
+                                        return false;
+                                    }
+                                }
                             }))
                         }
                     ]
