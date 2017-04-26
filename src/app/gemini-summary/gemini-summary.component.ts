@@ -134,7 +134,6 @@ export class GeminiSummaryComponent {
 
                 this.chartOptions = {
                     chart: {
-                        type: 'spline',
                         zoomType: 'x'
                     },
                     title: {
@@ -160,12 +159,20 @@ export class GeminiSummaryComponent {
                             },
                             lineWidth: 2,
                             pointStart: 1
+                        },
+                        area: {
+                            marker: {
+                                enabled: false
+                            },
+                            lineWidth: 1,
+                            pointStart: 1
                         }
                     },
                     series: [
                         {
                             name: r.summary.one.name,
                             color: 'rgba(100,100,255,0.5)',
+                            type: 'spline',
                             data: r.trials.map(x => ({
                                 y: x.one.response_sec,
                                 name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
@@ -181,10 +188,26 @@ export class GeminiSummaryComponent {
                         {
                             name: r.summary.other.name,
                             color: 'rgba(255,100,100,0.5)',
+                            type: 'spline',
                             data: r.trials.map(x => ({
                                 y: x.other.response_sec,
                                 name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
                                 marker: statusToMarker(x.other.status_code),
+                                events: {
+                                    click: e => {
+                                        this.showDetail(this.activeReport.trials, e.point.index);
+                                        return false;
+                                    }
+                                }
+                            }))
+                        },
+                        {
+                            name: 'Numerical difference',
+                            color: 'rgba(100,255,100,0.5)',
+                            type: 'area',
+                            data: r.trials.map(x => ({
+                                y: x.responseSecDiff,
+                                name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
                                 events: {
                                     click: e => {
                                         this.showDetail(this.activeReport.trials, e.point.index);

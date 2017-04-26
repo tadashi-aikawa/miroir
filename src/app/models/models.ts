@@ -119,6 +119,10 @@ export class Trial {
     hasResponse(): boolean {
         return this.one.file !== undefined && this.other.file !== undefined;
     }
+
+    get responseSecDiff(): number {
+        return Math.round((this.other.response_sec - this.one.response_sec) * 100) / 100;
+    }
 }
 
 export class ResponseSummary {
