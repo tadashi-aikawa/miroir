@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
-import {Options} from 'highcharts';
+import {Marker, Options} from 'highcharts';
 
 const filterFunction = (v, q) =>
     q.split(' and ').every(x => {
@@ -19,6 +19,16 @@ const filterFunction = (v, q) =>
             return false;
         }
     });
+
+const statusToMarker = (status: number): Marker => {
+    const statusHead: number = Math.floor(status / 100);
+    const createMarker = (color: string): Marker =>
+        ({enabled: true, fillColor: color, lineColor: 'gray', lineWidth: 1, radius: 6});
+
+    return statusHead === 5 ? createMarker('red') :
+        statusHead === 4 ? createMarker('yellow') :
+            ({enabled: false});
+};
 
 interface RowData {
     trial: Trial;
@@ -145,17 +155,26 @@ export class GeminiSummaryComponent {
                     plotOptions: {
                         spline: {
                             marker: {
-                                enabled: false
+                                symbol: 'circle'
                             }
                         }
                     },
-                    series: [{
-                        name: r.summary.one.name,
-                        data: r.trials.map(x => x.one.response_sec)
-                    }, {
-                        name: r.summary.other.name,
-                        data: r.trials.map(x => x.other.response_sec)
-                    }]
+                    series: [
+                        {
+                            name: r.summary.one.name,
+                            data: r.trials.map(x => ({
+                                y: x.one.response_sec,
+                                marker: statusToMarker(x.one.status_code)
+                            }))
+                        },
+                        {
+                            name: r.summary.other.name,
+                            data: r.trials.map(x => ({
+                                y: x.other.response_sec,
+                                marker: statusToMarker(x.other.status_code)
+                            }))
+                        }
+                    ]
                 };
             })
             .catch(err => {
