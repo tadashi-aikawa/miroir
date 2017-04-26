@@ -23,7 +23,7 @@ const filterFunction = (v, q) =>
 const statusToMarker = (status: number): Marker => {
     const statusHead: number = Math.floor(status / 100);
     const createMarker = (color: string): Marker =>
-        ({enabled: true, fillColor: color, lineColor: 'gray', lineWidth: 1, radius: 6});
+        ({enabled: true, fillColor: color, lineColor: 'gray', lineWidth: 1, radius: 4});
 
     return statusHead === 5 ? createMarker('red') :
         statusHead === 4 ? createMarker('yellow') :
@@ -141,7 +141,7 @@ export class GeminiSummaryComponent {
                     },
                     yAxis: {
                         title: {
-                            text: 'msec'
+                            text: 'sec'
                         }
                     },
                     legend: {
@@ -156,12 +156,15 @@ export class GeminiSummaryComponent {
                         spline: {
                             marker: {
                                 symbol: 'circle'
-                            }
+                            },
+                            lineWidth: 2,
+                            pointStart: 1
                         }
                     },
                     series: [
                         {
                             name: r.summary.one.name,
+                            color: 'rgba(100,100,255,0.5)',
                             data: r.trials.map(x => ({
                                 y: x.one.response_sec,
                                 marker: statusToMarker(x.one.status_code)
@@ -169,6 +172,7 @@ export class GeminiSummaryComponent {
                         },
                         {
                             name: r.summary.other.name,
+                            color: 'rgba(255,100,100,0.5)',
                             data: r.trials.map(x => ({
                                 y: x.other.response_sec,
                                 marker: statusToMarker(x.other.status_code)
