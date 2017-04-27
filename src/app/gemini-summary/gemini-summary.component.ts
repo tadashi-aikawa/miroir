@@ -144,11 +144,6 @@ export class GeminiSummaryComponent {
                             text: 'sec'
                         }
                     },
-                    legend: {
-                        layout: 'vertical',
-                        align: 'right',
-                        verticalAlign: 'middle'
-                    },
                     tooltip: {
                         shared: true
                     },
