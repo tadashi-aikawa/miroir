@@ -161,6 +161,9 @@ export class GeminiSummaryComponent {
                             },
                             lineWidth: 1,
                             pointStart: 1
+                        },
+                        series: {
+                            turboThreshold: 10000
                         }
                     },
                     series: [
