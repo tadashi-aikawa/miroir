@@ -1,5 +1,5 @@
-import {AccessPoint, AwsConfig, Condition, Pair, PropertyDiff, RegExpMatcher, Trial} from '../models/models';
-import {AwsService} from '../services/aws-service';
+import {AccessPoint, AwsConfig, Condition, Pair, PropertyDiff, RegExpMatcher, Trial} from '../../models/models';
+import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
 import * as YAML from 'yamljs';
@@ -8,8 +8,8 @@ import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
 import * as _ from 'lodash';
-import DiffType from '../constants/DiffType';
-import DiffCognition from '../constants/DiffCognition';
+import DiffType from '../../constants/DiffType';
+import DiffCognition from '../../constants/DiffCognition';
 
 
 interface RowData {

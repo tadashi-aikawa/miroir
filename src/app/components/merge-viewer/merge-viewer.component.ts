@@ -8,7 +8,7 @@ import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/search/matchesonscrollbar';
 import 'codemirror/addon/scroll/annotatescrollbar';
 import 'codemirror/addon/search/jump-to-line';
-import {Pair} from '../models/models';
+import {Pair} from '../../models/models';
 
 
 function scrollToCenter(cm) {

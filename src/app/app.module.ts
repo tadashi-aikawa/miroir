@@ -16,20 +16,20 @@ import {AppComponent} from './app.component';
 import {
     DeleteConfirmDialogComponent,
     EditorDialogComponent,
-    GeminiSummaryComponent,
+    SummaryComponent,
     HoverComponent,
     StatusCodeComponent,
     StatusComponent
-} from './gemini-summary/gemini-summary.component';
-import {MergeViewerComponent} from './merge-viewer/merge-viewer.component';
+} from './components/summary/summary.component';
+import {MergeViewerComponent} from './components/merge-viewer/merge-viewer.component';
 import {CommonModule} from '@angular/common';
-import {DetailDialogComponent} from './detail-dialog/detail-dialog.component';
-import {EditorComponent} from './editor/editor.component';
+import {DetailDialogComponent} from './components/detail-dialog/detail-dialog.component';
+import {EditorComponent} from './components/editor/editor.component';
 
 @NgModule({
     declarations: [
         AppComponent,
-        GeminiSummaryComponent,
+        SummaryComponent,
         MergeViewerComponent,
         DetailDialogComponent,
         DeleteConfirmDialogComponent,
@@ -51,7 +51,7 @@ import {EditorComponent} from './editor/editor.component';
         Ng2HighchartsModule,
         HotkeyModule.forRoot({disableCheatSheet: true}),
         LocalStorageModule.withConfig({
-            prefix: 'gemini-viewer',
+            prefix: 'jumeaux-viewer',
             storageType: 'localStorage'
         })
     ],

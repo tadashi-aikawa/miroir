@@ -1,8 +1,8 @@
-# gemini-viewer
+# jumeaux-viewer
 
-Viewer for [gemini](https://github.com/tadashi-aikawa/gemini).
+Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
-Demo: https://tadashi-aikawa.github.io/gemini-viewer/
+Demo: https://tadashi-aikawa.github.io/jumeaux-viewer/
 
 ## Development server
 
@@ -15,8 +15,8 @@ Then access to `http://localhost:4200/`
 ## Deploy to GitHub Pages
 
 ```
-$ ng build --prod --base-href https://<user>.github.io/gemini-viewer/
-$ ngh --repo=https://<github_token>@github.com/<user>/gemini-viewer.git
+$ ng build --prod --base-href https://<user>.github.io/jumeaux-viewer/
+$ ngh --repo=https://<github_token>@github.com/<user>/jumeaux-viewer.git
 ```
 
 You have to specify `<user>` and `github_token` as your own.

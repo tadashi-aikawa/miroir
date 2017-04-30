@@ -1,5 +1,5 @@
-import {AwsConfig, DynamoResult, DynamoRow, Report, Trial} from '../models/models';
-import {AwsService} from '../services/aws-service';
+import {AwsConfig, DynamoResult, DynamoRow, Report, Trial} from '../../models/models';
+import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
@@ -46,17 +46,17 @@ interface RowData {
 }
 
 @Component({
-    selector: 'app-gemini-summary',
-    templateUrl: './gemini-summary.component.html',
+    selector: 'app-summary',
+    templateUrl: './summary.component.html',
     styleUrls: [
-        './gemini-summary.css',
-        '../../../node_modules/hover.css/css/hover.css'
+        './summary.css',
+        '../../../../node_modules/hover.css/css/hover.css'
     ],
     providers: [
         AwsService
     ]
 })
-export class GeminiSummaryComponent {
+export class SummaryComponent {
     @Input() awsConfig: AwsConfig;
 
     searchingSummary: boolean;
@@ -307,7 +307,7 @@ export class GeminiSummaryComponent {
                 height: '97%'
             });
             dialogRef.componentInstance.mode = 'javascript';
-            dialogRef.componentInstance.title = 'Requests which can used on gemini';
+            dialogRef.componentInstance.title = 'Requests which can used on jumeaux';
             dialogRef.componentInstance.value = JSON.stringify(
                     rs.map((x: RowData) => ({
                         name: x.trial.name,
