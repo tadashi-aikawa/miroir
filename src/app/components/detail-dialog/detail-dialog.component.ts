@@ -2,7 +2,7 @@ import {AccessPoint, AwsConfig, Condition, Pair, PropertyDiff, RegExpMatcher, Tr
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
-import * as YAML from 'yamljs';
+import * as yaml from 'js-yaml';
 import {MdDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
@@ -80,7 +80,7 @@ export class DetailDialogComponent implements OnInit {
                 @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService) {
         // To prevent from unexpected close
-        dialogRef.config = {disableClose: true};
+        dialogRef._containerInstance.dialogConfig = {disableClose: true};
 
         // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
@@ -117,7 +117,7 @@ export class DetailDialogComponent implements OnInit {
             theme: 'monokai'
         };
 
-        this.checkedAlready = YAML.parse(this.editorConfig.value);
+        this.checkedAlready = yaml.safeLoad(this.editorConfig.value);
 
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
@@ -262,7 +262,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     updateEditorConfig(e) {
-        this.checkedAlready = YAML.parse(this.editor.instance.getValue());
+        this.checkedAlready = yaml.safeLoad(this.editor.instance.getValue());
         this.updatePropertyDiffs(this.getActiveTrial());
     }
 
