@@ -2,10 +2,6 @@ md-sidenav {
     padding: 10px;
 }
 
-md-sidenav.app-sidenav2 {
-    width: 800px;
-}
-
 md-sidenav-container {
     min-height: 1024px;
 }
@@ -45,4 +41,11 @@ md-sidenav-container {
 .retry-text {
     color: gray;
     font-size: 50%;
+}
+
+.sidebar {
+    background-color: rgb(103, 58, 183);
+    color: darkgray;
+    padding-right: 10px;
+    min-height: 1024px;
 }

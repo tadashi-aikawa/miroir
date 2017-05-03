@@ -1,9 +1,9 @@
 import {AwsConfig, DynamoResult, DynamoRow, Report, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
-import {Component, Input, OnInit, Optional} from '@angular/core';
+import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
-import {MdDialog, MdDialogRef} from '@angular/material';
+import {MdDialog, MdDialogRef, MdSidenav} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import * as CodeMirror from 'codemirror';
@@ -59,6 +59,8 @@ interface RowData {
 export class SummaryComponent {
     @Input() awsConfig: AwsConfig;
 
+    @ViewChild('sidenav') sideNav: MdSidenav;
+
     searchingSummary: boolean;
     searchErrorMessage: string;
     rows: DynamoRow[];
@@ -74,11 +76,16 @@ export class SummaryComponent {
     constructor(private service: AwsService, private _dialog: MdDialog) {
     }
 
-    searchReport(keyWord: string) {
+    onSearchReport(keyword: string) {
+        this.searchReport(keyword);
+        this.expandSideBar();
+    }
+
+    searchReport(keyword: string) {
         this.searchErrorMessage = undefined;
         this.searchingSummary = true;
 
-        this.service.searchReport(keyWord, this.awsConfig)
+        this.service.searchReport(keyword, this.awsConfig)
             .then((r: DynamoResult) => {
                 this.searchingSummary = false;
                 this.rows = r.Items.sort(
@@ -89,6 +96,18 @@ export class SummaryComponent {
                 this.searchingSummary = false;
                 this.searchErrorMessage = err;
             });
+    }
+
+    expandSideBar() {
+        this.sideNav.toggle(true);
+    }
+
+    collapseSideBar() {
+        this.sideNav.toggle(false);
+    }
+
+    isSideBarExpanded() {
+        return this.sideNav._isOpened;
     }
 
     onClickCard(row: DynamoRow, event) {
