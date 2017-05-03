@@ -1,6 +1,6 @@
 import {AwsConfig, DynamoResult, DynamoRow, Report, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
-import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import {MdDialog, MdDialogRef, MdSidenav} from '@angular/material';
@@ -56,7 +56,7 @@ interface RowData {
         AwsService
     ]
 })
-export class SummaryComponent {
+export class SummaryComponent implements AfterViewInit {
     @Input() awsConfig: AwsConfig;
 
     @ViewChild('sidenav') sideNav: MdSidenav;
@@ -76,9 +76,13 @@ export class SummaryComponent {
     constructor(private service: AwsService, private _dialog: MdDialog) {
     }
 
+    ngAfterViewInit(): void {
+        // Avoid for ExpressionChangedAfterItHasBeenCheckedError
+        setTimeout(() => this.sideNav.open(), 0);
+    }
+
     onSearchReport(keyword: string) {
         this.searchReport(keyword);
-        this.expandSideBar();
     }
 
     searchReport(keyword: string) {
@@ -96,18 +100,6 @@ export class SummaryComponent {
                 this.searchingSummary = false;
                 this.searchErrorMessage = err;
             });
-    }
-
-    expandSideBar() {
-        this.sideNav.toggle(true);
-    }
-
-    collapseSideBar() {
-        this.sideNav.toggle(false);
-    }
-
-    isSideBarExpanded() {
-        return this.sideNav._isOpened;
     }
 
     onClickCard(row: DynamoRow, event) {

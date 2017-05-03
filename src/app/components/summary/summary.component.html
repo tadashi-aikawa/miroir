@@ -1,19 +1,26 @@
 <div style="display: flex;">
     <div class="sidebar">
-        <div *ngIf="isSideBarExpanded(); then collapseButton else expandButton"></div>
+        <div *ngIf="sidenav._isOpened; then collapseButton else expandButton"></div>
         <ng-template #collapseButton>
-            <md-icon class="action-icon action-icon-large" (click)="collapseSideBar()">
+            <md-icon class="action-icon action-icon-large" (click)="sidenav.close()">
                 chevron_left
             </md-icon>
         </ng-template>
         <ng-template #expandButton>
-            <md-icon class="action-icon action-icon-large" (click)="expandSideBar()">
+            <md-icon class="action-icon action-icon-large" (click)="sidenav.open()">
                 chevron_right
             </md-icon>
         </ng-template>
     </div>
     <md-sidenav-container>
         <md-sidenav #sidenav mode="side" class="app-sidenav" align="start">
+            <md-input-container>
+                <input mdInput #keyWord (keyup.enter)="onSearchReport(keyWord.value)" >
+                <md-placeholder>
+                    <i class="material-icons app-input-icon">search</i> Search word
+                </md-placeholder>
+            </md-input-container>
+
             <div *ngIf="searchingSummary">
                 <md-spinner></md-spinner>
             </div>
@@ -95,13 +102,6 @@
 
         <div class="smart-padding">
 
-            <md-input-container>
-                <input mdInput #keyWord (keyup.enter)="onSearchReport(keyWord.value)" >
-                <md-placeholder>
-                    <i class="material-icons app-input-icon">search</i> Search word
-                </md-placeholder>
-            </md-input-container>
-            <hr/>
             <md-tab-group>
                 <md-tab label="Table">
                     <div *ngIf="activeReport">
