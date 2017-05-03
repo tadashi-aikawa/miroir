@@ -1,5 +1,6 @@
 md-sidenav {
     padding: 10px;
+    min-width: 250px;
 }
 
 md-sidenav-container {
