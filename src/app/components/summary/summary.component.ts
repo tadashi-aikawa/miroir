@@ -143,7 +143,7 @@ export class SummaryComponent implements AfterViewInit {
                     name: t.name,
                     path: t.path,
                     status: t.status,
-                    queries: Object.keys(t.queries).map(k => `${k}: ${t.queries[k]}`).join('&'),
+                    queries: Object.keys(t.queries).map(k => `${k}=${t.queries[k]}`).join('&'),
                     oneByte: t.one.byte,
                     otherByte: t.other.byte,
                     oneSec: t.one.response_sec,
@@ -469,7 +469,7 @@ export class HoverComponent implements ViewCell, OnInit {
 
     ngOnInit(): void {
         this.renderValue = `${String(this.value).split('&').length} queries`;
-        this.hoverValue = String(this.value).split('&').join('\n');
+        this.hoverValue = String(this.value);
     }
 }
 
