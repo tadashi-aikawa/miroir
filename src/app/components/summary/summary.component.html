@@ -69,7 +69,7 @@
                         cloud_download
                     </md-icon>
                     <div *ngIf="row.retry_hash" class="card-retry-text">
-                        Retry from
+                        Retried from
                         <span class="hvr-underline-from-center action-text"
                               (click)="onClickRetryHash(row.retry_hash, $event)">
                             <u>{{row.retry_hash.substring(0, 7)}}</u>
@@ -113,6 +113,13 @@
                         <h2>
                             {{activeReport.title}}
                             <span class="hashkey-text">({{activeReport.key.substring(0, 7)}})</span>
+                            <span *ngIf="activeReport.retry_hash" class="retry-text">
+                                retried from
+                                <span class="hvr-underline-from-center action-text"
+                                      (click)="onClickRetryHash(activeReport.retry_hash, $event)">
+                                    <u>{{activeReport.retry_hash.substring(0, 7)}}</u>
+                                </span>
+                            </span>
                         </h2>
                     </div>
                     <div class="smart-padding-without-top">
