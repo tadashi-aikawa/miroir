@@ -13,7 +13,7 @@
         </div>
         <div *ngIf="!searchingSummary && !searchErrorMessage">
             <md-card *ngFor="let row of rows"
-                     (click)="showReport(row.hashkey)"
+                     (click)="onClickCard(row, $event)"
                      [ngClass]="activeReport && row.hashkey == activeReport.key ?
                         ['hvr-curl-bottom-right', 'summary-card', 'summary-card-active'] :
                             ['hvr-curl-bottom-right', 'summary-card']"
@@ -21,7 +21,7 @@
                 <md-card-header>
                     <md-card-title>
                         {{row.title}}
-                        <span class="card-hashkey-text">({{row.hashkey.substring(0, 6)}})</span>
+                        <span class="card-hashkey-text">({{row.hashkey.substring(0, 7)}})</span>
                     </md-card-title>
                     <md-card-subtitle>{{row.begin_time}}</md-card-subtitle>
                 </md-card-header>
@@ -68,6 +68,13 @@
                              class="action-icon hvr-buzz-out">
                         cloud_download
                     </md-icon>
+                    <div *ngIf="row.retry_hash" class="card-retry-text">
+                        Retry from
+                        <span class="hvr-underline-from-center action-text"
+                              (click)="onClickRetryHash(row.retry_hash, $event)">
+                            <u>{{row.retry_hash.substring(0, 7)}}</u>
+                        </span>
+                    </div>
                 </md-card-actions>
             </md-card>
         </div>
@@ -105,7 +112,7 @@
                         </md-menu>
                         <h2>
                             {{activeReport.title}}
-                            <span class="hashkey-text">({{activeReport.key.substring(0, 6)}})</span>
+                            <span class="hashkey-text">({{activeReport.key.substring(0, 7)}})</span>
                         </h2>
                     </div>
                     <div class="smart-padding-without-top">

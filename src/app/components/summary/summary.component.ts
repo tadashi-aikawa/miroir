@@ -91,6 +91,16 @@ export class SummaryComponent {
             });
     }
 
+    onClickCard(row: DynamoRow, event) {
+        this.showReport(row.hashkey);
+        event.stopPropagation();
+    }
+
+    onClickRetryHash(retryHash: string, event) {
+        this.showReport(retryHash);
+        event.stopPropagation();
+    }
+
     showReport(key: string) {
         this.loadingReportKey = key;
         this.service.fetchReport(`${key}/report.json`, this.awsConfig)
@@ -225,7 +235,7 @@ export class SummaryComponent {
 
     downloadArchive(key: string, event) {
         const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
-        const zipName = `${key.substring(0, 6)}.zip`;
+        const zipName = `${key.substring(0, 7)}.zip`;
 
         row.downloading = true;
         this.service.fetchArchive(`${key}/${zipName}`, this.awsConfig)
@@ -257,7 +267,7 @@ export class SummaryComponent {
 
                         this.service.removeDetails(keysToRemove, this.awsConfig)
                             .then(p => this.service.removeReport(key, this.awsConfig))
-                            .then(p => {
+                            .then(() => {
                                 this.rows = this.rows.filter((r: DynamoRow) => r.hashkey !== key);
                                 if (key === this.activeReport.key) {
                                     // TODO: abnormal
@@ -330,8 +340,11 @@ export class SummaryComponent {
         dialogRef.componentInstance.title = 'Summary';
         dialogRef.componentInstance.value = JSON.stringify(
             {
+                key: this.activeReport.key,
+                title: this.activeReport.title,
                 summary: this.activeReport.summary,
-                addons: this.activeReport.addons
+                addons: this.activeReport.addons,
+                retry_hash: this.activeReport.retry_hash
             },
             null,
             4
@@ -398,9 +411,6 @@ export class EditorDialogComponent implements OnInit {
     @Input() title: string;
     @Input() value: string;
     editorConfig: CodeMirror.EditorConfiguration;
-
-    constructor(@Optional() public dialogRef: MdDialogRef<EditorDialogComponent>) {
-    }
 
     ngOnInit(): void {
         this.editorConfig = {

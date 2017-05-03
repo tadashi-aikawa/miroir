@@ -32,6 +32,11 @@ md-sidenav-container {
     font-size: 80%;
 }
 
+.card-retry-text {
+    color: gray;
+    font-size: 80%;
+}
+
 .hashkey-text {
     color: gray;
     font-size: 50%;

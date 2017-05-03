@@ -26,6 +26,7 @@ export class DynamoRow {
     begin_time: string;
     end_time: string;
     with_zip: boolean;
+    retry_hash?: string;
 
     deleting?: boolean;
     deleteErrorMessage?: string;
@@ -55,10 +56,6 @@ export class Condition {
     };
 }
 
-export class IgnorePropertiesConfig {
-    ignores: Condition[];
-}
-
 export class JudgementAddon {
     config: object;
 }
@@ -74,6 +71,7 @@ export class Report {
     summary: Summary;
     trials: Trial[];
     addons?: Addons;
+    retry_hash?: string;
 }
 
 export class Summary {
