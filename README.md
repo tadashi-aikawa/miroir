@@ -4,6 +4,27 @@ Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
 Demo: https://tadashi-aikawa.github.io/jumeaux-viewer/
 
+## Preparation for development
+
+1. Install `npm` globally if you are not installed
+2. Install `yarn` globally if you are not installed
+
+```
+$ npm i -g yarn
+```
+
+3. Install `angular-cli` if you are not installed
+
+```
+$ yarn global add @angular/cli
+```
+
+4. Install dependencies
+
+```
+$ yarn install
+```
+
 ## Development server
 
 ```
