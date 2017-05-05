@@ -1,6 +1,17 @@
+import {ActivatedRoute} from '@angular/router';
 import {AwsConfig, DynamoResult, DynamoRow, Report, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
-import {AfterViewChecked, AfterViewInit, Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    Input,
+    OnChanges,
+    OnInit,
+    Optional,
+    SimpleChanges,
+    ViewChild
+} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import {MdDialog, MdDialogRef, MdSidenav} from '@angular/material';
@@ -56,16 +67,17 @@ interface RowData {
         AwsService
     ]
 })
-export class SummaryComponent implements AfterViewInit {
+export class SummaryComponent implements OnChanges, AfterViewInit {
     @Input() awsConfig: AwsConfig;
 
     @ViewChild('sidenav') sideNav: MdSidenav;
+    @ViewChild('keyWord') keyWord: ElementRef;
 
     searchingSummary: boolean;
     searchErrorMessage: string;
     rows: DynamoRow[];
     settings: any;
-    errorMessage: string;
+    errorMessages: string[];
 
     activeReport: Report;
     loadingReportKey: string;
@@ -73,12 +85,41 @@ export class SummaryComponent implements AfterViewInit {
 
     chartOptions: Options;
 
-    constructor(private service: AwsService, private _dialog: MdDialog) {
+    constructor(private service: AwsService,
+                private _dialog: MdDialog,
+                private route: ActivatedRoute) {
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        const p = changes.awsConfig.previousValue;
+        const c = changes.awsConfig.currentValue;
+
+        // HACK: Because of password has not been reflected immediately...
+        // TODO: More clever solution
+        if ((p === undefined || p.secretAccessKey === undefined) && c.secretAccessKey !== undefined) {
+            this.route.params.subscribe(ps => {
+                if (ps.hash) {
+                    this.searchReport(ps.hash);
+                    this.showReport(ps.hash);
+                }
+            });
+        }
     }
 
     ngAfterViewInit(): void {
-        // Avoid for ExpressionChangedAfterItHasBeenCheckedError
-        setTimeout(() => this.sideNav.open(), 0);
+        this.route.params.subscribe(ps => {
+            if (ps.hash) {
+                this.errorMessages = [
+                    `Loading ${ps.hash}...`,
+                    'If nothing is shown, click anywhere on the page.'
+                ];
+            }
+        });
+        setTimeout(() => {
+            this.sideNav.open().then(x => {
+                setTimeout(() => this.keyWord.nativeElement.click(), 100)
+            });
+        }, 0);
     }
 
     onSearchReport(keyword: string) {
@@ -91,6 +132,7 @@ export class SummaryComponent implements AfterViewInit {
 
         this.service.searchReport(keyword, this.awsConfig)
             .then((r: DynamoResult) => {
+                console.log(r);
                 this.searchingSummary = false;
                 this.rows = r.Items.sort(
                     (a, b) => b.begin_time > a.begin_time ? 1 : -1
@@ -114,6 +156,7 @@ export class SummaryComponent implements AfterViewInit {
 
     showReport(key: string) {
         this.loadingReportKey = key;
+        this.errorMessages = undefined;
         this.service.fetchReport(`${key}/report.json`, this.awsConfig)
             .then((r: Report) => {
                 this.loadingReportKey = undefined;
@@ -240,7 +283,7 @@ export class SummaryComponent implements AfterViewInit {
             })
             .catch(err => {
                 this.loadingReportKey = undefined;
-                this.errorMessage = err;
+                this.errorMessages = [err];
             });
     }
 
@@ -249,6 +292,7 @@ export class SummaryComponent implements AfterViewInit {
         const zipName = `${key.substring(0, 7)}.zip`;
 
         row.downloading = true;
+        this.errorMessages = undefined;
         this.service.fetchArchive(`${key}/${zipName}`, this.awsConfig)
             .then(x => {
                 row.downloading = false;
@@ -264,6 +308,7 @@ export class SummaryComponent implements AfterViewInit {
 
     removeDetail(key: string, event) {
         const dialogRef = this._dialog.open(DeleteConfirmDialogComponent);
+        this.errorMessages = undefined;
         dialogRef.componentInstance.isLoading = true;
 
         const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
@@ -294,7 +339,7 @@ export class SummaryComponent implements AfterViewInit {
             })
             .catch(err => {
                 dialogRef.componentInstance.isLoading = false;
-                this.errorMessage = err;
+                this.errorMessages = [err];
             });
         event.stopPropagation();
     }

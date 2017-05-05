@@ -15,7 +15,7 @@
     <md-sidenav-container style="flex: 1">
         <md-sidenav #sidenav mode="side" class="app-sidenav" align="start">
             <md-input-container>
-                <input mdInput #keyWord (keyup.enter)="onSearchReport(keyWord.value)" >
+                <input mdInput #keyWord (keyup.enter)="onSearchReport(keyWord.value)">
                 <md-placeholder>
                     <i class="material-icons app-input-icon">search</i> Search word
                 </md-placeholder>
@@ -160,7 +160,9 @@
                 </md-tab-group>
             </div>
 
-            <p class="error" *ngIf="errorMessage">{{errorMessage}}</p>
+            <p *ngFor="let message of errorMessages">
+                {{message}}
+            </p>
         </div>
 
     </md-sidenav-container>
