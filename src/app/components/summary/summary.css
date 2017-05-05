@@ -4,7 +4,7 @@ md-sidenav {
 }
 
 md-sidenav-container {
-    min-height: 1024px;
+    min-height: calc(100vh - 64px)
 }
 
 .summary-card.mat-card {
@@ -48,5 +48,5 @@ md-sidenav-container {
     background-color: rgb(103, 58, 183);
     color: darkgray;
     padding-right: 10px;
-    min-height: 1024px;
+    min-height: calc(100vh - 64px)
 }
