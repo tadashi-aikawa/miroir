@@ -99,8 +99,11 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
         if ((p === undefined || p.secretAccessKey === undefined) && c.secretAccessKey !== undefined) {
             this.route.params.subscribe(ps => {
                 if (ps.hash) {
-                    this.searchReport(ps.hash);
-                    this.showReport(ps.hash);
+                    this.searchReport(ps.hash).then((rs: DynamoRow[]) => {
+                        if (rs.length === 1) {
+                            this.showReport(rs[0].hashkey);
+                        }
+                    });
                 }
             });
         }
@@ -122,26 +125,29 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
         }, 0);
     }
 
-    onSearchReport(keyword: string) {
+    onSearchReports(keyword: string) {
         this.searchReport(keyword);
     }
 
-    searchReport(keyword: string) {
-        this.searchErrorMessage = undefined;
-        this.searchingSummary = true;
+    searchReport(keyword: string): Promise<DynamoRow[]> {
+        return new Promise((resolve, reject) => {
+            this.searchErrorMessage = undefined;
+            this.searchingSummary = true;
 
-        this.service.searchReport(keyword, this.awsConfig)
-            .then((r: DynamoResult) => {
-                console.log(r);
-                this.searchingSummary = false;
-                this.rows = r.Items.sort(
-                    (a, b) => b.begin_time > a.begin_time ? 1 : -1
-                );
-            })
-            .catch(err => {
-                this.searchingSummary = false;
-                this.searchErrorMessage = err;
-            });
+            this.service.searchReport(keyword, this.awsConfig)
+                .then((r: DynamoResult) => {
+                    this.searchingSummary = false;
+                    this.rows = r.Items.sort(
+                        (a, b) => b.begin_time > a.begin_time ? 1 : -1
+                    );
+                    resolve(this.rows);
+                })
+                .catch(err => {
+                    this.searchingSummary = false;
+                    this.searchErrorMessage = err;
+                    reject(err);
+                });
+        });
     }
 
     onClickCard(row: DynamoRow, event) {

@@ -15,7 +15,7 @@
     <md-sidenav-container style="flex: 1">
         <md-sidenav #sidenav mode="side" class="app-sidenav" align="start">
             <md-input-container>
-                <input mdInput #keyWord (keyup.enter)="onSearchReport(keyWord.value)">
+                <input mdInput #keyWord (keyup.enter)="onSearchReports(keyWord.value)">
                 <md-placeholder>
                     <i class="material-icons app-input-icon">search</i> Search word
                 </md-placeholder>
@@ -101,68 +101,76 @@
         </md-sidenav>
 
         <div class="smart-padding">
-            <div *ngIf="activeReport">
-                <md-tab-group>
-                    <md-tab label="Table">
-                        <div class="smart-padding">
-                            <div style="float: right;" class="center-vertical">
-                                <md-icon>access_time</md-icon>
-                                <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}</small>
-                            </div>
-                            <div class="center-vertical">
-                                <button md-icon-button [mdMenuTriggerFor]="menu">
-                                    <md-icon>more_vert</md-icon>
-                                </button>
-                                <md-menu #menu="mdMenu" [overlapTrigger]="false">
-                                    <button md-menu-item (click)="showRequestsAsJson()">
-                                        <md-icon>open_in_new</md-icon>
-                                        <span>Show requests as logs</span>
+            <div *ngIf="loadingReportKey; then loadingReport else report"></div>
+
+            <ng-template #loadingReport>
+                Now Loading...
+                <md-progress-bar mode="indeterminate"></md-progress-bar>
+            </ng-template>
+            <ng-template #report>
+                <div *ngIf="activeReport">
+                    <md-tab-group>
+                        <md-tab label="Table">
+                            <div class="smart-padding">
+                                <div style="float: right;" class="center-vertical">
+                                    <md-icon>access_time</md-icon>
+                                    <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}
+                                    </small>
+                                </div>
+                                <div class="center-vertical">
+                                    <button md-icon-button [mdMenuTriggerFor]="menu">
+                                        <md-icon>more_vert</md-icon>
                                     </button>
-                                    <button md-menu-item (click)="showSummaryAsJson()">
-                                        <md-icon>open_in_new</md-icon>
-                                        <span>Show summary</span>
-                                    </button>
-                                </md-menu>
-                                <h2>
-                                    {{activeReport.title}}
-                                    <span class="hashkey-text">({{activeReport.key.substring(0, 7)}})</span>
-                                    <span *ngIf="activeReport.retry_hash" class="retry-text">
+                                    <md-menu #menu="mdMenu" [overlapTrigger]="false">
+                                        <button md-menu-item (click)="showRequestsAsJson()">
+                                            <md-icon>open_in_new</md-icon>
+                                            <span>Show requests as logs</span>
+                                        </button>
+                                        <button md-menu-item (click)="showSummaryAsJson()">
+                                            <md-icon>open_in_new</md-icon>
+                                            <span>Show summary</span>
+                                        </button>
+                                    </md-menu>
+                                    <h2>
+                                        {{activeReport.title}}
+                                        <span class="hashkey-text">({{activeReport.key.substring(0, 7)}})</span>
+                                        <span *ngIf="activeReport.retry_hash" class="retry-text">
                                     retried from
                                     <span class="hvr-underline-from-center action-text"
                                           (click)="onClickRetryHash(activeReport.retry_hash, $event)">
                                         <u>{{activeReport.retry_hash.substring(0, 7)}}</u>
                                     </span>
                                 </span>
-                                </h2>
+                                    </h2>
+                                </div>
+                                <div class="smart-padding-without-top">
+                                    <small>
+                                        <md-chip>{{activeReport.summary.one.name}}</md-chip>
+                                        {{activeReport.summary.one.host}}
+                                    </small>
+                                    <small>
+                                        <md-chip>{{activeReport.summary.other.name}}</md-chip>
+                                        {{activeReport.summary.other.host}}
+                                    </small>
+                                </div>
+                                <ng2-smart-table [settings]="settings"
+                                                 [source]="tableSource"
+                                                 (userRowSelect)="onSelectRow($event);"
+                                >
+                                </ng2-smart-table>
                             </div>
-                            <div class="smart-padding-without-top">
-                                <small>
-                                    <md-chip>{{activeReport.summary.one.name}}</md-chip>
-                                    {{activeReport.summary.one.host}}
-                                </small>
-                                <small>
-                                    <md-chip>{{activeReport.summary.other.name}}</md-chip>
-                                    {{activeReport.summary.other.host}}
-                                </small>
+                        </md-tab>
+                        <md-tab label="Chart">
+                            <div class="smart-padding">
+                                <div [ng2-highcharts]="chartOptions"></div>
                             </div>
-                            <ng2-smart-table [settings]="settings"
-                                             [source]="tableSource"
-                                             (userRowSelect)="onSelectRow($event);"
-                            >
-                            </ng2-smart-table>
-                        </div>
-                    </md-tab>
-                    <md-tab label="Chart">
-                        <div class="smart-padding">
-                            <div [ng2-highcharts]="chartOptions"></div>
-                        </div>
-                    </md-tab>
-                </md-tab-group>
-            </div>
-
-            <p *ngFor="let message of errorMessages">
-                {{message}}
-            </p>
+                        </md-tab>
+                    </md-tab-group>
+                </div>
+                <p *ngFor="let message of errorMessages">
+                    {{message}}
+                </p>
+            </ng-template>
         </div>
 
     </md-sidenav-container>
