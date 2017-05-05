@@ -25,7 +25,7 @@ import {
     SummaryComponent
 } from './components/summary/summary.component';
 import {MergeViewerComponent} from './components/merge-viewer/merge-viewer.component';
-import {CommonModule} from '@angular/common';
+import {CommonModule, HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {DetailDialogComponent} from './components/detail-dialog/detail-dialog.component';
 import {EditorComponent} from './components/editor/editor.component';
 
@@ -74,7 +74,7 @@ const appRoutes: Routes = [
         StatusCodeComponent,
         StatusComponent
     ],
-    providers: [],
+    providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}],
     bootstrap: [AppComponent]
 })
 export class AppModule {
