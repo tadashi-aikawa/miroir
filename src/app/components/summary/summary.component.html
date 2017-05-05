@@ -109,50 +109,50 @@
             </ng-template>
             <ng-template #report>
                 <div *ngIf="activeReport">
-                    <md-tab-group>
-                        <md-tab label="Table">
-                            <div class="smart-padding">
-                                <div style="float: right;" class="center-vertical">
-                                    <md-icon>access_time</md-icon>
-                                    <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}
-                                    </small>
-                                </div>
-                                <div class="center-vertical">
-                                    <button md-icon-button [mdMenuTriggerFor]="menu">
-                                        <md-icon>more_vert</md-icon>
-                                    </button>
-                                    <md-menu #menu="mdMenu" [overlapTrigger]="false">
-                                        <button md-menu-item (click)="showRequestsAsJson()">
-                                            <md-icon>open_in_new</md-icon>
-                                            <span>Show requests as logs</span>
-                                        </button>
-                                        <button md-menu-item (click)="showSummaryAsJson()">
-                                            <md-icon>open_in_new</md-icon>
-                                            <span>Show summary</span>
-                                        </button>
-                                    </md-menu>
-                                    <h2>
-                                        {{activeReport.title}}
-                                        <span class="hashkey-text">({{activeReport.key.substring(0, 7)}})</span>
-                                        <span *ngIf="activeReport.retry_hash" class="retry-text">
+                    <div style="float: right;" class="center-vertical">
+                        <md-icon>access_time</md-icon>
+                        <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}
+                        </small>
+                    </div>
+                    <div class="center-vertical">
+                        <button md-icon-button [mdMenuTriggerFor]="menu">
+                            <md-icon>more_vert</md-icon>
+                        </button>
+                        <md-menu #menu="mdMenu" [overlapTrigger]="false">
+                            <button md-menu-item (click)="showRequestsAsJson()">
+                                <md-icon>open_in_new</md-icon>
+                                <span>Show requests as logs</span>
+                            </button>
+                            <button md-menu-item (click)="showSummaryAsJson()">
+                                <md-icon>open_in_new</md-icon>
+                                <span>Show summary</span>
+                            </button>
+                        </md-menu>
+                        <h2>
+                            {{activeReport.title}}
+                            <span class="hashkey-text">({{activeReport.key.substring(0, 7)}})</span>
+                            <span *ngIf="activeReport.retry_hash" class="retry-text">
                                     retried from
                                     <span class="hvr-underline-from-center action-text"
                                           (click)="onClickRetryHash(activeReport.retry_hash, $event)">
                                         <u>{{activeReport.retry_hash.substring(0, 7)}}</u>
                                     </span>
                                 </span>
-                                    </h2>
-                                </div>
-                                <div class="smart-padding-without-top">
-                                    <small>
-                                        <md-chip>{{activeReport.summary.one.name}}</md-chip>
-                                        {{activeReport.summary.one.host}}
-                                    </small>
-                                    <small>
-                                        <md-chip>{{activeReport.summary.other.name}}</md-chip>
-                                        {{activeReport.summary.other.host}}
-                                    </small>
-                                </div>
+                        </h2>
+                    </div>
+                    <div class="smart-padding-without-top">
+                        <small>
+                            <md-chip>{{activeReport.summary.one.name}}</md-chip>
+                            {{activeReport.summary.one.host}}
+                        </small>
+                        <small>
+                            <md-chip>{{activeReport.summary.other.name}}</md-chip>
+                            {{activeReport.summary.other.host}}
+                        </small>
+                    </div>
+                    <md-tab-group>
+                        <md-tab label="Table">
+                            <div class="smart-padding">
                                 <ng2-smart-table [settings]="settings"
                                                  [source]="tableSource"
                                                  (userRowSelect)="onSelectRow($event);"
