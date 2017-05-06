@@ -1,4 +1,4 @@
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {AwsConfig, DynamoResult, DynamoRow, Report, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {
@@ -72,6 +72,7 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
 
     @ViewChild('sidenav') sideNav: MdSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
+    word: string = '';
 
     searchingSummary: boolean;
     searchErrorMessage: string;
@@ -87,7 +88,8 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
 
     constructor(private service: AwsService,
                 private _dialog: MdDialog,
-                private route: ActivatedRoute) {
+                private route: ActivatedRoute,
+                private router: Router) {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -98,12 +100,12 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
         // TODO: More clever solution
         if ((p === undefined || p.secretAccessKey === undefined) && c.secretAccessKey !== undefined) {
             this.route.params.subscribe(ps => {
-                if (ps.hash) {
-                    this.searchReport(ps.hash).then((rs: DynamoRow[]) => {
-                        if (rs.length === 1) {
-                            this.showReport(rs[0].hashkey);
-                        }
-                    });
+                if (ps.searchWord) {
+                    this.word = ps.searchWord;
+                    this.searchReport(ps.searchWord);
+                }
+                if (ps.hashKey) {
+                    this.showReport(ps.hashKey);
                 }
             });
         }
@@ -127,6 +129,7 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
 
     onSearchReports(keyword: string) {
         this.searchReport(keyword);
+        //this.router.navigate(['/report', keyword], {replaceUrl: true})
     }
 
     searchReport(keyword: string): Promise<DynamoRow[]> {
@@ -152,6 +155,7 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
 
     onClickCard(row: DynamoRow, event) {
         this.showReport(row.hashkey);
+        //this.router.navigate(['/report', this.word, row.hashkey], {replaceUrl: true});
         event.stopPropagation();
     }
 

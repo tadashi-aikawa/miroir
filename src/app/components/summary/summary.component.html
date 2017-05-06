@@ -15,7 +15,7 @@
     <md-sidenav-container style="flex: 1">
         <md-sidenav #sidenav mode="side" class="app-sidenav" align="start">
             <md-input-container>
-                <input mdInput #keyWord (keyup.enter)="onSearchReports(keyWord.value)">
+                <input mdInput #keyWord [(ngModel)]="word" (keyup.enter)="onSearchReports(word)">
                 <md-placeholder>
                     <i class="material-icons app-input-icon">search</i> Search word
                 </md-placeholder>

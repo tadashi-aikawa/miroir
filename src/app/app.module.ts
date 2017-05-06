@@ -30,7 +30,8 @@ import {DetailDialogComponent} from './components/detail-dialog/detail-dialog.co
 import {EditorComponent} from './components/editor/editor.component';
 
 const appRoutes: Routes = [
-    {path: 'report/:hash', component: RootComponent},
+    {path: 'report/:searchWord', component: RootComponent},
+    {path: 'report/:searchWord/:hashKey', component: RootComponent},
     {path: '', component: RootComponent}
 ];
 
