@@ -408,7 +408,7 @@ export class SummaryComponent implements OnInit {
     }
 
     createActiveReportLink() {
-        return `${location.origin}/#/report/${this.activeReport.key}/${this.activeReport.key}`
+        return `${location.origin}${location.pathname}/#/report/${this.activeReport.key}/${this.activeReport.key}`
     }
 }
 
