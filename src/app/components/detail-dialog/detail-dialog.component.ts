@@ -262,7 +262,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     createActiveTrialLink() {
-        return `/#/report/${this.reportKey}/${this.reportKey}/${this.getActiveTrial().seq}`
+        return `${location.origin}/#/report/${this.reportKey}/${this.reportKey}/${this.getActiveTrial().seq}`
     }
 
     findUnknownPropertyDiffs(): PropertyDiff[] {
