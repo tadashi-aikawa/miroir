@@ -1,4 +1,4 @@
-import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges, EventEmitter} from '@angular/core';
+import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges, EventEmitter, OnInit} from '@angular/core';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/merge/merge';
@@ -35,7 +35,7 @@ function pretty(value: string): string {
     styleUrls: ['./merge-viewer.css'],
     template: `<div #view></div>`,
 })
-export class MergeViewerComponent implements OnChanges {
+export class MergeViewerComponent implements OnInit {
 
     @Input() config: CodeMirror.MergeView.MergeViewEditorConfiguration;
     @Input() height?: string;
@@ -56,7 +56,7 @@ export class MergeViewerComponent implements OnChanges {
 
     @ViewChild('view') view;
 
-    ngOnChanges(changes: SimpleChanges): void {
+    ngOnInit(): void {
         const editorKeyBinding = (isOrigin: boolean) => ({
             'D': cm => this.onKeyD.emit(),
             'Q': cm => this.onKeyQ.emit(),
@@ -83,7 +83,6 @@ export class MergeViewerComponent implements OnChanges {
             'Shift-/': cm => this.onKeyQuestion.emit()
         });
 
-        this.config = changes['config']['currentValue'];
         this.view.nativeElement.innerHTML = '';
         if (this.config) {
             this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config);

@@ -173,9 +173,8 @@ export class DetailDialogComponent implements OnInit {
 
     showTrial(trial: Trial): void {
         // Diff viewer
+        this.isLoading = true;
         if (trial.hasResponse()) {
-            this.isLoading = true;
-
             const fetchFile = (file: string) => this.service.fetchDetail(`${this.reportKey}/${file}`);
             Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
                 .then((rs: {encoding: string, body: string}[]) => {
@@ -191,7 +190,12 @@ export class DetailDialogComponent implements OnInit {
                 });
         } else {
             this.errorMessage = undefined;
-            this.mergeViewConfig = createConfig('No file', 'No file');
+            // We must initialize mergeView after set config.
+            // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
+            setTimeout(() => {
+                this.isLoading = false;
+                this.mergeViewConfig = createConfig('No file', 'No file');
+            }, 100);
         }
 
         // Query parameters
