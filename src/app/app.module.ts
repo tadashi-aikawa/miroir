@@ -36,7 +36,8 @@ const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
     {path: '', component: RootComponent, canActivate: [AuthGuard]},
     {path: 'report/:searchWord', component: RootComponent, canActivate: [AuthGuard]},
-    {path: 'report/:searchWord/:hashKey', component: RootComponent, canActivate: [AuthGuard]}
+    {path: 'report/:searchWord/:hashKey', component: RootComponent, canActivate: [AuthGuard]},
+    {path: 'report/:searchWord/:hashKey/:seq', component: RootComponent, canActivate: [AuthGuard]}
 ];
 
 @NgModule({

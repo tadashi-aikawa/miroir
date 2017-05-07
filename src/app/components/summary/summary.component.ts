@@ -88,7 +88,12 @@ export class SummaryComponent implements OnInit {
                 this.searchReport(ps.searchWord);
             }
             if (ps.hashKey) {
-                this.showReport(ps.hashKey);
+                this.showReport(ps.hashKey)
+                    .then((r: Report) => {
+                        if(ps.seq) {
+                            this.showDetail(r.trials, ps.seq - 1);
+                        }
+                    });
             }
         });
     }
@@ -130,148 +135,157 @@ export class SummaryComponent implements OnInit {
         event.stopPropagation();
     }
 
-    showReport(key: string) {
-        this.loadingReportKey = key;
-        this.activeReport = undefined;
-        this.errorMessages = undefined;
-        this.service.fetchReport(`${key}/report.json`)
-            .then((r: Report) => {
-                this.loadingReportKey = undefined;
+    showReport(key: string): Promise<Report> {
+        return new Promise<Report>((resolve, reject) => {
+            this.loadingReportKey = key;
+            this.activeReport = undefined;
+            this.errorMessages = undefined;
+            this.service.fetchReport(`${key}/report.json`)
+                .then((r: Report) => {
+                    this.loadingReportKey = undefined;
 
-                r.trials = r.trials.map(t => Object.assign(new Trial(), t));
-                this.activeReport = r;
-                this.settings = {
-                    columns: {
-                        seq: {title: 'Seq', filterFunction},
-                        name: {title: 'Name', filterFunction},
-                        path: {title: 'Path', filterFunction},
-                        status: {title: 'Status', type: 'custom', renderComponent: StatusComponent, filterFunction},
-                        queries: {title: 'Queries', type: 'custom', renderComponent: HoverComponent, filterFunction},
-                        oneByte: {title: '<- Byte', filterFunction},
-                        otherByte: {title: 'Byte ->', filterFunction},
-                        oneSec: {title: '<- Sec', filterFunction},
-                        otherSec: {title: 'Sec ->', filterFunction},
-                        oneStatus: {
-                            title: '<- Status',
-                            type: 'custom',
-                            renderComponent: StatusCodeComponent,
-                            filterFunction
+                    r.trials = r.trials.map(t => Object.assign(new Trial(), t));
+                    this.activeReport = r;
+                    this.settings = {
+                        columns: {
+                            seq: {title: 'Seq', filterFunction},
+                            name: {title: 'Name', filterFunction},
+                            path: {title: 'Path', filterFunction},
+                            status: {title: 'Status', type: 'custom', renderComponent: StatusComponent, filterFunction},
+                            queries: {
+                                title: 'Queries',
+                                type: 'custom',
+                                renderComponent: HoverComponent,
+                                filterFunction
+                            },
+                            oneByte: {title: '<- Byte', filterFunction},
+                            otherByte: {title: 'Byte ->', filterFunction},
+                            oneSec: {title: '<- Sec', filterFunction},
+                            otherSec: {title: 'Sec ->', filterFunction},
+                            oneStatus: {
+                                title: '<- Status',
+                                type: 'custom',
+                                renderComponent: StatusCodeComponent,
+                                filterFunction
+                            },
+                            otherStatus: {
+                                title: 'Status ->',
+                                type: 'custom',
+                                renderComponent: StatusCodeComponent,
+                                filterFunction
+                            },
+                            requestTime: {title: 'Request time', filterFunction}
                         },
-                        otherStatus: {
-                            title: 'Status ->',
-                            type: 'custom',
-                            renderComponent: StatusCodeComponent,
-                            filterFunction
-                        },
-                        requestTime: {title: 'Request time', filterFunction}
-                    },
-                    actions: false
-                };
-                this.tableSource.load(r.trials.map(t => (<RowData>{
-                    trial: t,
-                    seq: t.seq,
-                    name: t.name,
-                    path: t.path,
-                    status: t.status,
-                    queries: Object.keys(t.queries).map(k => `${k}=${t.queries[k]}`).join('&'),
-                    oneByte: t.one.byte,
-                    otherByte: t.other.byte,
-                    oneSec: t.one.response_sec,
-                    otherSec: t.other.response_sec,
-                    oneStatus: t.one.status_code,
-                    otherStatus: t.other.status_code,
-                    requestTime: t.request_time
-                })));
+                        actions: false
+                    };
+                    this.tableSource.load(r.trials.map(t => (<RowData>{
+                        trial: t,
+                        seq: t.seq,
+                        name: t.name,
+                        path: t.path,
+                        status: t.status,
+                        queries: Object.keys(t.queries).map(k => `${k}=${t.queries[k]}`).join('&'),
+                        oneByte: t.one.byte,
+                        otherByte: t.other.byte,
+                        oneSec: t.one.response_sec,
+                        otherSec: t.other.response_sec,
+                        oneStatus: t.one.status_code,
+                        otherStatus: t.other.status_code,
+                        requestTime: t.request_time
+                    })));
 
-                this.chartOptions = {
-                    chart: {
-                        zoomType: 'x'
-                    },
-                    title: {
-                        text: 'Response time'
-                    },
-                    yAxis: {
+                    this.chartOptions = {
+                        chart: {
+                            zoomType: 'x'
+                        },
                         title: {
-                            text: 'sec'
-                        }
-                    },
-                    tooltip: {
-                        shared: true
-                    },
-                    plotOptions: {
-                        spline: {
-                            marker: {
-                                symbol: 'circle'
+                            text: 'Response time'
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'sec'
+                            }
+                        },
+                        tooltip: {
+                            shared: true
+                        },
+                        plotOptions: {
+                            spline: {
+                                marker: {
+                                    symbol: 'circle'
+                                },
+                                lineWidth: 2,
+                                pointStart: 1
                             },
-                            lineWidth: 2,
-                            pointStart: 1
-                        },
-                        area: {
-                            marker: {
-                                enabled: false
+                            area: {
+                                marker: {
+                                    enabled: false
+                                },
+                                lineWidth: 1,
+                                pointStart: 1
                             },
-                            lineWidth: 1,
-                            pointStart: 1
+                            series: {
+                                turboThreshold: 10000
+                            }
                         },
-                        series: {
-                            turboThreshold: 10000
-                        }
-                    },
-                    series: [
-                        {
-                            name: r.summary.one.name,
-                            color: 'rgba(100,100,255,0.5)',
-                            type: 'spline',
-                            data: r.trials.map(x => ({
-                                y: x.one.response_sec,
-                                name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
-                                marker: statusToMarker(x.one.status_code),
-                                events: {
-                                    click: e => {
-                                        this.showDetail(this.activeReport.trials, e.point.index);
-                                        return false;
+                        series: [
+                            {
+                                name: r.summary.one.name,
+                                color: 'rgba(100,100,255,0.5)',
+                                type: 'spline',
+                                data: r.trials.map(x => ({
+                                    y: x.one.response_sec,
+                                    name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                                    marker: statusToMarker(x.one.status_code),
+                                    events: {
+                                        click: e => {
+                                            this.showDetail(this.activeReport.trials, e.point.index);
+                                            return false;
+                                        }
                                     }
-                                }
-                            }))
-                        },
-                        {
-                            name: r.summary.other.name,
-                            color: 'rgba(255,100,100,0.5)',
-                            type: 'spline',
-                            data: r.trials.map(x => ({
-                                y: x.other.response_sec,
-                                name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
-                                marker: statusToMarker(x.other.status_code),
-                                events: {
-                                    click: e => {
-                                        this.showDetail(this.activeReport.trials, e.point.index);
-                                        return false;
+                                }))
+                            },
+                            {
+                                name: r.summary.other.name,
+                                color: 'rgba(255,100,100,0.5)',
+                                type: 'spline',
+                                data: r.trials.map(x => ({
+                                    y: x.other.response_sec,
+                                    name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                                    marker: statusToMarker(x.other.status_code),
+                                    events: {
+                                        click: e => {
+                                            this.showDetail(this.activeReport.trials, e.point.index);
+                                            return false;
+                                        }
                                     }
-                                }
-                            }))
-                        },
-                        {
-                            name: 'Numerical difference',
-                            color: 'rgba(100,255,100,0.5)',
-                            type: 'area',
-                            data: r.trials.map(x => ({
-                                y: x.responseSecDiff,
-                                name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
-                                events: {
-                                    click: e => {
-                                        this.showDetail(this.activeReport.trials, e.point.index);
-                                        return false;
+                                }))
+                            },
+                            {
+                                name: 'Numerical difference',
+                                color: 'rgba(100,255,100,0.5)',
+                                type: 'area',
+                                data: r.trials.map(x => ({
+                                    y: x.responseSecDiff,
+                                    name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                                    events: {
+                                        click: e => {
+                                            this.showDetail(this.activeReport.trials, e.point.index);
+                                            return false;
+                                        }
                                     }
-                                }
-                            }))
-                        }
-                    ]
-                };
-            })
-            .catch(err => {
-                this.loadingReportKey = undefined;
-                this.errorMessages = [err];
-            });
+                                }))
+                            }
+                        ]
+                    };
+                    resolve(r);
+                })
+                .catch(err => {
+                    this.loadingReportKey = undefined;
+                    this.errorMessages = [err];
+                    reject(err);
+                });
+        });
     }
 
     downloadArchive(key: string, event) {
