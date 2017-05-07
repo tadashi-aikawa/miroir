@@ -9,7 +9,7 @@ import {LocalStorageService} from 'angular-2-local-storage';
 import {Router} from '@angular/router';
 import DocumentClient = DynamoDB.DocumentClient;
 
-const DURATION_SECONDS: number = 900;
+const DURATION_SECONDS: number = 86400;
 
 @Injectable()
 export class AwsService {
