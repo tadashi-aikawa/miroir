@@ -1,17 +1,7 @@
-import {ActivatedRoute, Router} from '@angular/router';
-import {AwsConfig, DynamoResult, DynamoRow, Report, Trial} from '../../models/models';
+import {ActivatedRoute} from '@angular/router';
+import {DynamoResult, DynamoRow, Report, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
-import {
-    AfterViewInit,
-    Component,
-    ElementRef,
-    Input,
-    OnChanges,
-    OnInit,
-    Optional,
-    SimpleChanges,
-    ViewChild
-} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import {MdDialog, MdDialogRef, MdSidenav} from '@angular/material';
@@ -62,14 +52,9 @@ interface RowData {
     styleUrls: [
         './summary.css',
         '../../../../node_modules/hover.css/css/hover.css'
-    ],
-    providers: [
-        AwsService
     ]
 })
-export class SummaryComponent implements OnChanges, AfterViewInit {
-    @Input() awsConfig: AwsConfig;
-
+export class SummaryComponent implements OnInit {
     @ViewChild('sidenav') sideNav: MdSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
     word: string = '';
@@ -88,43 +73,24 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
 
     constructor(private service: AwsService,
                 private _dialog: MdDialog,
-                private route: ActivatedRoute,
-                private router: Router) {
+                private route: ActivatedRoute) {
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        const p = changes.awsConfig.previousValue;
-        const c = changes.awsConfig.currentValue;
-
-        // HACK: Because of password has not been reflected immediately...
-        // TODO: More clever solution
-        if ((p === undefined || p.secretAccessKey === undefined) && c.secretAccessKey !== undefined) {
-            this.route.params.subscribe(ps => {
-                if (ps.searchWord) {
-                    this.word = ps.searchWord;
-                    this.searchReport(ps.searchWord);
-                }
-                if (ps.hashKey) {
-                    this.showReport(ps.hashKey);
-                }
-            });
-        }
-    }
-
-    ngAfterViewInit(): void {
-        this.route.params.subscribe(ps => {
-            if (ps.hash) {
-                this.errorMessages = [
-                    `Loading ${ps.hash}...`,
-                    'If nothing is shown, click anywhere on the page.'
-                ];
-            }
-        });
+    ngOnInit(): void {
         setTimeout(() => {
-            this.sideNav.open().then(x => {
+            this.sideNav.open().then(() => {
                 setTimeout(() => this.keyWord.nativeElement.click(), 100)
             });
         }, 0);
+        this.route.params.subscribe(ps => {
+            if (ps.searchWord) {
+                this.word = ps.searchWord;
+                this.searchReport(ps.searchWord);
+            }
+            if (ps.hashKey) {
+                this.showReport(ps.hashKey);
+            }
+        });
     }
 
     onSearchReports(keyword: string) {
@@ -137,7 +103,7 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
             this.searchErrorMessage = undefined;
             this.searchingSummary = true;
 
-            this.service.searchReport(keyword, this.awsConfig)
+            this.service.searchReport(keyword)
                 .then((r: DynamoResult) => {
                     this.searchingSummary = false;
                     this.rows = r.Items.sort(
@@ -167,7 +133,7 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
     showReport(key: string) {
         this.loadingReportKey = key;
         this.errorMessages = undefined;
-        this.service.fetchReport(`${key}/report.json`, this.awsConfig)
+        this.service.fetchReport(`${key}/report.json`)
             .then((r: Report) => {
                 this.loadingReportKey = undefined;
 
@@ -184,8 +150,18 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
                         otherByte: {title: 'Byte ->', filterFunction},
                         oneSec: {title: '<- Sec', filterFunction},
                         otherSec: {title: 'Sec ->', filterFunction},
-                        oneStatus: {title: '<- Status', type: 'custom', renderComponent: StatusCodeComponent, filterFunction},
-                        otherStatus: {title: 'Status ->', type: 'custom', renderComponent: StatusCodeComponent, filterFunction},
+                        oneStatus: {
+                            title: '<- Status',
+                            type: 'custom',
+                            renderComponent: StatusCodeComponent,
+                            filterFunction
+                        },
+                        otherStatus: {
+                            title: 'Status ->',
+                            type: 'custom',
+                            renderComponent: StatusCodeComponent,
+                            filterFunction
+                        },
                         requestTime: {title: 'Request time', filterFunction}
                     },
                     actions: false
@@ -303,7 +279,7 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
 
         row.downloading = true;
         this.errorMessages = undefined;
-        this.service.fetchArchive(`${key}/${zipName}`, this.awsConfig)
+        this.service.fetchArchive(`${key}/${zipName}`)
             .then(x => {
                 row.downloading = false;
                 fileSaver.saveAs(x, `${row.title}-${zipName}`);
@@ -323,7 +299,7 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
 
         const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
 
-        this.service.fetchList(key, this.awsConfig)
+        this.service.fetchList(key)
             .then((oList: ObjectList) => {
                 dialogRef.componentInstance.isLoading = false;
                 dialogRef.componentInstance.keys = oList.map(x => x.Key);
@@ -331,8 +307,8 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
                     if (keysToRemove) {
                         row.deleting = true;
 
-                        this.service.removeDetails(keysToRemove, this.awsConfig)
-                            .then(p => this.service.removeReport(key, this.awsConfig))
+                        this.service.removeDetails(keysToRemove)
+                            .then(p => this.service.removeReport(key))
                             .then(() => {
                                 this.rows = this.rows.filter((r: DynamoRow) => r.hashkey !== key);
                                 if (key === this.activeReport.key) {
@@ -368,7 +344,6 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
         dialogRef.componentInstance.reportKey = this.activeReport.key;
         dialogRef.componentInstance.oneAccessPoint = this.activeReport.summary.one;
         dialogRef.componentInstance.otherAccessPoint = this.activeReport.summary.other;
-        dialogRef.componentInstance.awsConfig = this.awsConfig;
         dialogRef.componentInstance.activeIndex = String(index);
         dialogRef.componentInstance.trials = trials;
         dialogRef.componentInstance.ignores = _(this.activeReport.addons.judgement)
@@ -385,15 +360,15 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
             dialogRef.componentInstance.mode = 'javascript';
             dialogRef.componentInstance.title = 'Requests which can used on jumeaux';
             dialogRef.componentInstance.value = JSON.stringify(
-                    rs.map((x: RowData) => ({
-                        name: x.trial.name,
-                        path: x.trial.path,
-                        qs: x.trial.queries,
-                        headers: x.trial.headers
-                    })),
-                    null,
-                    4
-                );
+                rs.map((x: RowData) => ({
+                    name: x.trial.name,
+                    path: x.trial.path,
+                    qs: x.trial.queries,
+                    headers: x.trial.headers
+                })),
+                null,
+                4
+            );
         });
     }
 
@@ -420,35 +395,35 @@ export class SummaryComponent implements OnChanges, AfterViewInit {
 
 
 @Component({
-    template: `    
-    <h2 md-dialog-title>Remove following items... is it really O.K.?</h2>
+    template: `
+        <h2 md-dialog-title>Remove following items... is it really O.K.?</h2>
 
-    <md-dialog-content>
-        <div *ngIf="isLoading" class="center">
-            <md-spinner></md-spinner>
-        </div>
-        <div *ngIf="!isLoading">
-            <ul>
-                <li *ngFor="let key of keys">{{key}}</li>
-            </ul>
-        </div>
-    </md-dialog-content>
-    
-    <md-dialog-actions>
-        <div class="smart-padding-without-bottom">
-            <button md-raised-button
-                    color="primary"
-                    (click)="onClickRemove()">
-                Remove
-            </button>
-            <button md-raised-button
-                    color="secondary"
-                    md-dialog-close>
-                Cancel
-            </button>
-        </div>
-    </md-dialog-actions>
-  `,
+        <md-dialog-content>
+            <div *ngIf="isLoading" class="center">
+                <md-spinner></md-spinner>
+            </div>
+            <div *ngIf="!isLoading">
+                <ul>
+                    <li *ngFor="let key of keys">{{key}}</li>
+                </ul>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions>
+            <div class="smart-padding-without-bottom">
+                <button md-raised-button
+                        color="primary"
+                        (click)="onClickRemove()">
+                    Remove
+                </button>
+                <button md-raised-button
+                        color="secondary"
+                        md-dialog-close>
+                    Cancel
+                </button>
+            </div>
+        </md-dialog-actions>
+    `,
 })
 export class DeleteConfirmDialogComponent {
     @Input() keys: string[];
@@ -491,7 +466,7 @@ export class EditorDialogComponent implements OnInit {
 
 @Component({
     template: `
-    <span [class]="status">{{renderValue}}</span>
+        <span [class]="status">{{renderValue}}</span>
     `,
     styles: [
         '.server-error { color: red; font-weight: bold;}',
@@ -502,7 +477,7 @@ export class EditorDialogComponent implements OnInit {
 export class StatusCodeComponent implements ViewCell, OnInit {
     renderValue: string;
     status: string;
-    @Input() value: string|number;
+    @Input() value: string | number;
 
     ngOnInit(): void {
         const v = String(this.value);
@@ -514,13 +489,13 @@ export class StatusCodeComponent implements ViewCell, OnInit {
 
 @Component({
     template: `
-    <span [mdTooltip]="hoverValue">{{renderValue}}</span>
+        <span [mdTooltip]="hoverValue">{{renderValue}}</span>
     `
 })
 export class HoverComponent implements ViewCell, OnInit {
     renderValue: string;
     hoverValue: string;
-    @Input() value: string|number;
+    @Input() value: string | number;
 
     ngOnInit(): void {
         this.renderValue = `${String(this.value).split('&').length} queries`;
@@ -530,15 +505,15 @@ export class HoverComponent implements ViewCell, OnInit {
 
 @Component({
     template: `
-    <md-chip-list>
-        <md-chip [color]="kind" selected="true">{{renderValue}}</md-chip>
-    </md-chip-list>
+        <md-chip-list>
+            <md-chip [color]="kind" selected="true">{{renderValue}}</md-chip>
+        </md-chip-list>
     `
 })
 export class StatusComponent implements ViewCell, OnInit {
     renderValue: string;
     kind: string;
-    @Input() value: string|number;
+    @Input() value: string | number;
 
     ngOnInit(): void {
         const v = String(this.value);

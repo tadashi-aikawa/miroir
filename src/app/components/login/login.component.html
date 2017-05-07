@@ -1,0 +1,21 @@
+<div class="center-horizontal">
+    <h2>Login</h2>
+    <md-list>
+        <md-list-item>
+            <md-input-container>
+                <input mdInput [(ngModel)]="accessKeyId" placeholder="Access key ID" (keyup.enter)="login()">
+            </md-input-container>
+        </md-list-item>
+        <md-list-item>
+            <md-input-container>
+                <input mdInput [(ngModel)]="secretAccessKey" placeholder="Secret access key" type="password"
+                       (keyup.enter)="login()">
+            </md-input-container>
+        </md-list-item>
+    </md-list>
+    <div *ngIf="authenticating">
+        Login...
+        <md-progress-bar mode="indeterminate"></md-progress-bar>
+    </div>
+    <span *ngIf="errorMessage" class="error-message">{{errorMessage}}</span>
+</div>

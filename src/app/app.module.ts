@@ -28,16 +28,21 @@ import {MergeViewerComponent} from './components/merge-viewer/merge-viewer.compo
 import {CommonModule, HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {DetailDialogComponent} from './components/detail-dialog/detail-dialog.component';
 import {EditorComponent} from './components/editor/editor.component';
+import {AwsService} from './services/aws-service';
+import {AuthGuard} from './components/guard/auth.guard';
+import {LoginComponent} from './components/login/login.component';
 
 const appRoutes: Routes = [
-    {path: 'report/:searchWord', component: RootComponent},
-    {path: 'report/:searchWord/:hashKey', component: RootComponent},
-    {path: '', component: RootComponent}
+    {path: 'login', component: LoginComponent},
+    {path: '', component: RootComponent, canActivate: [AuthGuard]},
+    {path: 'report/:searchWord', component: RootComponent, canActivate: [AuthGuard]},
+    {path: 'report/:searchWord/:hashKey', component: RootComponent, canActivate: [AuthGuard]}
 ];
 
 @NgModule({
     declarations: [
         AppComponent,
+        LoginComponent,
         RootComponent,
         SummaryComponent,
         MergeViewerComponent,
@@ -75,7 +80,11 @@ const appRoutes: Routes = [
         StatusCodeComponent,
         StatusComponent
     ],
-    providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}],
+    providers: [
+        AwsService,
+        AuthGuard,
+        {provide: LocationStrategy, useClass: HashLocationStrategy}
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {

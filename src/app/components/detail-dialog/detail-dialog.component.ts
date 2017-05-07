@@ -1,4 +1,4 @@
-import {AccessPoint, AwsConfig, Condition, Pair, PropertyDiff, RegExpMatcher, Trial} from '../../models/models';
+import {AccessPoint, Condition, Pair, PropertyDiff, RegExpMatcher, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
@@ -43,9 +43,6 @@ function createConfig(one: string, other: string): CodeMirror.MergeView.MergeVie
     templateUrl: './detail-dialog.component.html',
     styleUrls: [
         './detail-dialog.css'
-    ],
-    providers: [
-        AwsService
     ]
 })
 export class DetailDialogComponent implements OnInit {
@@ -55,7 +52,6 @@ export class DetailDialogComponent implements OnInit {
     @Input() trials: Trial[];
     @Input() ignores: Condition[];
     @Input() checkedAlready: Condition[];
-    @Input() awsConfig: AwsConfig;
     @Input() activeTabIndex: string;
 
     @ViewChild('selector') selector;
@@ -86,18 +82,18 @@ export class DetailDialogComponent implements OnInit {
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
         _hotkeysService.add([
-            new Hotkey('d', e => {this.changeTab(0); return false; }, null, 'Move `Diff viewer` tab.'),
-            new Hotkey('q', e => {this.changeTab(1); return false; }, null, 'Move `Query parameters` tab.'),
-            new Hotkey('p', e => {this.changeTab(2); return false; }, null, 'Move `Property diffs` tab.'),
-            new Hotkey('f', e => { return false; }, null, 'Find patterns in active editor.'),
-            new Hotkey('i', e => {this.mergeView.moveToPreviousDiff(true); return false; }, null, 'Move to next diff.'),
-            new Hotkey('j', e => {this.showPreviousTrial(); return false; }, null, 'Show previous trial.'),
-            new Hotkey('k', e => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
-            new Hotkey('l', e => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
-            new Hotkey('x', e => { return false; }, null, 'Format the text of the active editor pretty.'),
-            new Hotkey('w', e => {this.closeDialog(); return false; }, null, 'Close this dialog'),
-            new Hotkey('/', e => {this.openSelector(); return false; }, null, 'Open trial list'),
-            new Hotkey('?', e => {this.toggleCheatSheet(); return false; }, null, 'Open/Close cheat sheet')
+            new Hotkey('d', () => {this.changeTab(0); return false; }, null, 'Move `Diff viewer` tab.'),
+            new Hotkey('q', () => {this.changeTab(1); return false; }, null, 'Move `Query parameters` tab.'),
+            new Hotkey('p', () => {this.changeTab(2); return false; }, null, 'Move `Property diffs` tab.'),
+            new Hotkey('f', () => { return false; }, null, 'Find patterns in active editor.'),
+            new Hotkey('i', () => {this.mergeView.moveToPreviousDiff(true); return false; }, null, 'Move to next diff.'),
+            new Hotkey('j', () => {this.showPreviousTrial(); return false; }, null, 'Show previous trial.'),
+            new Hotkey('k', () => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
+            new Hotkey('l', () => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
+            new Hotkey('x', () => { return false; }, null, 'Format the text of the active editor pretty.'),
+            new Hotkey('w', () => {this.closeDialog(); return false; }, null, 'Close this dialog'),
+            new Hotkey('/', () => {this.openSelector(); return false; }, null, 'Open trial list'),
+            new Hotkey('?', () => {this.toggleCheatSheet(); return false; }, null, 'Open/Close cheat sheet')
         ]);
     }
 
@@ -180,8 +176,7 @@ export class DetailDialogComponent implements OnInit {
         if (trial.hasResponse()) {
             this.isLoading = true;
 
-            const fetchFile = (file: string) =>
-                this.service.fetchDetail(`${this.reportKey}/${file}`, this.awsConfig);
+            const fetchFile = (file: string) => this.service.fetchDetail(`${this.reportKey}/${file}`);
             Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
                 .then((rs: {encoding: string, body: string}[]) => {
                     this.isLoading = false;
@@ -261,7 +256,7 @@ export class DetailDialogComponent implements OnInit {
         }
     }
 
-    updateEditorConfig(e) {
+    updateEditorConfig() {
         this.checkedAlready = yaml.safeLoad(this.editor.instance.getValue());
         this.updatePropertyDiffs(this.getActiveTrial());
     }

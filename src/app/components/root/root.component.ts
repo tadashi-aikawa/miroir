@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {LocalStorageService} from 'angular-2-local-storage';
+import {AwsService} from '../../services/aws-service';
 
 @Component({
     selector: 'app-root',
@@ -7,18 +7,17 @@ import {LocalStorageService} from 'angular-2-local-storage';
     styleUrls: ['./root.component.css']
 })
 export class RootComponent {
-    region = 'ap-northeast-1';
-    accessKeyId;
-    secretAccessKey;
-    table: string = this.localStorageService.get<string>('table');
-    bucket: string = this.localStorageService.get<string>('bucket');
+    region: string = this.awsService.region;
+    table: string = this.awsService.table;
+    bucket: string = this.awsService.bucket;
 
-    constructor(private localStorageService: LocalStorageService) {
+    constructor(private awsService: AwsService) {
         // DO NOTHING
     }
 
-    updateLocalStorage() {
-        this.localStorageService.set('table', this.table);
-        this.localStorageService.set('bucket', this.bucket);
+    update() {
+        this.awsService.updateRegion(this.region);
+        this.awsService.updateTable(this.table);
+        this.awsService.updateBucket(this.bucket);
     }
 }

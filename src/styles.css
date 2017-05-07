@@ -11,6 +11,12 @@
     align-items: center;
 }
 
+.center-horizontal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 
 div.ellipsis-text {
     display: inline-block;
@@ -88,4 +94,8 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
 
 .action-text {
     cursor : pointer;
+}
+
+.error-message {
+    color: red;
 }

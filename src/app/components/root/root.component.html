@@ -6,21 +6,11 @@
         <div>Jumeaux Viewer</div>
     </md-toolbar>
 
-    <md-sidenav #sidenav mode="over" class="app-sidenav" (close)="updateLocalStorage()">
+    <md-sidenav #sidenav mode="over" class="app-sidenav" (close)="update()">
         <md-list>
             <md-list-item>
                 <md-input-container>
                     <input mdInput [(ngModel)]="region" placeholder="Region">
-                </md-input-container>
-            </md-list-item>
-            <md-list-item>
-                <md-input-container>
-                    <input mdInput [(ngModel)]="accessKeyId" placeholder="Access key ID">
-                </md-input-container>
-            </md-list-item>
-            <md-list-item>
-                <md-input-container>
-                    <input mdInput [(ngModel)]="secretAccessKey" placeholder="Secret access key" type="password">
                 </md-input-container>
             </md-list-item>
             <md-list-item>
@@ -36,13 +26,6 @@
         </md-list>
     </md-sidenav>
 
-    <app-summary [awsConfig]="{
-        region: region,
-        accessKeyId: accessKeyId,
-        secretAccessKey: secretAccessKey,
-        table: table,
-        bucket: bucket
-    }">
-    </app-summary>
+    <app-summary></app-summary>
 
 </md-sidenav-container>

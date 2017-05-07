@@ -1,14 +1,6 @@
 import DiffType from '../constants/DiffType';
 import DiffCognition from '../constants/DiffCognition';
 
-export class AwsConfig {
-    region: string;
-    accessKeyId: string;
-    secretAccessKey: string;
-    table: string;
-    bucket: string;
-}
-
 export class DynamoResult {
     Count: number;
     ScannedCount: number;
