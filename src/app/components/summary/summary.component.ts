@@ -529,31 +529,40 @@ export class StatusComponent implements ViewCell, OnInit {
 
 const TABLE_SETTINGS = {
     columns: {
-        seq: {title: 'Seq', filterFunction},
+        seq: {title: 'Seq', filterFunction, width: '100px'},
         name: {title: 'Name', filterFunction},
         path: {title: 'Path', filterFunction},
-        status: {title: 'Status', type: 'custom', renderComponent: StatusComponent, filterFunction},
+        status: {
+            title: 'Status',
+            type: 'custom',
+            renderComponent: StatusComponent,
+            filterFunction,
+            width: '100px'
+        },
         queries: {
             title: 'Queries',
             type: 'custom',
             renderComponent: HoverComponent,
-            filterFunction
+            filterFunction,
+            width: '100px'
         },
-        oneByte: {title: '<- Byte', filterFunction},
-        otherByte: {title: 'Byte ->', filterFunction},
-        oneSec: {title: '<- Sec', filterFunction},
-        otherSec: {title: 'Sec ->', filterFunction},
+        oneByte: {title: '<- Byte', filterFunction, width: '100px'},
+        otherByte: {title: 'Byte ->', filterFunction, width: '100px'},
+        oneSec: {title: '<- Sec', filterFunction, width: '100px'},
+        otherSec: {title: 'Sec ->', filterFunction, width: '100px'},
         oneStatus: {
             title: '<- Status',
             type: 'custom',
             renderComponent: StatusCodeComponent,
-            filterFunction
+            filterFunction,
+            width: '100px'
         },
         otherStatus: {
             title: 'Status ->',
             type: 'custom',
             renderComponent: StatusCodeComponent,
-            filterFunction
+            filterFunction,
+            width: '100px'
         },
         requestTime: {title: 'Request time', filterFunction}
     },
