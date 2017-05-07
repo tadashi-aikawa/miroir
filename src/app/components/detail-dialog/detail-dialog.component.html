@@ -9,6 +9,9 @@
            (selected)="showTrial(getActiveTrial())"
 >
 </ng-select>
+<div class="align-right">
+    <a href={{createActiveTrialLink()}}><md-icon class="action-icon hvr-buzz-out">link</md-icon></a>
+</div>
 <md-tab-group [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
     <md-tab label="Diff viewer">
         <div class="smart-padding-small" style="display: flex; justify-content: space-around">

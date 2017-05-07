@@ -261,6 +261,10 @@ export class DetailDialogComponent implements OnInit {
         this.updatePropertyDiffs(this.getActiveTrial());
     }
 
+    createActiveTrialLink() {
+        return `/#/report/${this.reportKey}/${this.reportKey}/${this.getActiveTrial().seq}`
+    }
+
     findUnknownPropertyDiffs(): PropertyDiff[] {
         return this.findPropertyDiffs(DiffCognition.UNKNOWN);
     }

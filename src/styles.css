@@ -17,6 +17,10 @@
     align-items: center;
 }
 
+.align-right {
+    display: flex;
+    justify-content: flex-end;
+}
 
 div.ellipsis-text {
     display: inline-block;

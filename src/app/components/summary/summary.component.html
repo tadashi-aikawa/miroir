@@ -17,7 +17,8 @@
             <md-input-container>
                 <input mdInput #keyWord [(ngModel)]="word" (keyup.enter)="onSearchReports(word)">
                 <md-placeholder>
-                    <md-icon>search</md-icon> Search word
+                    <md-icon>search</md-icon>
+                    Search word
                 </md-placeholder>
             </md-input-container>
 
@@ -61,7 +62,8 @@
                         </span>
                         <span *ngIf="row.deleteErrorMessage">
                             <md-chip-list class="smart-padding-without-bottom">
-                                <md-chip color="warn" selected="true" [mdTooltip]="row.deleteErrorMessage" mdTooltipPosition="after">
+                                <md-chip color="warn" selected="true" [mdTooltip]="row.deleteErrorMessage"
+                                         mdTooltipPosition="after">
                                     Fail to delete!!
                                 </md-chip>
                             </md-chip-list>
@@ -72,7 +74,8 @@
                         </span>
                         <span *ngIf="row.downloadErrorMessage">
                             <md-chip-list class="smart-padding-without-bottom">
-                                <md-chip color="warn" selected="true" [mdTooltip]="row.downloadErrorMessage" mdTooltipPosition="after">
+                                <md-chip color="warn" selected="true" [mdTooltip]="row.downloadErrorMessage"
+                                         mdTooltipPosition="after">
                                     Fail to download!!
                                 </md-chip>
                             </md-chip-list>
@@ -130,7 +133,10 @@
                         </md-menu>
                         <h2>
                             {{activeReport.title}}
-                            <span class="hashkey-text">({{activeReport.key.substring(0, 7)}})</span>
+                            <a href={{createActiveReportLink()}}><span
+                                class="hashkey-text hvr-underline-from-center action-text">
+                                    ({{activeReport.key.substring(0, 7)}})
+                            </span></a>
                             <span *ngIf="activeReport.retry_hash" class="retry-text">
                                     retried from
                                     <span class="hvr-underline-from-center action-text"

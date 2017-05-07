@@ -406,6 +406,10 @@ export class SummaryComponent implements OnInit {
             4
         );
     }
+
+    createActiveReportLink() {
+        return `/#/report/${this.activeReport.key}/${this.activeReport.key}`
+    }
 }
 
 
