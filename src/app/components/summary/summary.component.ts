@@ -132,6 +132,7 @@ export class SummaryComponent implements OnInit {
 
     showReport(key: string) {
         this.loadingReportKey = key;
+        this.activeReport = undefined;
         this.errorMessages = undefined;
         this.service.fetchReport(`${key}/report.json`)
             .then((r: Report) => {
