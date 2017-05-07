@@ -6,19 +6,24 @@ import {ObjectList} from 'aws-sdk/clients/s3';
 import {DynamoResult, Report} from '../models/models';
 import * as Encoding from 'encoding-japanese';
 import {LocalStorageService} from 'angular-2-local-storage';
+import {Router} from '@angular/router';
+import DocumentClient = DynamoDB.DocumentClient;
+
+const DURATION_SECONDS: number = 900;
 
 @Injectable()
 export class AwsService {
     region = this.localStorageService.get<string>('region') || 'ap-northeast-1';
     table: string = this.localStorageService.get<string>('table');
     bucket: string = this.localStorageService.get<string>('bucket');
+    tmpCredentials: TemporaryCredentials;
     tmpAccessKeyId: string = this.localStorageService.get<string>('tmpAccessKeyId');
     tmpSecretAccessKey: string = this.localStorageService.get<string>('tmpSecretAccessKey');
     tmpSessionToken: string = this.localStorageService.get<string>('tmpSessionToken');
+    tmpExpireTime: Date = new Date(this.localStorageService.get<Date>('tmpExpireTime'));
 
-    constructor(
-        private localStorageService: LocalStorageService
-    ) {
+    constructor(private localStorageService: LocalStorageService,
+                private router: Router) {
         // DO NOTHING
     }
 
@@ -38,47 +43,36 @@ export class AwsService {
     }
 
     login(accessKeyId: string, secretAccessKey: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            const tmpCredentials: TemporaryCredentials = new TemporaryCredentials({DurationSeconds: 900}, <Credentials>{
-                accessKeyId: accessKeyId,
-                secretAccessKey: secretAccessKey
-            });
-
-            tmpCredentials.refresh(err => {
-                if (err) {
-                    reject(err);
-                }
-
-                this.tmpAccessKeyId = tmpCredentials.accessKeyId;
-                this.tmpSecretAccessKey = tmpCredentials.secretAccessKey;
-                this.tmpSessionToken = tmpCredentials.sessionToken;
-
-                this.localStorageService.set('tmpAccessKeyId', this.tmpAccessKeyId);
-                this.localStorageService.set('tmpSecretAccessKey', this.tmpSecretAccessKey);
-                this.localStorageService.set('tmpSessionToken', this.tmpSessionToken);
-
-                resolve()
-            })
+        this.tmpCredentials = new TemporaryCredentials({DurationSeconds: DURATION_SECONDS}, <Credentials>{
+            accessKeyId: accessKeyId,
+            secretAccessKey: secretAccessKey
         });
+
+        return this.refresh();
     }
 
     logout() {
         this.localStorageService.remove(
             'tmpAccessKeyId',
             'tmpSecretAccessKey',
-            'tmpSessionToken'
+            'tmpSessionToken',
+            'tmpExpireTime'
         )
     }
 
-    fetchDetail(key: string): Promise<{encoding: string, body: string}> {
-        return new Promise((resolve, reject) => {
-            const s3 = new S3({
-                apiVersion: '2006-03-01',
-                accessKeyId: this.tmpAccessKeyId,
-                secretAccessKey: this.tmpSecretAccessKey,
-                sessionToken: this.tmpSessionToken
-            });
+    async fetchDetail(key: string): Promise<{ encoding: string, body: string }> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
 
+        const s3 = new S3({
+            apiVersion: '2006-03-01',
+            accessKeyId: this.tmpAccessKeyId,
+            secretAccessKey: this.tmpSecretAccessKey,
+            sessionToken: this.tmpSessionToken
+        });
+
+        return new Promise<{ encoding: string, body: string }>((resolve, reject) => {
             s3.getObject(
                 {Key: key, Bucket: this.bucket},
                 (err, data) => {
@@ -96,39 +90,11 @@ export class AwsService {
         });
     }
 
-    fetchReport(key: string): Promise<Report> {
-        return new Promise((resolve, reject) => {
-            const s3 = new S3({
-                apiVersion: '2006-03-01',
-                accessKeyId: this.tmpAccessKeyId,
-                secretAccessKey: this.tmpSecretAccessKey,
-                sessionToken: this.tmpSessionToken
-            });
+    async fetchReport(key: string): Promise<Report> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
 
-            s3.getObject(
-                {Key: key, Bucket: this.bucket},
-                (err, data) => err ? reject(err.message) : resolve(JSON.parse(data.Body.toString()))
-            );
-        });
-    }
-
-    fetchArchive(key: string): Promise<Blob> {
-        return new Promise((resolve, reject) => {
-            const s3 = new S3({
-                apiVersion: '2006-03-01',
-                accessKeyId: this.tmpAccessKeyId,
-                secretAccessKey: this.tmpSecretAccessKey,
-                sessionToken: this.tmpSessionToken
-            });
-
-            s3.getObject(
-                {Key: key, Bucket: this.bucket},
-                (err, data) => err ? reject(err.message) : resolve(new Blob([data.Body]))
-            );
-        });
-    }
-
-    fetchList(key: string): Promise<ObjectList> {
         const s3 = new S3({
             apiVersion: '2006-03-01',
             accessKeyId: this.tmpAccessKeyId,
@@ -136,7 +102,47 @@ export class AwsService {
             sessionToken: this.tmpSessionToken
         });
 
-        return new Promise((resolve, reject) => {
+        return new Promise<Report>((resolve, reject) => {
+            s3.getObject(
+                {Key: key, Bucket: this.bucket},
+                (err, data) => err ? reject(err.message) : resolve(JSON.parse(data.Body.toString()))
+            );
+        });
+    }
+
+    async fetchArchive(key: string): Promise<Blob> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        const s3 = new S3({
+            apiVersion: '2006-03-01',
+            accessKeyId: this.tmpAccessKeyId,
+            secretAccessKey: this.tmpSecretAccessKey,
+            sessionToken: this.tmpSessionToken
+        });
+
+        return new Promise<Blob>((resolve, reject) => {
+            s3.getObject(
+                {Key: key, Bucket: this.bucket},
+                (err, data) => err ? reject(err.message) : resolve(new Blob([data.Body]))
+            );
+        });
+    }
+
+    async fetchList(key: string): Promise<ObjectList> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        const s3 = new S3({
+            apiVersion: '2006-03-01',
+            accessKeyId: this.tmpAccessKeyId,
+            secretAccessKey: this.tmpSecretAccessKey,
+            sessionToken: this.tmpSessionToken
+        });
+
+        return new Promise<ObjectList>((resolve, reject) => {
             s3.listObjectsV2(
                 {Bucket: this.bucket, Prefix: key},
                 (err, data) => err ? reject(err.message) : resolve(data.Contents)
@@ -144,7 +150,11 @@ export class AwsService {
         });
     }
 
-    removeDetails(keys: string[]): Promise<any> {
+    async removeDetails(keys: string[]): Promise<any> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
         // WARNING: this method is alpha
         if (keys.length === 0) {
             return Promise.resolve('ok');
@@ -156,6 +166,7 @@ export class AwsService {
             secretAccessKey: this.tmpSecretAccessKey,
             sessionToken: this.tmpSessionToken
         });
+
         return new Promise((resolve, reject) => {
             s3.deleteObjects(
                 {Bucket: this.bucket, Delete: {Objects: keys.map(k => ({Key: k}))}},
@@ -164,66 +175,116 @@ export class AwsService {
         });
     }
 
-    removeReport(key: string): Promise<any> {
+    async removeReport(key: string): Promise<any> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
         // WARNING: this method is alpha
+        const db = new DynamoDB.DocumentClient({
+            service: new DynamoDB({
+                region: this.region,
+                accessKeyId: this.tmpAccessKeyId,
+                secretAccessKey: this.tmpSecretAccessKey,
+                sessionToken: this.tmpSessionToken
+            })
+        });
+
+        const params = {
+            TableName: this.table,
+            Key: {
+                hashkey: key
+            }
+        };
+
         return new Promise((resolve, reject) => {
-            const db = new DynamoDB.DocumentClient({
-                service: new DynamoDB({
-                    region: this.region,
-                    accessKeyId: this.tmpAccessKeyId,
-                    secretAccessKey: this.tmpSecretAccessKey,
-                    sessionToken: this.tmpSessionToken
-                })
-            });
-
-            const params = {
-                TableName: this.table,
-                Key: {
-                    hashkey: key
-                }
-            };
-
             db.delete(params, (err, data) => {
                 return err ? reject(err.message) : resolve(data);
             });
         });
     }
 
-    searchReport(keyWord: string): Promise<DynamoResult> {
-        return new Promise((resolve, reject) => {
-            const db = new DynamoDB.DocumentClient({
-                service: new DynamoDB({
-                    region: this.region,
-                    accessKeyId: this.tmpAccessKeyId,
-                    secretAccessKey: this.tmpSecretAccessKey,
-                    sessionToken: this.tmpSessionToken
-                })
-            });
+    async searchReport(keyWord: string): Promise<DynamoResult> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
 
-            const params = {
-                TableName: this.table,
-                FilterExpression: [
-                    'contains(hashkey, :hashkey)',
-                    'contains(title, :title)',
-                    'contains(one_host, :one_host)',
-                    'contains(other_host, :other_host)',
-                    'contains(begin_time, :begin_time)',
-                    'contains(paths, :paths)'
-                ].join(' OR '),
-                ExpressionAttributeValues: {
-                    ':hashkey': keyWord,
-                    ':title': keyWord,
-                    ':one_host': keyWord,
-                    ':other_host': keyWord,
-                    ':begin_time': keyWord,
-                    ':paths': keyWord
-                }
-            };
+        const db = new DynamoDB.DocumentClient({
+            service: new DynamoDB({
+                region: this.region,
+                accessKeyId: this.tmpAccessKeyId,
+                secretAccessKey: this.tmpSecretAccessKey,
+                sessionToken: this.tmpSessionToken
+            })
+        });
 
-            db.scan(params, (err, data) => {
-                return err ? reject(err.message) : resolve(data);
+        const params = {
+            TableName: this.table,
+            FilterExpression: [
+                'contains(hashkey, :hashkey)',
+                'contains(title, :title)',
+                'contains(one_host, :one_host)',
+                'contains(other_host, :other_host)',
+                'contains(begin_time, :begin_time)',
+                'contains(paths, :paths)'
+            ].join(' OR '),
+            ExpressionAttributeValues: {
+                ':hashkey': keyWord,
+                ':title': keyWord,
+                ':one_host': keyWord,
+                ':other_host': keyWord,
+                ':begin_time': keyWord,
+                ':paths': keyWord
+            }
+        };
+
+        return new Promise<DynamoResult>((resolve, reject) => {
+            db.scan(params, (err, data: DocumentClient.ScanOutput) => {
+                return err ? reject(err.message) : resolve(data as DynamoResult);
             });
         });
     }
 
+    private refresh(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.tmpCredentials.refresh(err => {
+                if (err) {
+                    reject(err);
+                }
+
+                this.tmpAccessKeyId = this.tmpCredentials.accessKeyId;
+                this.tmpSecretAccessKey = this.tmpCredentials.secretAccessKey;
+                this.tmpSessionToken = this.tmpCredentials.sessionToken;
+                this.tmpExpireTime = this.tmpCredentials.expireTime;
+
+                this.localStorageService.set('tmpAccessKeyId', this.tmpAccessKeyId);
+                this.localStorageService.set('tmpSecretAccessKey', this.tmpSecretAccessKey);
+                this.localStorageService.set('tmpSessionToken', this.tmpSessionToken);
+                this.localStorageService.set('tmpExpireTime', this.tmpExpireTime);
+
+                resolve()
+            })
+        });
+    }
+
+    /**
+     *
+     * @returns {Promise<boolean>} Should continue operation (ex. search)
+     */
+    private async checkCredentialsExpiredAndTreat(): Promise<boolean> {
+        if (this.tmpExpireTime > new Date()) {
+            return true;
+        }
+
+        // Temporary credentials is expired
+        if (this.tmpCredentials) {
+            await this.refresh();
+            return true;
+        }
+
+        // Nothing to do without login again
+        this.logout();
+        this.router.navigate(['/login']);
+        return false;
+    }
 }
