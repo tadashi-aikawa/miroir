@@ -65,6 +65,11 @@ export class SummaryComponent implements OnInit {
     settings: any;
     errorMessages: string[];
 
+    selectedValues: string[] = Object.keys(TABLE_SETTINGS.columns);
+    optionColumns: {value: string, label: string}[] = _.map(
+        TABLE_SETTINGS.columns,
+        (v, k) => ({value: k, label: v.title})
+    );
     activeReport: Report;
     loadingReportKey: string;
     tableSource = new LocalDataSource();
@@ -135,6 +140,16 @@ export class SummaryComponent implements OnInit {
         event.stopPropagation();
     }
 
+    onSelectColumns(event) {
+        this.updateColumnVisibility();
+    }
+
+    private updateColumnVisibility() {
+        this.settings = Object.assign({}, TABLE_SETTINGS,
+            {columns: _.pick(TABLE_SETTINGS.columns, this.selectedValues)}
+        );
+    }
+
     showReport(key: string): Promise<Report> {
         return new Promise<Report>((resolve, reject) => {
             this.loadingReportKey = key;
@@ -146,38 +161,7 @@ export class SummaryComponent implements OnInit {
 
                     r.trials = r.trials.map(t => Object.assign(new Trial(), t));
                     this.activeReport = r;
-                    this.settings = {
-                        columns: {
-                            seq: {title: 'Seq', filterFunction},
-                            name: {title: 'Name', filterFunction},
-                            path: {title: 'Path', filterFunction},
-                            status: {title: 'Status', type: 'custom', renderComponent: StatusComponent, filterFunction},
-                            queries: {
-                                title: 'Queries',
-                                type: 'custom',
-                                renderComponent: HoverComponent,
-                                filterFunction
-                            },
-                            oneByte: {title: '<- Byte', filterFunction},
-                            otherByte: {title: 'Byte ->', filterFunction},
-                            oneSec: {title: '<- Sec', filterFunction},
-                            otherSec: {title: 'Sec ->', filterFunction},
-                            oneStatus: {
-                                title: '<- Status',
-                                type: 'custom',
-                                renderComponent: StatusCodeComponent,
-                                filterFunction
-                            },
-                            otherStatus: {
-                                title: 'Status ->',
-                                type: 'custom',
-                                renderComponent: StatusCodeComponent,
-                                filterFunction
-                            },
-                            requestTime: {title: 'Request time', filterFunction}
-                        },
-                        actions: false
-                    };
+                    this.updateColumnVisibility();
                     this.tableSource.load(r.trials.map(t => (<RowData>{
                         trial: t,
                         seq: t.seq,
@@ -542,3 +526,36 @@ export class StatusComponent implements ViewCell, OnInit {
                 v === 'failure' ? 'warn' : '';
     }
 }
+
+const TABLE_SETTINGS = {
+    columns: {
+        seq: {title: 'Seq', filterFunction},
+        name: {title: 'Name', filterFunction},
+        path: {title: 'Path', filterFunction},
+        status: {title: 'Status', type: 'custom', renderComponent: StatusComponent, filterFunction},
+        queries: {
+            title: 'Queries',
+            type: 'custom',
+            renderComponent: HoverComponent,
+            filterFunction
+        },
+        oneByte: {title: '<- Byte', filterFunction},
+        otherByte: {title: 'Byte ->', filterFunction},
+        oneSec: {title: '<- Sec', filterFunction},
+        otherSec: {title: 'Sec ->', filterFunction},
+        oneStatus: {
+            title: '<- Status',
+            type: 'custom',
+            renderComponent: StatusCodeComponent,
+            filterFunction
+        },
+        otherStatus: {
+            title: 'Status ->',
+            type: 'custom',
+            renderComponent: StatusCodeComponent,
+            filterFunction
+        },
+        requestTime: {title: 'Request time', filterFunction}
+    },
+    actions: false
+};

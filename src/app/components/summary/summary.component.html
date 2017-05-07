@@ -159,6 +159,15 @@
                     <md-tab-group>
                         <md-tab label="Table">
                             <div class="smart-padding">
+                                <ng-select
+                                    [options]="optionColumns"
+                                    [multiple]="true"
+                                    [(ngModel)]="selectedValues"
+                                    (selected)="onSelectColumns($event)"
+                                    (deselected)="onSelectColumns($event)"
+                                    label="Enable columns"
+                                >
+                                </ng-select>
                                 <ng2-smart-table [settings]="settings"
                                                  [source]="tableSource"
                                                  (userRowSelect)="onSelectRow($event);"
