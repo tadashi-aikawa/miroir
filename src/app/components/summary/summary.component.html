@@ -83,12 +83,21 @@
                     </md-card-content>
                     <md-card-actions>
                         <md-icon (click)="removeDetail(row.hashkey, $event)"
-                                 class="action-icon hvr-buzz-out">
+                                 class="action-icon hvr-buzz-out"
+                                 title="Remove from S3 storage (never restore)">
                             delete_forever
+                        </md-icon>
+                        <md-icon (click)="downloadReport(row.hashkey, $event)"
+                                 class="action-icon hvr-buzz-out"
+                                 title="Download report.json"
+                        >
+                            file_download
                         </md-icon>
                         <md-icon *ngIf="row.with_zip"
                                  (click)="downloadArchive(row.hashkey, $event)"
-                                 class="action-icon hvr-buzz-out">
+                                 class="action-icon hvr-buzz-out"
+                                 title="Download all (zip file)"
+                        >
                             cloud_download
                         </md-icon>
                         <div *ngIf="row.retry_hash" class="card-retry-text">

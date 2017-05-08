@@ -276,6 +276,24 @@ export class SummaryComponent implements OnInit {
         });
     }
 
+    downloadReport(key: string, event) {
+        const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
+
+        row.downloading = true;
+        this.errorMessages = undefined;
+        this.service.fetchReport(`${key}/report.json`)
+            .then(x => {
+                row.downloading = false;
+                fileSaver.saveAs(new Blob([JSON.stringify(x, null, 4)]), 'report.json');
+            })
+            .catch(err => {
+                row.downloading = false;
+                row.downloadErrorMessage = err;
+            });
+
+        event.stopPropagation();
+    }
+
     downloadArchive(key: string, event) {
         const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
         const zipName = `${key.substring(0, 7)}.zip`;
