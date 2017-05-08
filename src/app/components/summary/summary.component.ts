@@ -11,6 +11,7 @@ import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import {Marker, Options} from 'highcharts';
+import {LocalStorageService} from 'angular-2-local-storage';
 
 const filterFunction = (v, q) =>
     q.split(' and ').every(x => {
@@ -65,7 +66,8 @@ export class SummaryComponent implements OnInit {
     settings: any;
     errorMessages: string[];
 
-    selectedValues: string[] = Object.keys(TABLE_SETTINGS.columns);
+    selectedValues: string[] = this.localStorageService.get<string[]>('selectedColumnNames') ||
+        Object.keys(TABLE_SETTINGS.columns);
     optionColumns: {value: string, label: string}[] = _.map(
         TABLE_SETTINGS.columns,
         (v, k) => ({value: k, label: v.title})
@@ -78,7 +80,8 @@ export class SummaryComponent implements OnInit {
 
     constructor(private service: AwsService,
                 private _dialog: MdDialog,
-                private route: ActivatedRoute) {
+                private route: ActivatedRoute,
+                private localStorageService: LocalStorageService) {
     }
 
     ngOnInit(): void {
@@ -145,6 +148,7 @@ export class SummaryComponent implements OnInit {
     }
 
     private updateColumnVisibility() {
+        this.localStorageService.set('selectedColumnNames', this.selectedValues);
         this.settings = Object.assign({}, TABLE_SETTINGS,
             {columns: _.pick(TABLE_SETTINGS.columns, this.selectedValues)}
         );
