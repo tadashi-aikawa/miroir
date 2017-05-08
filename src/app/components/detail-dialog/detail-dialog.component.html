@@ -70,7 +70,7 @@
     </md-tab>
     <md-tab label="Property diffs">
         <div style="display: flex; justify-content: space-between;">
-            <div>
+            <div style="width: 50%">
                 <h2 class="center-vertical">
                     <md-icon>report_problem</md-icon>&nbsp;Unknown!!
                 </h2>
@@ -110,7 +110,7 @@
                     </tr>
                 </table>
             </div>
-            <div style="flex-basis: 40%">
+            <div style="max-width: 50%">
                 <button md-button (click)="updateEditorConfig()">Save</button>
                 <app-editor #editor
                             [config]="editorConfig">
