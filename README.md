@@ -6,20 +6,17 @@ Demo: https://tadashi-aikawa.github.io/jumeaux-viewer/
 
 ## Preparation for development
 
-1. Install `npm` globally if you are not installed
-2. Install `yarn` globally if you are not installed
+1. Install `yarn` globally if you are not installed
 
-```
-$ npm i -g yarn
-```
+See https://yarnpkg.com/en/docs/install
 
-3. Install `angular-cli` if you are not installed
+2. Install `angular-cli` if you are not installed
 
 ```
 $ yarn global add @angular/cli
 ```
 
-4. Install dependencies
+3. Install dependencies
 
 ```
 $ yarn install
@@ -33,18 +30,15 @@ $ ng serve
 
 Then access to `http://localhost:4200/`
 
-## Deploy to GitHub Pages
+## Production build
 
 ```
-$ ng build --prod --base-href https://<user>.github.io/jumeaux-viewer/
-$ ngh --repo=https://<github_token>@github.com/<user>/jumeaux-viewer.git
+$ ng build --prod --base-href ${BASE_URL}
 ```
 
-You have to specify `<user>` and `github_token` as your own.
+You have to specify BASE_URL as your own.
+Ex. https://xxxxx/jumeaux-viewer/
 
-Ex.
+## Deploy
 
-* `<user>`
-  * tadashi-aikawa
-* `github_token`
-  * 7af3................ (Of course secret)
+You have to deploy `dist/*` to web server you want.
