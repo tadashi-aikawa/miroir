@@ -93,7 +93,7 @@
                             </md-icon>
                         </td>
                         <td class="property-diffs">{{p.pattern}}</td>
-                        <td class="comment">{{p.note}}</td>
+                        <td class="comment" [innerHTML]="p.note"></td>
                     </tr>
                 </table>
                 <h2 class="center-vertical">
@@ -106,7 +106,7 @@
                             </md-icon>
                         </td>
                         <td class="property-diffs">{{p.pattern}}</td>
-                        <td class="comment">{{p.note}}</td>
+                        <td class="comment" [innerHTML]="p.note"></td>
                     </tr>
                 </table>
             </div>
