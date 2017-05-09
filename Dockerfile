@@ -8,6 +8,11 @@ RUN wget https://dl.yarnpkg.com/rpm/yarn.repo -O /etc/yum.repos.d/yarn.repo \
 
 RUN yarn global add @angular/cli
 
-COPY yarn.lock /tmp/
-COPY package.json /tmp/
-RUN cd /tmp && yarn install
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+COPY yarn.lock /usr/src/app/
+COPY . /usr/src/app
+RUN yarn install
+
+CMD ["sh", "/mount-tmp/exec.sh"]
