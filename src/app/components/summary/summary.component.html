@@ -165,7 +165,7 @@
                             {{activeReport.summary.other.host}}
                         </small>
                     </div>
-                    <md-tab-group>
+                    <md-tab-group  [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
                         <md-tab label="Table">
                             <div class="smart-padding">
                                 <ng-select

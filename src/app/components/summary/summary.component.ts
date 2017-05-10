@@ -1,5 +1,5 @@
 import {ActivatedRoute} from '@angular/router';
-import {DynamoResult, DynamoRow, Report, Trial} from '../../models/models';
+import {DynamoResult, DynamoRow, Report, Summary, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
@@ -147,13 +147,6 @@ export class SummaryComponent implements OnInit {
         this.updateColumnVisibility();
     }
 
-    private updateColumnVisibility() {
-        this.localStorageService.set('selectedColumnNames', this.selectedValues);
-        this.settings = Object.assign({}, TABLE_SETTINGS,
-            {columns: _.pick(TABLE_SETTINGS.columns, this.selectedValues)}
-        );
-    }
-
     showReport(key: string): Promise<Report> {
         return new Promise<Report>((resolve, reject) => {
             this.loadingReportKey = key;
@@ -180,93 +173,13 @@ export class SummaryComponent implements OnInit {
                         oneStatus: t.one.status_code,
                         otherStatus: t.other.status_code,
                         requestTime: t.request_time
-                    })));
-
-                    this.chartOptions = {
-                        chart: {
-                            zoomType: 'x'
-                        },
-                        title: {
-                            text: 'Response time'
-                        },
-                        yAxis: {
-                            title: {
-                                text: 'sec'
-                            }
-                        },
-                        tooltip: {
-                            shared: true
-                        },
-                        plotOptions: {
-                            spline: {
-                                marker: {
-                                    symbol: 'circle'
-                                },
-                                lineWidth: 2,
-                                pointStart: 1
-                            },
-                            area: {
-                                marker: {
-                                    enabled: false
-                                },
-                                lineWidth: 1,
-                                pointStart: 1
-                            },
-                            series: {
-                                turboThreshold: 10000
-                            }
-                        },
-                        series: [
-                            {
-                                name: r.summary.one.name,
-                                color: 'rgba(100,100,255,0.5)',
-                                type: 'spline',
-                                data: r.trials.map(x => ({
-                                    y: x.one.response_sec,
-                                    name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
-                                    marker: statusToMarker(x.one.status_code),
-                                    events: {
-                                        click: e => {
-                                            this.showDetail(this.activeReport.trials, e.point.index);
-                                            return false;
-                                        }
-                                    }
-                                }))
-                            },
-                            {
-                                name: r.summary.other.name,
-                                color: 'rgba(255,100,100,0.5)',
-                                type: 'spline',
-                                data: r.trials.map(x => ({
-                                    y: x.other.response_sec,
-                                    name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
-                                    marker: statusToMarker(x.other.status_code),
-                                    events: {
-                                        click: e => {
-                                            this.showDetail(this.activeReport.trials, e.point.index);
-                                            return false;
-                                        }
-                                    }
-                                }))
-                            },
-                            {
-                                name: 'Numerical difference',
-                                color: 'rgba(100,255,100,0.5)',
-                                type: 'area',
-                                data: r.trials.map(x => ({
-                                    y: x.responseSecDiff,
-                                    name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
-                                    events: {
-                                        click: e => {
-                                            this.showDetail(this.activeReport.trials, e.point.index);
-                                            return false;
-                                        }
-                                    }
-                                }))
-                            }
-                        ]
-                    };
-                    resolve(r);
+                    }))).then(() => {
+                        this.tableSource.getFilteredAndSorted()
+                            .then((es: RowData[]) => {
+                                this.chartOptions = this.createChartOptions(r.summary, es.map(x => x.trial));
+                            });
+                        resolve(r);
+                    });
                 })
                 .catch(err => {
                     this.loadingReportKey = undefined;
@@ -357,6 +270,20 @@ export class SummaryComponent implements OnInit {
         });
     }
 
+    afterChangeTab(index: number): void {
+        if (index === 1) {
+            this.tableSource.getFilteredAndSorted()
+                .then((es: RowData[]) => {
+                    const nextOptions: Options = this.createChartOptions(this.activeReport.summary, es.map(x => x.trial));
+                    const toY: (Options) => number[] = options => options.series.map(x => x.data.map(d => d.y));
+
+                    if (!_.isEqual(toY(this.chartOptions), toY(nextOptions))) {
+                       this.chartOptions = nextOptions;
+                    }
+                });
+        }
+    }
+
     showDetail(trials: Trial[], index: number) {
         const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '80vw',
@@ -416,6 +343,101 @@ export class SummaryComponent implements OnInit {
     createActiveReportLink() {
         return `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}`
     }
+
+    private updateColumnVisibility() {
+        this.localStorageService.set('selectedColumnNames', this.selectedValues);
+        this.settings = Object.assign({}, TABLE_SETTINGS,
+            {columns: _.pick(TABLE_SETTINGS.columns, this.selectedValues)}
+        );
+    }
+
+    private createChartOptions(summary: Summary, trials: Trial[]): Options {
+        return {
+            chart: {
+                zoomType: 'x'
+            },
+            title: {
+                text: 'Response time'
+            },
+            yAxis: {
+                title: {
+                    text: 'sec'
+                }
+            },
+            tooltip: {
+                shared: true
+            },
+            plotOptions: {
+                spline: {
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    lineWidth: 2,
+                    pointStart: 1
+                },
+                area: {
+                    marker: {
+                        enabled: false
+                    },
+                    lineWidth: 1,
+                    pointStart: 1
+                },
+                series: {
+                    turboThreshold: 10000
+                }
+            },
+            series: [
+                {
+                    name: summary.one.name,
+                    color: 'rgba(100,100,255,0.5)',
+                    type: 'spline',
+                    data: trials.map(x => ({
+                        y: x.one.response_sec,
+                        name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                        marker: statusToMarker(x.one.status_code),
+                        events: {
+                            click: e => {
+                                this.showDetail(trials, e.point.index);
+                                return false;
+                            }
+                        }
+                    }))
+                },
+                {
+                    name: summary.other.name,
+                    color: 'rgba(255,100,100,0.5)',
+                    type: 'spline',
+                    data: trials.map(x => ({
+                        y: x.other.response_sec,
+                        name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                        marker: statusToMarker(x.other.status_code),
+                        events: {
+                            click: e => {
+                                this.showDetail(trials, e.point.index);
+                                return false;
+                            }
+                        }
+                    }))
+                },
+                {
+                    name: 'Numerical difference',
+                    color: 'rgba(100,255,100,0.5)',
+                    type: 'area',
+                    data: trials.map(x => ({
+                        y: x.responseSecDiff,
+                        name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                        events: {
+                            click: e => {
+                                this.showDetail(trials, e.point.index);
+                                return false;
+                            }
+                        }
+                    }))
+                }
+            ]
+        };
+    }
+
 }
 
 
