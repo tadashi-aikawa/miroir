@@ -121,9 +121,19 @@ export class ResponseSummary {
     response_sec: number;
     url: string;
     file?: string;
+    content_type?: string;
 }
 
 export class Pair<T> {
     one: T;
     other: T;
+}
+
+export class MergeViewConfig {
+    leftContent: string;
+    leftContentType: string;
+    rightContent: string;
+    rightContentType: string;
+    readOnly: boolean;
+    sideBySide: boolean;
 }

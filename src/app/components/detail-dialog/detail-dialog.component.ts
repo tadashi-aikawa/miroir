@@ -1,4 +1,4 @@
-import {AccessPoint, Condition, Pair, PropertyDiff, RegExpMatcher, Trial} from '../../models/models';
+import {AccessPoint, Condition, MergeViewConfig, Pair, PropertyDiff, RegExpMatcher, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
@@ -17,6 +17,18 @@ interface RowData {
     value: string;
 }
 
+const toLanguage = (contentType: string) => {
+    if (contentType.match(/json/)) {
+        return 'json';
+    } else if (contentType.match(/xml/)) {
+        return 'xml';
+    } else if (contentType.match(/html/)) {
+        return 'html';
+    } else {
+        return 'plain';
+    }
+};
+
 const filterFunction = (v, q) =>
     q.split(' and ').every(x => {
         try {
@@ -26,16 +38,14 @@ const filterFunction = (v, q) =>
         }
     });
 
-function createConfig(one: string, other: string): CodeMirror.MergeView.MergeViewEditorConfiguration {
+function createConfig(one: string, other: string, oneContentType: string, otherContentType: string): MergeViewConfig {
     return {
-        value: other,
-        orig: undefined,
-        origLeft: one,
-        lineNumbers: true,
-        lineWrapping: true,
-        viewportMargin: 10,
-        collapseIdentical: 30,
-        readOnly: true
+        leftContent: one,
+        leftContentType: oneContentType,
+        rightContent: other,
+        rightContentType: otherContentType,
+        readOnly: false,
+        sideBySide: true
     };
 }
 
@@ -68,7 +78,7 @@ export class DetailDialogComponent implements OnInit {
     options: IOption[];
     isLoading: boolean;
     errorMessage: string;
-    mergeViewConfig: CodeMirror.MergeView.MergeViewEditorConfiguration;
+    mergeViewConfig: MergeViewConfig;
     editorConfig: CodeMirror.EditorConfiguration;
     displayedQueries: {key: string, value: string}[];
 
@@ -85,12 +95,10 @@ export class DetailDialogComponent implements OnInit {
             new Hotkey('d', () => {this.changeTab(0); return false; }, null, 'Move `Diff viewer` tab.'),
             new Hotkey('q', () => {this.changeTab(1); return false; }, null, 'Move `Query parameters` tab.'),
             new Hotkey('p', () => {this.changeTab(2); return false; }, null, 'Move `Property diffs` tab.'),
-            new Hotkey('f', () => { return false; }, null, 'Find patterns in active editor.'),
             new Hotkey('i', () => {this.mergeView.moveToPreviousDiff(true); return false; }, null, 'Move to next diff.'),
             new Hotkey('j', () => {this.showPreviousTrial(); return false; }, null, 'Show previous trial.'),
             new Hotkey('k', () => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
             new Hotkey('l', () => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
-            new Hotkey('x', () => { return false; }, null, 'Format the text of the active editor pretty.'),
             new Hotkey('w', () => {this.closeDialog(); return false; }, null, 'Close this dialog'),
             new Hotkey('/', () => {this.openSelector(); return false; }, null, 'Open trial list'),
             new Hotkey('?', () => {this.toggleCheatSheet(); return false; }, null, 'Open/Close cheat sheet')
@@ -167,10 +175,6 @@ export class DetailDialogComponent implements OnInit {
         this.selector.open();
     }
 
-    updateValues(pair: Pair<string>): void {
-        this.mergeViewConfig = createConfig(pair.one, pair.other);
-    }
-
     showTrial(trial: Trial): void {
         // Diff viewer
         this.isLoading = true;
@@ -180,7 +184,9 @@ export class DetailDialogComponent implements OnInit {
                 .then((rs: {encoding: string, body: string}[]) => {
                     this.isLoading = false;
                     this.errorMessage = undefined;
-                    this.mergeViewConfig = createConfig(rs[0].body, rs[1].body);
+                    this.mergeViewConfig = createConfig(
+                        rs[0].body, rs[1].body, toLanguage(trial.one.content_type), toLanguage(trial.other.content_type)
+                    );
                     this.oneExpectedEncoding = rs[0].encoding;
                     this.otherExpectedEncoding = rs[1].encoding;
                 })
@@ -194,7 +200,7 @@ export class DetailDialogComponent implements OnInit {
             // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
             setTimeout(() => {
                 this.isLoading = false;
-                this.mergeViewConfig = createConfig('No file', 'No file');
+                this.mergeViewConfig = createConfig('No file', 'No file', 'text', 'text');
             }, 100);
         }
 

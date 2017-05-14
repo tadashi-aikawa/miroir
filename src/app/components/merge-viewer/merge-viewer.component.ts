@@ -1,123 +1,106 @@
-import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges, EventEmitter, OnInit} from '@angular/core';
-import * as CodeMirror from 'codemirror';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/addon/merge/merge';
-import 'codemirror/addon/dialog/dialog';
-import 'codemirror/addon/search/search';
-import 'codemirror/addon/search/searchcursor';
-import 'codemirror/addon/search/matchesonscrollbar';
-import 'codemirror/addon/scroll/annotatescrollbar';
-import 'codemirror/addon/search/jump-to-line';
-import {Pair} from '../../models/models';
+import {
+    Component, Input, Output, ViewChild, OnChanges, SimpleChanges, EventEmitter, OnInit,
+    AfterViewInit, ElementRef, OnDestroy
+} from '@angular/core';
+import {MergeViewConfig} from '../../models/models';
 
+declare const monaco: any;
+declare const require: any;
 
-function scrollToCenter(cm) {
-    const {line} = cm.getCursor();
-
-    const top = cm.charCoords({line: line, ch: 0}, 'local').top;
-    const halfWindowHeight = cm.getWrapperElement().offsetHeight / 2;
-    cm.scrollTo(null, top - halfWindowHeight);
-}
-
-function pretty(value: string): string {
-    // TODO: Not json case
-    return JSON.stringify(
-        JSON.parse(value),
-        (_, v) => (!(v instanceof Array || v === null) && typeof v === 'object') ?
-            Object.keys(v).sort().reduce((r, k) => { r[k] = v[k]; return r; }, {}) :
-            v,
-        4
-    );
-}
 
 @Component({
     selector: 'app-merge-viewer',
     styleUrls: ['./merge-viewer.css'],
-    template: `<div #view></div>`,
+    template: `<div #view class="monaco-editor" style="height:65vh;"></div>`,
 })
-export class MergeViewerComponent implements OnInit {
+export class MergeViewerComponent implements AfterViewInit, OnDestroy {
+    @Input() config: MergeViewConfig;
+    diffEditor: any;
+    diffNavigator: any;
 
-    @Input() config: CodeMirror.MergeView.MergeViewEditorConfiguration;
-    @Input() height?: string;
+    @ViewChild('view') view: ElementRef;
 
-    @Output() instance: CodeMirror.MergeView.MergeViewEditor;
     @Output() onKeyD = new EventEmitter<void>();
-    @Output() onKeyQ = new EventEmitter<void>();
-    @Output() onKeyP = new EventEmitter<void>();
-    @Output() onKeyF = new EventEmitter<void>();
     @Output() onKeyI = new EventEmitter<boolean>();
     @Output() onKeyJ = new EventEmitter<void>();
     @Output() onKeyK = new EventEmitter<boolean>();
     @Output() onKeyL = new EventEmitter<void>();
-    @Output() onKeyX = new EventEmitter<Pair<string>>();
+    @Output() onKeyP = new EventEmitter<void>();
+    @Output() onKeyQ = new EventEmitter<void>();
     @Output() onKeyW = new EventEmitter<void>();
     @Output() onKeySlash = new EventEmitter<void>();
     @Output() onKeyQuestion = new EventEmitter<void>();
 
-    @ViewChild('view') view;
+    private _updateLayout: Function;
 
-    ngOnInit(): void {
-        const editorKeyBinding = (isOrigin: boolean) => ({
-            'D': cm => this.onKeyD.emit(),
-            'Q': cm => this.onKeyQ.emit(),
-            'P': cm => this.onKeyP.emit(),
-            'F': cm => {
-                cm.execCommand('findPersistent');
-                this.onKeyF.emit();
-            },
-            'I': cm => this.onKeyI.emit(isOrigin),
-            'J': cm => this.onKeyJ.emit(),
-            'K': cm => this.onKeyK.emit(isOrigin),
-            'L': cm => this.onKeyL.emit(),
-            'X': cm => {
-                // Support for response of JSONView extension
-                const optimizeFormat = (target) => pretty(target.replace(/^([^":\[\]{},]+):/mg, '"$1":'));
+    constructor() {
+        this._updateLayout = this.updateLayout.bind(this);
+    }
 
-                const one = optimizeFormat(this.instance.leftOriginal().getValue());
-                const other = optimizeFormat(this.instance.editor().getValue());
+    ngAfterViewInit() {
+        const onGotAmdLoader = () => {
+            const w: any = <any>window;
+            w.require.config({ paths: { 'vs': 'assets/monaco/vs' } });
+            w.require(['vs/editor/editor.main'], () => {
+                this.diffEditor = monaco.editor.createDiffEditor(this.view.nativeElement, {
+                    readOnly: this.config.readOnly,
+                    originalEditable: !this.config.readOnly,
+                    renderSideBySide: this.config.sideBySide,
+                    scrollBeyondLastLine: false
+                });
+                this.bindKeys(this.diffEditor);
+                w.addEventListener('resize', this._updateLayout);
 
-                this.onKeyX.emit({one, other});
-            },
-            'W': cm => this.onKeyW.emit(),
-            '/': cm => this.onKeySlash.emit(),
-            'Shift-/': cm => this.onKeyQuestion.emit()
-        });
+                this.diffNavigator = monaco.editor.createDiffNavigator(this.diffEditor);
+                this.diffEditor.setModel({
+                    original: monaco.editor.createModel(this.config.leftContent, this.config.leftContentType),
+                    modified: monaco.editor.createModel(this.config.rightContent, this.config.rightContentType)
+                })
+            });
+        };
 
-        this.view.nativeElement.innerHTML = '';
-        if (this.config) {
-            this.instance = CodeMirror.MergeView(this.view.nativeElement, this.config);
-            this.setHeight(this.height || '70vh');
-            this.instance.editor().setOption('extraKeys', editorKeyBinding(false));
-            this.instance.leftOriginal().setOption('extraKeys', editorKeyBinding(true));
-            this.instance.leftOriginal().focus();
+        if (!(<any>window).require) {
+            const loaderScript = document.createElement('script');
+            loaderScript.type = 'text/javascript';
+            loaderScript.src = 'assets/monaco/vs/loader.js';
+            loaderScript.addEventListener('load', onGotAmdLoader);
+            document.body.appendChild(loaderScript);
+        } else {
+            onGotAmdLoader();
         }
     }
 
-    moveToNextDiff(isOrigin: boolean) {
-        const cm: any = isOrigin ? this.instance.leftOriginal() : this.instance.editor();
-        cm.execCommand('goNextDiff');
-        scrollToCenter(cm);
+    ngOnDestroy(): void {
+        const w: any = <any>window;
+        w.removeEventListener('resize', this._updateLayout);
     }
 
-    moveToPreviousDiff(isOrigin: boolean) {
-        const cm: any = isOrigin ? this.instance.leftOriginal() : this.instance.editor();
-        cm.execCommand('goPrevDiff');
-        scrollToCenter(cm);
+    private updateLayout() {
+        this.diffEditor.layout();
+    }
+
+    moveToNextDiff() {
+        this.diffNavigator.next();
+    }
+
+    moveToPreviousDiff() {
+        this.diffNavigator.previous();
     }
 
     updateView() {
-        this.instance.leftOriginal().refresh();
-        this.instance.editor().refresh();
+        this.diffEditor.layout();
     }
 
-    private setHeight(height: string) {
-        const instanceAny: any = this.instance;
-        instanceAny.wrap.style.height = height;
-
-        this.instance.editor().setSize(null, height);
-        this.instance.editor().setOption('readOnly', false);
-
-        this.instance.leftOriginal().setSize(null, height);
-        this.instance.leftOriginal().setOption('readOnly', false);
+    private bindKeys(diffEditor) {
+        diffEditor.addCommand(monaco.KeyCode.KEY_D, () => this.onKeyD.emit());
+        diffEditor.addCommand(monaco.KeyCode.KEY_I, () => this.onKeyI.emit());
+        diffEditor.addCommand(monaco.KeyCode.KEY_J, () => this.onKeyJ.emit());
+        diffEditor.addCommand(monaco.KeyCode.KEY_K, () => this.onKeyK.emit());
+        diffEditor.addCommand(monaco.KeyCode.KEY_L, () => this.onKeyL.emit());
+        diffEditor.addCommand(monaco.KeyCode.KEY_P, () => this.onKeyP.emit());
+        diffEditor.addCommand(monaco.KeyCode.KEY_Q, () => this.onKeyQ.emit());
+        diffEditor.addCommand(monaco.KeyCode.KEY_W, () => this.onKeyW.emit());
+        diffEditor.addCommand(monaco.KeyCode.US_SLASH, () => this.onKeySlash.emit());
+        diffEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.US_SLASH, () => this.onKeyI.emit());
     }
 }
