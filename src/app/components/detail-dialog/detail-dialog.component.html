@@ -40,16 +40,6 @@
         <div *ngIf="!isLoading && !errorMessage">
             <app-merge-viewer #mergeView
                               [config]="mergeViewConfig"
-                              (onKeyD)="changeTab(0)"
-                              (onKeyQ)="changeTab(1)"
-                              (onKeyP)="changeTab(2)"
-                              (onKeyI)="mergeView.moveToPreviousDiff($event)"
-                              (onKeyJ)="showPreviousTrial()"
-                              (onKeyK)="mergeView.moveToNextDiff($event)"
-                              (onKeyL)="showNextTrial()"
-                              (onKeyW)="closeDialog()"
-                              (onKeySlash)="openSelector()"
-                              (onKeyQuestion)="toggleCheatSheet()"
             >
             </app-merge-viewer>
             <div class="smart-padding-small" style="display: flex; justify-content: space-around">
