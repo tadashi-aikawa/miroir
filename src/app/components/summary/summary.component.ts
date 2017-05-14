@@ -116,7 +116,7 @@ export class SummaryComponent implements OnInit {
             this.searchErrorMessage = undefined;
             this.searchingSummary = true;
 
-            this.service.searchReport(keyword)
+            this.service.findSummary(keyword)
                 .then((r: DynamoResult) => {
                     this.searchingSummary = false;
                     this.rows = r.Items.sort(
@@ -152,7 +152,7 @@ export class SummaryComponent implements OnInit {
             this.loadingReportKey = key;
             this.activeReport = undefined;
             this.errorMessages = undefined;
-            this.service.fetchReport(`${key}/report.json`)
+            this.service.fetchReport(key)
                 .then((r: Report) => {
                     this.loadingReportKey = undefined;
 
@@ -194,7 +194,7 @@ export class SummaryComponent implements OnInit {
 
         row.downloading = true;
         this.errorMessages = undefined;
-        this.service.fetchReport(`${key}/report.json`)
+        this.service.fetchReport(key)
             .then(x => {
                 row.downloading = false;
                 fileSaver.saveAs(new Blob([JSON.stringify(x, null, 4)]), 'report.json');
@@ -209,14 +209,13 @@ export class SummaryComponent implements OnInit {
 
     downloadArchive(key: string, event) {
         const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
-        const zipName = `${key.substring(0, 7)}.zip`;
 
         row.downloading = true;
         this.errorMessages = undefined;
-        this.service.fetchArchive(`${key}/${zipName}`)
-            .then(x => {
+        this.service.fetchArchive(key)
+            .then(({name, body}) => {
                 row.downloading = false;
-                fileSaver.saveAs(x, `${row.title}-${zipName}`);
+                fileSaver.saveAs(body, `${row.title}-${name}`);
             })
             .catch(err => {
                 row.downloading = false;
@@ -237,12 +236,12 @@ export class SummaryComponent implements OnInit {
             .then((oList: ObjectList) => {
                 dialogRef.componentInstance.isLoading = false;
                 dialogRef.componentInstance.keys = oList.map(x => x.Key);
-                dialogRef.afterClosed().subscribe((keysToRemove: string[]) => {
-                    if (keysToRemove) {
+                dialogRef.afterClosed().subscribe((s3KeysToRemove: string[]) => {
+                    if (s3KeysToRemove) {
                         row.deleting = true;
 
-                        this.service.removeDetails(keysToRemove)
-                            .then(p => this.service.removeReport(key))
+                        this.service.removeTrials(s3KeysToRemove)
+                            .then(p => this.service.removeSummary(key))
                             .then(() => {
                                 this.rows = this.rows.filter((r: DynamoRow) => r.hashkey !== key);
                                 if (key === this.activeReport.key) {

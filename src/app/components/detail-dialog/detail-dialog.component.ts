@@ -175,7 +175,7 @@ export class DetailDialogComponent implements OnInit {
         // Diff viewer
         this.isLoading = true;
         if (trial.hasResponse()) {
-            const fetchFile = (file: string) => this.service.fetchDetail(`${this.reportKey}/${file}`);
+            const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
             Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
                 .then((rs: {encoding: string, body: string}[]) => {
                     this.isLoading = false;

@@ -3,13 +3,14 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import {S3, DynamoDB, TemporaryCredentials, Credentials} from 'aws-sdk';
 import {ObjectList} from 'aws-sdk/clients/s3';
-import {DynamoResult, Report} from '../models/models';
+import {DynamoResult, Pair, Report} from '../models/models';
 import * as Encoding from 'encoding-japanese';
 import {LocalStorageService} from 'angular-2-local-storage';
 import {Router} from '@angular/router';
 import DocumentClient = DynamoDB.DocumentClient;
 
 const DURATION_SECONDS: number = 86400;
+const JUMEAUX_RESULTS_PREFIX = 'jumeaux-results';
 
 @Injectable()
 export class AwsService {
@@ -60,7 +61,7 @@ export class AwsService {
         )
     }
 
-    async fetchDetail(key: string): Promise<{ encoding: string, body: string }> {
+    async fetchTrial(key: string, name: string): Promise<{ encoding: string, body: string }> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
@@ -74,7 +75,7 @@ export class AwsService {
 
         return new Promise<{ encoding: string, body: string }>((resolve, reject) => {
             s3.getObject(
-                {Key: key, Bucket: this.bucket},
+                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/${name}`, Bucket: this.bucket},
                 (err, data) => {
                     if (err) {
                         return reject(err.message);
@@ -104,13 +105,13 @@ export class AwsService {
 
         return new Promise<Report>((resolve, reject) => {
             s3.getObject(
-                {Key: key, Bucket: this.bucket},
+                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`, Bucket: this.bucket},
                 (err, data) => err ? reject(err.message) : resolve(JSON.parse(data.Body.toString()))
             );
         });
     }
 
-    async fetchArchive(key: string): Promise<Blob> {
+    async fetchArchive(key: string): Promise<{name: string, body: Blob}> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
@@ -122,10 +123,39 @@ export class AwsService {
             sessionToken: this.tmpSessionToken
         });
 
-        return new Promise<Blob>((resolve, reject) => {
+        const zipName = `${key.substring(0, 7)}.zip`;
+        return new Promise<{name: string, body: Blob}>((resolve, reject) => {
             s3.getObject(
-                {Key: key, Bucket: this.bucket},
-                (err, data) => err ? reject(err.message) : resolve(new Blob([data.Body]))
+                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/${zipName}`, Bucket: this.bucket},
+                (err, data) => err ? reject(err.message) : resolve({
+                    name: zipName,
+                    body: new Blob([data.Body])
+                })
+            );
+        });
+    }
+
+    async removeTrials(s3Keys: string[]): Promise<any> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        // WARNING: this method is alpha
+        if (s3Keys.length === 0) {
+            return Promise.resolve('ok');
+        }
+
+        const s3 = new S3({
+            apiVersion: '2006-03-01',
+            accessKeyId: this.tmpAccessKeyId,
+            secretAccessKey: this.tmpSecretAccessKey,
+            sessionToken: this.tmpSessionToken
+        });
+
+        return new Promise((resolve, reject) => {
+            s3.deleteObjects(
+                {Bucket: this.bucket, Delete: {Objects: s3Keys.map(k => ({Key: k}))}},
+                (err, data) => err ? reject(err.message) : resolve(data)
             );
         });
     }
@@ -144,38 +174,13 @@ export class AwsService {
 
         return new Promise<ObjectList>((resolve, reject) => {
             s3.listObjectsV2(
-                {Bucket: this.bucket, Prefix: key},
+                {Bucket: this.bucket, Prefix: `${JUMEAUX_RESULTS_PREFIX}/${key}`},
                 (err, data) => err ? reject(err.message) : resolve(data.Contents)
             );
         });
     }
 
-    async removeDetails(keys: string[]): Promise<any> {
-        if (!await this.checkCredentialsExpiredAndTreat()) {
-            return Promise.reject('Temporary credentials is expired!!');
-        }
-
-        // WARNING: this method is alpha
-        if (keys.length === 0) {
-            return Promise.resolve('ok');
-        }
-
-        const s3 = new S3({
-            apiVersion: '2006-03-01',
-            accessKeyId: this.tmpAccessKeyId,
-            secretAccessKey: this.tmpSecretAccessKey,
-            sessionToken: this.tmpSessionToken
-        });
-
-        return new Promise((resolve, reject) => {
-            s3.deleteObjects(
-                {Bucket: this.bucket, Delete: {Objects: keys.map(k => ({Key: k}))}},
-                (err, data) => err ? reject(err.message) : resolve(data)
-            );
-        });
-    }
-
-    async removeReport(key: string): Promise<any> {
+    async removeSummary(key: string): Promise<any> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
@@ -204,7 +209,7 @@ export class AwsService {
         });
     }
 
-    async searchReport(keyWord: string): Promise<DynamoResult> {
+    async findSummary(keyWord: string): Promise<DynamoResult> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
