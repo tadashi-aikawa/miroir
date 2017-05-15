@@ -7,6 +7,7 @@ import {MdDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
+import {LocalStorageService} from 'angular-2-local-storage';
 import * as _ from 'lodash';
 import DiffType from '../../constants/DiffType';
 import DiffCognition from '../../constants/DiffCognition';
@@ -38,14 +39,14 @@ const filterFunction = (v, q) =>
         }
     });
 
-function createConfig(one: string, other: string, oneContentType: string, otherContentType: string): MergeViewConfig {
+function createConfig(one: string, other: string, oneContentType: string, otherContentType: string, sideBySide: boolean): MergeViewConfig {
     return {
         leftContent: one,
         leftContentType: oneContentType,
         rightContent: other,
         rightContentType: otherContentType,
         readOnly: false,
-        sideBySide: true
+        sideBySide: sideBySide
     };
 }
 
@@ -63,6 +64,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() ignores: Condition[];
     @Input() checkedAlready: Condition[];
     @Input() activeTabIndex: string;
+    @Input() unifiedDiff: boolean = this.localStorageService.get<boolean>('unifiedDiff');
 
     @ViewChild('selector') selector;
     @ViewChild('mergeView') mergeView;
@@ -84,7 +86,8 @@ export class DetailDialogComponent implements OnInit {
 
     constructor(private service: AwsService,
                 @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
-                private _hotkeysService: HotkeysService) {
+                private _hotkeysService: HotkeysService,
+                private localStorageService: LocalStorageService) {
         // To prevent from unexpected close
         dialogRef._containerInstance.dialogConfig = {disableClose: true};
 
@@ -185,7 +188,9 @@ export class DetailDialogComponent implements OnInit {
                     this.isLoading = false;
                     this.errorMessage = undefined;
                     this.mergeViewConfig = createConfig(
-                        rs[0].body, rs[1].body, toLanguage(trial.one.content_type), toLanguage(trial.other.content_type)
+                        rs[0].body, rs[1].body,
+                        toLanguage(trial.one.content_type), toLanguage(trial.other.content_type),
+                        !this.unifiedDiff
                     );
                     this.oneExpectedEncoding = rs[0].encoding;
                     this.otherExpectedEncoding = rs[1].encoding;
@@ -200,7 +205,7 @@ export class DetailDialogComponent implements OnInit {
             // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
             setTimeout(() => {
                 this.isLoading = false;
-                this.mergeViewConfig = createConfig('No file', 'No file', 'text', 'text');
+                this.mergeViewConfig = createConfig('No file', 'No file', 'text', 'text', !this.unifiedDiff);
             }, 100);
         }
 
@@ -254,6 +259,20 @@ export class DetailDialogComponent implements OnInit {
     changeTab(index: number): void {
         this.activeTabIndex = String(index);
         this.afterChangeTab(index);
+    }
+
+    changeDiffType(unifiedDiff: boolean) {
+        this.unifiedDiff = unifiedDiff;
+        this.localStorageService.set('unifiedDiff', unifiedDiff);
+
+        this.mergeViewConfig.sideBySide = !unifiedDiff;
+
+        // We must initialize mergeView after set config.
+        // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
+        this.isLoading = true;
+        setTimeout(() => {
+            this.isLoading = false;
+        }, 1);
     }
 
     afterChangeTab(index: number): void {

@@ -16,39 +16,50 @@
 </div>
 <md-tab-group  [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
     <md-tab label="Diff viewer">
-        <div class="smart-padding-small" style="display: flex; justify-content: space-around">
-            <div>
-                <md-chip>{{oneAccessPoint.name}}</md-chip>
-                <small>
-                    <a [href]="getActiveTrial().one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                        {{oneAccessPoint.host}}.....
-                    </a>
-                </small>
+        <div style="display: flex;">
+            <div style="flex: 1;">
+                <div class="smart-padding-small" style="display: flex; justify-content: space-around">
+                    <div>
+                        <md-chip>{{oneAccessPoint.name}}</md-chip>
+                        <small>
+                            <a [href]="getActiveTrial().one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                                {{oneAccessPoint.host}}.....
+                            </a>
+                        </small>
+                    </div>
+                    <div>
+                        <md-chip>{{otherAccessPoint.name}}</md-chip>
+                        <small>
+                            <a [href]="getActiveTrial().other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                                {{otherAccessPoint.host}}.....
+                            </a>
+                        </small>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="center" style="height: 50vh;">
+                    <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
+                </div>
+                <div *ngIf="!isLoading && !errorMessage">
+                    <app-merge-viewer #mergeView
+                                      [config]="mergeViewConfig"
+                    >
+                    </app-merge-viewer>
+                    <div class="smart-padding-small" style="display: flex; justify-content: space-around">
+                        <small>{{oneExpectedEncoding}}</small>
+                        <small>{{otherExpectedEncoding}}</small>
+                    </div>
+                </div>
+                <div *ngIf="errorMessage">
+                    {{errorMessage}}
+                </div>
             </div>
-            <div>
-                <md-chip>{{otherAccessPoint.name}}</md-chip>
-                <small>
-                    <a [href]="getActiveTrial().other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                        {{otherAccessPoint.host}}.....
-                    </a>
-                </small>
+            <div style="padding-top: 40px; padding-left: 10px;">
+                <div>
+                    <md-button-toggle [checked]="unifiedDiff" (change)="changeDiffType($event.source.checked)">
+                        <md-icon>view_agenda</md-icon>
+                    </md-button-toggle>
+                </div>
             </div>
-        </div>
-        <div *ngIf="isLoading" class="center" style="height: 50vh;">
-            <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
-        </div>
-        <div *ngIf="!isLoading && !errorMessage">
-            <app-merge-viewer #mergeView
-                              [config]="mergeViewConfig"
-            >
-            </app-merge-viewer>
-            <div class="smart-padding-small" style="display: flex; justify-content: space-around">
-                <small>{{oneExpectedEncoding}}</small>
-                <small>{{otherExpectedEncoding}}</small>
-            </div>
-        </div>
-        <div *ngIf="errorMessage">
-            {{errorMessage}}
         </div>
     </md-tab>
     <md-tab label="Query parameters">
