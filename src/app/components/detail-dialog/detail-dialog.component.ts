@@ -84,6 +84,10 @@ export class DetailDialogComponent implements OnInit {
     editorConfig: CodeMirror.EditorConfiguration;
     displayedQueries: {key: string, value: string}[];
 
+    get activeIndexNum(): number {
+        return Number(this.activeIndex)
+    }
+
     constructor(private service: AwsService,
                 @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService,
@@ -155,23 +159,21 @@ export class DetailDialogComponent implements OnInit {
     }
 
     showNextTrial(): boolean {
-        const index: number = Number(this.activeIndex);
-        if (index === this.trials.length - 1) {
+        if (this.activeIndexNum === this.trials.length - 1) {
             return false;
         }
 
-        this.showTrial(this.trials[index + 1]);
-        this.activeIndex = String(index + 1);
+        this.showTrial(this.trials[this.activeIndexNum + 1]);
+        this.activeIndex = String(this.activeIndexNum + 1);
     }
 
     showPreviousTrial(): boolean {
-        const index: number = Number(this.activeIndex);
-        if (index === 0) {
+        if (this.activeIndexNum === 0) {
             return false;
         }
 
-        this.showTrial(this.trials[index - 1]);
-        this.activeIndex = String(index - 1);
+        this.showTrial(this.trials[this.activeIndexNum - 1]);
+        this.activeIndex = String(this.activeIndexNum - 1);
     }
 
     openSelector(): void {

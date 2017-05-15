@@ -2,6 +2,15 @@
     width: 200px;
 }
 
+.smart-padding-without-left {
+    padding-top: 5px;
+}
+
+.count-word {
+    color: gray;
+    font-size:75%;
+}
+
 .property-diffs {
     font-size: 75%;
 }
