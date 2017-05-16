@@ -1,4 +1,4 @@
-import {AccessPoint, Condition, MergeViewConfig, Pair, PropertyDiff, RegExpMatcher, Trial} from '../../models/models';
+import {AccessPoint, Condition, MergeViewConfig, PropertyDiff, RegExpMatcher, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
@@ -232,7 +232,9 @@ export class DetailDialogComponent implements OnInit {
                 pattern: x,
                 type: DiffType.ADDED,
                 cognition: ig ? DiffCognition.IGNORED : ca ? DiffCognition.CHECKED_ALREADY : DiffCognition.UNKNOWN,
-                note: ig ? ig.note : ca ? ca.note : ''
+                note: ig ? ig.note : ca ? ca.note : '',
+                image: ig ? ig.image : ca ? ca.image : '',
+                link: ig ? ig.link : ca ? ca.link : ''
             };
         });
         const changed_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.changed.map((x: string) => {
@@ -242,7 +244,9 @@ export class DetailDialogComponent implements OnInit {
                 pattern: x,
                 type: DiffType.CHANGED,
                 cognition: ig ? DiffCognition.IGNORED : ca ? DiffCognition.CHECKED_ALREADY : DiffCognition.UNKNOWN,
-                note: ig ? ig.note : ca ? ca.note : ''
+                note: ig ? ig.note : ca ? ca.note : '',
+                image: ig ? ig.image : ca ? ca.image : '',
+                link: ig ? ig.link : ca ? ca.link : ''
             };
         });
         const removed_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.removed.map((x: string) => {
@@ -252,7 +256,9 @@ export class DetailDialogComponent implements OnInit {
                 pattern: x,
                 type: DiffType.REMOVED,
                 cognition: ig ? DiffCognition.IGNORED : ca ? DiffCognition.CHECKED_ALREADY : DiffCognition.UNKNOWN,
-                note: ig ? ig.note : ca ? ca.note : ''
+                note: ig ? ig.note : ca ? ca.note : '',
+                image: ig ? ig.image : ca ? ca.image : '',
+                link: ig ? ig.link : ca ? ca.link : ''
             };
         });
         this.propertyDiffs = [...added_rows, ...changed_rows, ...removed_rows];

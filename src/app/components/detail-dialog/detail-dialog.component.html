@@ -98,7 +98,13 @@
                             </md-icon>
                         </td>
                         <td class="property-diffs">{{p.pattern}}</td>
-                        <td class="comment" [innerHTML]="p.note"></td>
+                        <td>
+                            <img *ngIf="p.image" src={{p.image}} width="24px"/>
+                            <a *ngIf="p.link" href={{p.link}} style="text-decoration: none;">
+                                <span class="comment" [innerHTML]="p.note"></span>
+                            </a>
+                            <span *ngIf="!p.link" class="comment" [innerHTML]="p.note"></span>
+                        </td>
                     </tr>
                 </table>
                 <h2 class="center-vertical">
@@ -111,7 +117,13 @@
                             </md-icon>
                         </td>
                         <td class="property-diffs">{{p.pattern}}</td>
-                        <td class="comment" [innerHTML]="p.note"></td>
+                        <td>
+                            <img *ngIf="p.image" src={{p.image}} width="24px"/>
+                            <a *ngIf="p.link" href={{p.link}} style="text-decoration: none;">
+                                <span class="comment" [innerHTML]="p.note"></span>
+                            </a>
+                            <span *ngIf="!p.link" class="comment" [innerHTML]="p.note"></span>
+                        </td>
                     </tr>
                 </table>
             </div>

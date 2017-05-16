@@ -29,13 +29,17 @@ export class DynamoRow {
 export class RegExpMatcher {
     pattern: string;
     note?: string;
+    image?: string;
+    link?: string;
 }
 
 export class PropertyDiff {
     pattern: string;
     type: DiffType;
     cognition: DiffCognition;
-    note: string;
+    note?: string;
+    image?: string;
+    link?: string;
 }
 
 // TODO define needed parameters
