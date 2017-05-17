@@ -26,30 +26,48 @@ export class DynamoRow {
     downloadErrorMessage?: string;
 }
 
-export class RegExpMatcher {
-    pattern: string;
-    note?: string;
+export class PropertyDiffs {
+    title?: string;
     image?: string;
     link?: string;
+    added: string[];
+    changed: string[];
+    removed: string[];
+
+    isEmpty(): boolean {
+        return this.added.length === 0 &&
+            this.changed.length === 0 &&
+            this.removed.length === 0;
+    }
 }
 
-export class PropertyDiff {
-    pattern: string;
-    type: DiffType;
-    cognition: DiffCognition;
-    note?: string;
-    image?: string;
-    link?: string;
+export class PropertyDiffsByCognition {
+    unknown: PropertyDiffs;
+    checkedAlready: PropertyDiffs[];
+    ignored: PropertyDiffs[];
+
+    getNonEmptyCheckedAlready(): PropertyDiffs[]  {
+        return this.checkedAlready.filter(x => !x.isEmpty());
+    }
+
+    getNonEmptyIgnored(): PropertyDiffs[]  {
+        return this.ignored.filter(x => !x.isEmpty());
+    }
+}
+
+export class Condition {
+    path?: string;
+    added?: string[];
+    changed?: string[];
+    removed?: string[];
 }
 
 // TODO define needed parameters
-export class Condition {
-    path: {
-        pattern: string;
-        added?: RegExpMatcher[];
-        changed?: RegExpMatcher[];
-        removed?: RegExpMatcher[];
-    };
+export class IgnoreCase {
+    title: string;
+    image?: string;
+    link?: string;
+    conditions: Condition[];
 }
 
 export class JudgementAddon {
@@ -92,7 +110,7 @@ class Time {
     end: string;
 }
 
-class DiffKeys {
+export class DiffKeys {
     added: string[];
     changed: string[];
     removed: string[];

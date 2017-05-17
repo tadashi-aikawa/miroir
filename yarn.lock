@@ -3203,6 +3203,10 @@ ng2-completer@^1.2.2:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/ng2-completer/-/ng2-completer-1.4.0.tgz#43caec0dff44c7ad998327d411307b5d54546527"
 
+ng2-expansion-panels@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/ng2-expansion-panels/-/ng2-expansion-panels-0.0.6.tgz#a1ef1e8fe15e38ac3bbdb71bb0eec70734259eea"
+
 ng2-highcharts@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ng2-highcharts/-/ng2-highcharts-1.0.0.tgz#9ba507c86598efa113e6dd0de232773171d4bfe2"

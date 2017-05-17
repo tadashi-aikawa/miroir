@@ -10,7 +10,7 @@ import {LocalStorageModule} from 'angular-2-local-storage';
 import {SelectModule} from 'ng-select';
 import {HotkeyModule} from 'angular2-hotkeys';
 import {Ng2HighchartsModule} from 'ng2-highcharts';
-
+import {ExpansionPanelsModule} from 'ng2-expansion-panels';
 
 import 'hammerjs';
 
@@ -66,6 +66,7 @@ const appRoutes: Routes = [
         SelectModule,
         CommonModule,
         Ng2HighchartsModule,
+        ExpansionPanelsModule,
         HotkeyModule.forRoot({disableCheatSheet: true}),
         LocalStorageModule.withConfig({
             prefix: 'jumeaux-viewer',

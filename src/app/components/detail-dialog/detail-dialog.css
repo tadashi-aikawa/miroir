@@ -2,6 +2,10 @@
     width: 200px;
 }
 
+:host >>> div.expansion-panel__content {
+    margin-left: 10px;
+}
+
 .smart-padding-without-left {
     padding-top: 5px;
 }
@@ -15,9 +19,14 @@
     font-size: 75%;
 }
 
+.diff-type-number {
+    font-size: 70%;
+    color: gray;
+}
+
 .comment {
     color: gray;
-    font-size: 50%;
+    margin-left: 5px;
 }
 
 .added {

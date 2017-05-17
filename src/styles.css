@@ -29,6 +29,11 @@ div.ellipsis-text {
     white-space: nowrap
 }
 
+.little-horizontal-padding {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
 .smart-padding {
     padding: 20px;
 }
@@ -98,6 +103,10 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
 
 .action-text {
     cursor : pointer;
+}
+
+.icon-large {
+    font-size: 28px;
 }
 
 .error-message {

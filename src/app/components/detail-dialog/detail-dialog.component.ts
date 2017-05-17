@@ -1,4 +1,12 @@
-import {AccessPoint, Condition, MergeViewConfig, PropertyDiff, RegExpMatcher, Trial} from '../../models/models';
+import {
+    AccessPoint,
+    Condition, DiffKeys,
+    IgnoreCase,
+    MergeViewConfig,
+    PropertyDiffs,
+    PropertyDiffsByCognition,
+    Trial
+} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import * as CodeMirror from 'codemirror';
@@ -9,8 +17,6 @@ import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
 import {LocalStorageService} from 'angular-2-local-storage';
 import * as _ from 'lodash';
-import DiffType from '../../constants/DiffType';
-import DiffCognition from '../../constants/DiffCognition';
 
 
 interface RowData {
@@ -53,7 +59,8 @@ function createConfig(one: string, other: string, oneContentType: string, otherC
 @Component({
     templateUrl: './detail-dialog.component.html',
     styleUrls: [
-        './detail-dialog.css'
+        './detail-dialog.css',
+        '../../../../node_modules/hover.css/css/hover.css'
     ]
 })
 export class DetailDialogComponent implements OnInit {
@@ -61,8 +68,8 @@ export class DetailDialogComponent implements OnInit {
     @Input() oneAccessPoint: AccessPoint;
     @Input() otherAccessPoint: AccessPoint;
     @Input() trials: Trial[];
-    @Input() ignores: Condition[];
-    @Input() checkedAlready: Condition[];
+    @Input() ignores: IgnoreCase[];
+    @Input() checkedAlready: IgnoreCase[];
     @Input() activeTabIndex: string;
     @Input() unifiedDiff: boolean = this.localStorageService.get<boolean>('unifiedDiff');
 
@@ -72,7 +79,7 @@ export class DetailDialogComponent implements OnInit {
 
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
-    propertyDiffs: PropertyDiff[];
+    propertyDiffsByCognition: PropertyDiffsByCognition;
     oneExpectedEncoding: string;
     otherExpectedEncoding: string;
 
@@ -116,11 +123,10 @@ export class DetailDialogComponent implements OnInit {
         // FIXME
         this.editorConfig = {
             value: `
-- path:
-    pattern: '.+'
-    removed:
-      - pattern: root<'items'><[0-9]><'color'>
-        note: test for times
+- title: for test
+  conditions:
+    - removed:
+        - root<'items'><[0-9]><'color'>
           `,
             lineNumbers: true,
             viewportMargin: 10,
@@ -225,43 +231,31 @@ export class DetailDialogComponent implements OnInit {
     }
 
     private updatePropertyDiffs(trial: Trial) {
-        const added_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.added.map((x: string) => {
-            const ig: RegExpMatcher = this.findAddedMatcher(this.ignores, x, trial);
-            const ca: RegExpMatcher = this.findAddedMatcher(this.checkedAlready, x, trial);
-            return {
-                pattern: x,
-                type: DiffType.ADDED,
-                cognition: ig ? DiffCognition.IGNORED : ca ? DiffCognition.CHECKED_ALREADY : DiffCognition.UNKNOWN,
-                note: ig ? ig.note : ca ? ca.note : '',
-                image: ig ? ig.image : ca ? ca.image : '',
-                link: ig ? ig.link : ca ? ca.link : ''
-            };
+        const ignoredDiffs: PropertyDiffs[] = this.ignores.map(
+            x => this.createPropertyDiff(x, trial.path, trial.diff_keys)
+        );
+
+        const diffsWithoutIgnored: DiffKeys = {
+            added: trial.diff_keys.added.filter(x => !_.includes(_.flatMap(ignoredDiffs, x => x.added), x)),
+            changed: trial.diff_keys.changed.filter(x => !_.includes(_.flatMap(ignoredDiffs, x => x.changed), x)),
+            removed: trial.diff_keys.removed.filter(x => !_.includes(_.flatMap(ignoredDiffs, x => x.removed), x)),
+        };
+
+        const checkedAlreadyDiffs: PropertyDiffs[] = this.checkedAlready.map(
+            x => this.createPropertyDiff(x, trial.path, diffsWithoutIgnored)
+        );
+
+        const unknownDiffs: DiffKeys = {
+            added: diffsWithoutIgnored.added.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, x => x.added), x)),
+            changed: diffsWithoutIgnored.changed.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, x => x.changed), x)),
+            removed: diffsWithoutIgnored.removed.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, x => x.removed), x)),
+        };
+
+        this.propertyDiffsByCognition = Object.assign(new PropertyDiffsByCognition(), {
+            unknown: Object.assign(new PropertyDiffs(), unknownDiffs),
+            checkedAlready: checkedAlreadyDiffs,
+            ignored: ignoredDiffs
         });
-        const changed_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.changed.map((x: string) => {
-            const ig: RegExpMatcher = this.findChangedMatcher(this.ignores, x, trial);
-            const ca: RegExpMatcher = this.findChangedMatcher(this.checkedAlready, x, trial);
-            return {
-                pattern: x,
-                type: DiffType.CHANGED,
-                cognition: ig ? DiffCognition.IGNORED : ca ? DiffCognition.CHECKED_ALREADY : DiffCognition.UNKNOWN,
-                note: ig ? ig.note : ca ? ca.note : '',
-                image: ig ? ig.image : ca ? ca.image : '',
-                link: ig ? ig.link : ca ? ca.link : ''
-            };
-        });
-        const removed_rows: PropertyDiff[] = !trial.diff_keys ? [] : trial.diff_keys.removed.map((x: string) => {
-            const ig: RegExpMatcher = this.findRemovedMatcher(this.ignores, x, trial);
-            const ca: RegExpMatcher = this.findRemovedMatcher(this.checkedAlready, x, trial);
-            return {
-                pattern: x,
-                type: DiffType.REMOVED,
-                cognition: ig ? DiffCognition.IGNORED : ca ? DiffCognition.CHECKED_ALREADY : DiffCognition.UNKNOWN,
-                note: ig ? ig.note : ca ? ca.note : '',
-                image: ig ? ig.image : ca ? ca.image : '',
-                link: ig ? ig.link : ca ? ca.link : ''
-            };
-        });
-        this.propertyDiffs = [...added_rows, ...changed_rows, ...removed_rows];
     }
 
     changeTab(index: number): void {
@@ -302,47 +296,30 @@ export class DetailDialogComponent implements OnInit {
         return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.getActiveTrial().seq}`
     }
 
-    findUnknownPropertyDiffs(): PropertyDiff[] {
-        return this.findPropertyDiffs(DiffCognition.UNKNOWN);
-    }
+    // congnitionは出てこない....
+    private createPropertyDiff(ignore: IgnoreCase, path: string, diff_keys: DiffKeys): PropertyDiffs {
+        const validConditions: Condition[] = _.filter(
+            ignore.conditions,
+            (c: Condition) => !c.path || matchRegExp(c.path, path)
+        );
 
-    findCheckedAlreadyPropertyDiffs(): PropertyDiff[] {
-        return this.findPropertyDiffs(DiffCognition.CHECKED_ALREADY);
+        return Object.assign(new PropertyDiffs(), {
+            title: ignore.title,
+            image: ignore.image,
+            link: ignore.link,
+            added: diff_keys.added.filter(
+                x => _(validConditions).flatMap(c => c.added).compact().some(c => matchRegExp(c, x))
+            ),
+            changed: diff_keys.changed.filter(
+                x => _(validConditions).flatMap(c => c.changed).compact().some(c => matchRegExp(c, x))
+            ),
+            removed: diff_keys.removed.filter(
+                x => _(validConditions).flatMap(c => c.removed).compact().some(c => matchRegExp(c, x))
+            )
+        });
     }
+}
 
-    findIgnoredPropertyDiffs(): PropertyDiff[] {
-        return this.findPropertyDiffs(DiffCognition.IGNORED);
-    }
-
-    private findPropertyDiffs(cognition: DiffCognition): PropertyDiff[] {
-        return this.propertyDiffs.filter(x => x.cognition === cognition);
-    }
-
-    private findAddedMatcher(conditions: Condition[], property: string, trial: Trial): RegExpMatcher {
-        return _(conditions)
-            .filter(x => new RegExp(x.path.pattern).test(trial.path))
-            .filter(x => x.path.added)
-            .map(x => x.path.added)
-            .flatten()
-            .find(matcher => new RegExp(matcher.pattern).test(property));
-    }
-
-    private findRemovedMatcher(conditions: Condition[], property: string, trial: Trial): RegExpMatcher {
-        return _(conditions)
-            .filter(x => new RegExp(x.path.pattern).test(trial.path))
-            .filter(x => x.path.removed)
-            .map(x => x.path.removed)
-            .flatten()
-            .find(matcher => new RegExp(matcher.pattern).test(property));
-    }
-
-    private findChangedMatcher(conditions: Condition[], property: string, trial: Trial): RegExpMatcher {
-        return _(conditions)
-            .filter(x => new RegExp(x.path.pattern).test(trial.path))
-            .filter(x => x.path.changed)
-            .map(x => x.path.changed)
-            .flatten()
-            .find(matcher => new RegExp(matcher.pattern).test(property));
-    }
-
+function matchRegExp(pattern: string, target: string): boolean {
+    return new RegExp(pattern).test(target);
 }
