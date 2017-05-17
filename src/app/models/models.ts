@@ -1,6 +1,3 @@
-import DiffType from '../constants/DiffType';
-import DiffCognition from '../constants/DiffCognition';
-
 export class DynamoResult {
     Count: number;
     ScannedCount: number;
