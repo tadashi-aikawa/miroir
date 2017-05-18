@@ -227,7 +227,9 @@ export class DetailDialogComponent implements OnInit {
         })));
 
         // Property diffs
-        this.updatePropertyDiffs(trial);
+        if (trial.diff_keys) {
+            this.updatePropertyDiffs(trial);
+        }
     }
 
     private updatePropertyDiffs(trial: Trial) {
@@ -296,7 +298,6 @@ export class DetailDialogComponent implements OnInit {
         return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.getActiveTrial().seq}`
     }
 
-    // congnitionは出てこない....
     private createPropertyDiff(ignore: IgnoreCase, path: string, diff_keys: DiffKeys): PropertyDiffs {
         const validConditions: Condition[] = _.filter(
             ignore.conditions,

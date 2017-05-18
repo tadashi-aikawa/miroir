@@ -82,6 +82,12 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
     font-size: 28px;
 }
 
+.icon-very-large {
+    width: 200px;
+    height: 200px;
+    font-size: 200px;
+}
+
 .error-message {
     color: red;
 }

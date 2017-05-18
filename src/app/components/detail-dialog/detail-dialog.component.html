@@ -74,8 +74,14 @@
         </div>
     </md-tab>
     <md-tab label="Property diffs">
+        <div style="height: 30px;" class="smart-padding-small">
+            <div *ngIf="isLoading">
+                Now Loading...
+                <md-progress-bar mode="indeterminate"></md-progress-bar>
+            </div>
+        </div>
         <div style="display: flex; justify-content: space-between;">
-            <div style="flex: 1;">
+            <div *ngIf="getActiveTrial().diff_keys" style="flex: 1;">
                 <h2 class="center-vertical">
                     <md-icon>report_problem</md-icon>&nbsp;Unknown!!
                 </h2>
@@ -220,6 +226,12 @@
                         </expansion-panel-content>
                     </expansion-panel>
                 </expansion-panels-container>
+            </div>
+            <div *ngIf="!getActiveTrial().diff_keys" style="flex: 1;">
+                <div class="center">
+                    <md-icon class="icon-very-large">hot_tub</md-icon>
+                    <div>Oops.. I can't understand properties..</div>
+                </div>
             </div>
             <div style="width: 50%">
                 <button md-button (click)="updateEditorConfig()">Save</button>
