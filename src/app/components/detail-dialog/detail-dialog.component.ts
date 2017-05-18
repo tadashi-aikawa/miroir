@@ -1,6 +1,8 @@
 import {
     AccessPoint,
-    Condition, DiffKeys,
+    Condition,
+    DiffKeys,
+    EditorConfig,
     IgnoreCase,
     MergeViewConfig,
     PropertyDiffs,
@@ -9,7 +11,6 @@ import {
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import * as CodeMirror from 'codemirror';
 import * as yaml from 'js-yaml';
 import {MdDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
@@ -52,7 +53,8 @@ function createConfig(one: string, other: string, oneContentType: string, otherC
         rightContent: other,
         rightContentType: otherContentType,
         readOnly: false,
-        sideBySide: sideBySide
+        sideBySide: sideBySide,
+        theme: 'vs'
     };
 }
 
@@ -88,7 +90,7 @@ export class DetailDialogComponent implements OnInit {
     isLoading: boolean;
     errorMessage: string;
     mergeViewConfig: MergeViewConfig;
-    editorConfig: CodeMirror.EditorConfiguration;
+    editorConfig: EditorConfig;
     displayedQueries: {key: string, value: string}[];
 
     get activeIndexNum(): number {
@@ -122,19 +124,18 @@ export class DetailDialogComponent implements OnInit {
     ngOnInit(): void {
         // FIXME
         this.editorConfig = {
-            value: `
+            content: `
 - title: for test
   conditions:
     - removed:
         - root<'items'><[0-9]><'color'>
           `,
-            lineNumbers: true,
-            viewportMargin: 10,
-            mode: 'yaml',
-            theme: 'monokai'
+            contentType: 'yaml',
+            readOnly: false,
+            theme: 'vs'
         };
 
-        this.checkedAlready = yaml.safeLoad(this.editorConfig.value);
+        this.checkedAlready = yaml.safeLoad(this.editorConfig.content);
 
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
@@ -227,7 +228,6 @@ export class DetailDialogComponent implements OnInit {
 
         // Property diffs
         this.updatePropertyDiffs(trial);
-        // TODO: Assign checked already diffs to codemirror
     }
 
     private updatePropertyDiffs(trial: Trial) {
@@ -288,7 +288,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     updateEditorConfig() {
-        this.checkedAlready = yaml.safeLoad(this.editor.instance.getValue());
+        this.checkedAlready = yaml.safeLoad(this.editor.getValue());
         this.updatePropertyDiffs(this.getActiveTrial());
     }
 

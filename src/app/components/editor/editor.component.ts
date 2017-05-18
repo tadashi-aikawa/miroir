@@ -1,38 +1,54 @@
-import {Component, Input, Output, ViewChild, OnChanges, SimpleChanges, EventEmitter} from '@angular/core';
-import * as CodeMirror from 'codemirror';
-import 'codemirror/mode/yaml/yaml';
-import 'codemirror/addon/search/search';
-import 'codemirror/addon/search/searchcursor';
-import 'codemirror/addon/search/matchesonscrollbar';
-import 'codemirror/addon/scroll/annotatescrollbar';
-import 'codemirror/addon/search/jump-to-line';
+import {AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild} from '@angular/core';
+import {EditorConfig} from '../../models/models';
 
+declare const monaco: any;
+declare const require: any;
 
 @Component({
     selector: 'app-editor',
-    template: `<div #view></div>`,
+    template: `<div #view class="monaco-editor" style="height: 85vh;"></div>`
 })
-export class EditorComponent implements OnChanges {
+export class EditorComponent implements AfterViewInit, OnDestroy {
+    @Input() config: EditorConfig;
+    // todo:
+    @Input() height: number;
+    editor: any;
 
-    @Input() config: CodeMirror.EditorConfiguration;
-    @Input() height?: string;
+    @ViewChild('view') view: ElementRef;
 
-    @Output() instance: CodeMirror.Editor;
+    private _updateLayout: Function;
 
-    @ViewChild('view') view;
+    constructor() {
+        this._updateLayout = this.updateView.bind(this);
+    }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        this.config = changes['config']['currentValue'];
-        this.view.nativeElement.innerHTML = '';
-        if (this.config) {
-            this.instance = CodeMirror(this.view.nativeElement, this.config);
-        }
-        if (this.height) {
-            this.instance.setSize(null, this.height);
-        }
+    ngAfterViewInit() {
+        const w: any = <any>window;
+        w.require.config({ paths: { 'vs': 'assets/monaco/vs' } });
+        w.require(['vs/editor/editor.main'], () => {
+            this.editor = monaco.editor.create(this.view.nativeElement, {
+                readOnly: this.config.readOnly,
+                scrollBeyondLastLine: false,
+                theme: this.config.theme
+            });
+            w.addEventListener('resize', this._updateLayout);
+
+            this.editor.setModel(
+                monaco.editor.createModel(this.config.content, this.config.contentType)
+            )
+        });
+    }
+
+    ngOnDestroy(): void {
+        const w: any = <any>window;
+        w.removeEventListener('resize', this._updateLayout);
     }
 
     updateView() {
-        this.instance.refresh();
+        this.editor.layout();
+    }
+
+    getValue(): string {
+        return this.editor.getValue();
     }
 }

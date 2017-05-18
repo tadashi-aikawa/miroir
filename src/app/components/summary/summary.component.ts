@@ -1,5 +1,5 @@
 import {ActivatedRoute} from '@angular/router';
-import {DynamoResult, DynamoRow, Report, Summary, Trial} from '../../models/models';
+import {DynamoResult, DynamoRow, EditorConfig, Report, Summary, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
@@ -7,8 +7,6 @@ import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import {MdDialog, MdDialogRef, MdSidenav} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
-import * as CodeMirror from 'codemirror';
-import 'codemirror/mode/javascript/javascript';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import {Marker, Options} from 'highcharts';
 import {LocalStorageService} from 'angular-2-local-storage';
@@ -304,7 +302,7 @@ export class SummaryComponent implements OnInit {
                 width: '80vw',
                 height: '97%'
             });
-            dialogRef.componentInstance.mode = 'javascript';
+            dialogRef.componentInstance.mode = 'json';
             dialogRef.componentInstance.title = 'Requests which can used on jumeaux';
             dialogRef.componentInstance.value = JSON.stringify(
                 rs.map((x: RowData) => ({
@@ -324,7 +322,7 @@ export class SummaryComponent implements OnInit {
             width: '80vw',
             height: '97%'
         });
-        dialogRef.componentInstance.mode = 'javascript';
+        dialogRef.componentInstance.mode = 'json';
         dialogRef.componentInstance.title = 'Summary';
         dialogRef.componentInstance.value = JSON.stringify(
             {
@@ -497,15 +495,14 @@ export class EditorDialogComponent implements OnInit {
     @Input() mode: string;
     @Input() title: string;
     @Input() value: string;
-    editorConfig: CodeMirror.EditorConfiguration;
+    editorConfig: EditorConfig;
 
     ngOnInit(): void {
         this.editorConfig = {
-            value: this.value,
-            lineNumbers: true,
-            viewportMargin: 10,
-            mode: this.mode,
-            theme: 'monokai'
+            content: this.value,
+            contentType: this.mode,
+            readOnly: true,
+            theme: 'vs-dark'
         };
     }
 }

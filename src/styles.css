@@ -66,33 +66,6 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
     background: rgba(27, 27, 202, 0.15);
 }
 
-.CodeMirror-merge-l-chunk {
-    background-color: rgba(200, 200, 200, 0.7);
-}
-
-.CodeMirror-merge-l-chunk-start {
-    border-top: 1px solid rgba(200, 200, 200, 0.7);
-}
-
-.CodeMirror-merge-l-chunk-end {
-    border-bottom: 1px solid rgba(200, 200, 200, 0.7);
-}
-
-.CodeMirror-merge-l-connect {
-    fill: rgba(200, 200, 200, 0.7);
-    stroke: rgba(200, 200, 200, 0.7);
-    stroke-width: 2px;
-}
-
-.CodeMirror-merge-l-inserted {
-    background: rgba(170, 255, 170, 1.0) none;
-}
-
-.CodeMirror-merge-l-deleted {
-    text-decoration: line-through;
-    background: rgba(255, 170, 170, 1.0) none;
-}
-
 .action-icon {
     cursor: pointer;
 }

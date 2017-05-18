@@ -10,4 +10,16 @@ if (environment.production) {
     enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule);
+const onGotAmdLoader = () => {
+    platformBrowserDynamic().bootstrapModule(AppModule);
+};
+
+if (!(<any>window).require) {
+    const loaderScript = document.createElement('script');
+    loaderScript.type = 'text/javascript';
+    loaderScript.src = 'assets/monaco/vs/loader.js';
+    loaderScript.addEventListener('load', onGotAmdLoader);
+    document.body.appendChild(loaderScript);
+} else {
+    onGotAmdLoader();
+}

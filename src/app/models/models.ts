@@ -148,6 +148,13 @@ export class Pair<T> {
     other: T;
 }
 
+export class EditorConfig {
+    content: string;
+    contentType: string;
+    readOnly: boolean;
+    theme?: string;
+}
+
 export class MergeViewConfig {
     leftContent: string;
     leftContentType: string;
@@ -155,4 +162,5 @@ export class MergeViewConfig {
     rightContentType: string;
     readOnly: boolean;
     sideBySide: boolean;
+    theme?: string;
 }
