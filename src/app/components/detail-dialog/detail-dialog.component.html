@@ -236,9 +236,15 @@
                 </expansion-panels-container>
             </div>
             <div *ngIf="!trial.diff_keys" style="flex: 1;">
-                <div class="center">
-                    <md-icon class="icon-very-large">hot_tub</md-icon>
-                    <div>Oops.. I can't understand properties..</div>
+                <div class="center-horizontal" style="height: 50%;">
+                    <div class="error-message" style="padding-top: 20px;">
+                        ┌────────────────────┐<br/>
+                        ｜ Oops.. I can't understand properties..   <br/>
+                        └──────────────v─────-┘
+                    </div>
+                    <div style="padding-top: 5px;">
+                        <md-icon class="icon-very-large error-message">hot_tub</md-icon>
+                    </div>
                 </div>
             </div>
             <div style="width: 50%">
