@@ -1,5 +1,8 @@
-<div>
-    <span class="count-word">{{activeIndexNum + 1}} / {{options.length}}</span>
+<div class="center-vertical">
+    <div class="count-word">{{activeIndexNum + 1}} / {{options.length}}</div>
+    <div *ngIf="isLoading" style="width: 90%; padding-left: 10px;">
+        <md-progress-bar mode="indeterminate"></md-progress-bar>
+    </div>
 </div>
 <div style="display: flex;">
     <ng-select #selector
@@ -10,35 +13,50 @@
                 'font-size': '1.2rem'
             }"
                [className]="'smart-padding-without-left'"
-               (selected)="showTrial(getActiveTrial())"
+               (selected)="showTrial(trial)"
     >
     </ng-select>
     <div>
         <a href={{createActiveTrialLink()}}><md-icon class="action-icon hvr-buzz-out">link</md-icon></a>
     </div>
 </div>
+<div style="display: flex; justify-content: space-around">
+    <div>
+        <md-chip>{{oneAccessPoint.name}}</md-chip>
+        <small>
+            <a [href]="trial.one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                {{oneAccessPoint.host}}.....
+            </a>
+        </small>
+    </div>
+    <div>
+        <md-chip>{{otherAccessPoint.name}}</md-chip>
+        <small>
+            <a [href]="trial.other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
+                {{otherAccessPoint.host}}.....
+            </a>
+        </small>
+    </div>
+</div>
+<div style="display: flex; justify-content: space-around">
+    <div>
+        <span class="label">{{oneExpectedEncoding}}</span>
+        <span class="label">{{trial.one.byte}} b</span>
+        <span class="label">{{trial.one.response_sec}} s</span>
+        <span class="label">{{trial.one.status_code}}</span>
+    </div>
+    <div>
+        <span class="label">{{otherExpectedEncoding}}</span>
+        <span class="label">{{trial.other.byte}} b</span>
+        <span class="label">{{trial.other.response_sec}} s</span>
+        <span class="label">{{trial.other.status_code}}</span>
+    </div>
+</div>
+<hr/>
 <md-tab-group  [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
     <md-tab label="Diff viewer">
         <div style="display: flex;">
             <div style="flex: 1;">
-                <div class="smart-padding-small" style="display: flex; justify-content: space-around">
-                    <div>
-                        <md-chip>{{oneAccessPoint.name}}</md-chip>
-                        <small>
-                            <a [href]="getActiveTrial().one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                                {{oneAccessPoint.host}}.....
-                            </a>
-                        </small>
-                    </div>
-                    <div>
-                        <md-chip>{{otherAccessPoint.name}}</md-chip>
-                        <small>
-                            <a [href]="getActiveTrial().other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                                {{otherAccessPoint.host}}.....
-                            </a>
-                        </small>
-                    </div>
-                </div>
                 <div *ngIf="isLoading" class="center" style="height: 50vh;">
                     <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
                 </div>
@@ -47,10 +65,6 @@
                                       [config]="mergeViewConfig"
                     >
                     </app-merge-viewer>
-                    <div class="smart-padding-small" style="display: flex; justify-content: space-around">
-                        <small>{{oneExpectedEncoding}}</small>
-                        <small>{{otherExpectedEncoding}}</small>
-                    </div>
                 </div>
                 <div *ngIf="errorMessage">
                     {{errorMessage}}
@@ -74,14 +88,8 @@
         </div>
     </md-tab>
     <md-tab label="Property diffs">
-        <div style="height: 30px;" class="smart-padding-small">
-            <div *ngIf="isLoading">
-                Now Loading...
-                <md-progress-bar mode="indeterminate"></md-progress-bar>
-            </div>
-        </div>
         <div style="display: flex; justify-content: space-between;">
-            <div *ngIf="getActiveTrial().diff_keys" style="flex: 1;">
+            <div *ngIf="trial.diff_keys" style="flex: 1;">
                 <h2 class="center-vertical">
                     <md-icon>report_problem</md-icon>&nbsp;Unknown!!
                 </h2>
@@ -227,7 +235,7 @@
                     </expansion-panel>
                 </expansion-panels-container>
             </div>
-            <div *ngIf="!getActiveTrial().diff_keys" style="flex: 1;">
+            <div *ngIf="!trial.diff_keys" style="flex: 1;">
                 <div class="center">
                     <md-icon class="icon-very-large">hot_tub</md-icon>
                     <div>Oops.. I can't understand properties..</div>

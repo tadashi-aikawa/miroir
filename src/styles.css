@@ -42,6 +42,10 @@ div.ellipsis-text {
     padding: 10px;
 }
 
+.smart-padding-xsmall {
+    padding: 5px;
+}
+
 .smart-padding-without-bottom {
     padding-top: 20px;
     padding-left: 20px;
@@ -52,6 +56,12 @@ div.ellipsis-text {
     padding-bottom: 20px;
     padding-left: 20px;
     padding-right: 20px;
+}
+
+.smart-padding-xsmall-without-top {
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .smart-padding-without-left {

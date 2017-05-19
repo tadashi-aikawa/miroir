@@ -150,7 +150,11 @@ export class DetailDialogComponent implements OnInit {
             },
             actions: false
         };
-        this.showTrial(this.getActiveTrial());
+        this.showTrial(this.trial);
+    }
+
+    get trial(): Trial {
+        return this.trials[this.activeIndex];
     }
 
     toggleCheatSheet(): void {
@@ -159,10 +163,6 @@ export class DetailDialogComponent implements OnInit {
 
     closeDialog(): void {
         this.dialogRef.close();
-    }
-
-    getActiveTrial(): Trial {
-        return this.trials[this.activeIndex];
     }
 
     showNextTrial(): boolean {
@@ -291,11 +291,11 @@ export class DetailDialogComponent implements OnInit {
 
     updateEditorConfig() {
         this.checkedAlready = yaml.safeLoad(this.editor.getValue());
-        this.updatePropertyDiffs(this.getActiveTrial());
+        this.updatePropertyDiffs(this.trial);
     }
 
     createActiveTrialLink() {
-        return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.getActiveTrial().seq}`
+        return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`
     }
 
     private createPropertyDiff(ignore: IgnoreCase, path: string, diff_keys: DiffKeys): PropertyDiffs {
