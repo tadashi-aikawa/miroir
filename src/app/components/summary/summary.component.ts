@@ -1,5 +1,5 @@
 import {ActivatedRoute} from '@angular/router';
-import {DynamoResult, DynamoRow, EditorConfig, Report, Summary, Trial} from '../../models/models';
+import {DynamoResult, DynamoRow, EditorConfig, JudgementAddon, Report, Summary, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
@@ -291,9 +291,15 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.otherAccessPoint = this.activeReport.summary.other;
         dialogRef.componentInstance.activeIndex = String(index);
         dialogRef.componentInstance.trials = trials;
-        dialogRef.componentInstance.ignores = _(this.activeReport.addons.judgement)
-            .find(x => x.name.match(/ignore_properties/gi) !== null)
-            .config.ignores;
+
+        const ignorePropertyaddon: JudgementAddon = _.find(
+            this.activeReport.addons.judgement,
+            x => x.name.match(/ignore_properties/gi) !== null
+        );
+        if (ignorePropertyaddon) {
+            dialogRef.componentInstance.ignores = ignorePropertyaddon.config.ignores;
+        }
+
     }
 
     showRequestsAsJson() {

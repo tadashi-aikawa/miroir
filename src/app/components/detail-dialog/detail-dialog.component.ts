@@ -70,8 +70,8 @@ export class DetailDialogComponent implements OnInit {
     @Input() oneAccessPoint: AccessPoint;
     @Input() otherAccessPoint: AccessPoint;
     @Input() trials: Trial[];
-    @Input() ignores: IgnoreCase[];
-    @Input() checkedAlready: IgnoreCase[];
+    @Input() ignores: IgnoreCase[] = [];
+    @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
     @Input() unifiedDiff: boolean = this.localStorageService.get<boolean>('unifiedDiff');
 
@@ -125,17 +125,24 @@ export class DetailDialogComponent implements OnInit {
         // FIXME
         this.editorConfig = {
             content: `
-- title: for test
+- title: something
   conditions:
+    - added:
+        # regexp
+        - root<'items'><[0-9]><'hogehoge-added'>
+    - changed:
+        # regexp
+        - root<'items'><[0-9]><'hogehoge-changed'>
     - removed:
-        - root<'items'><[0-9]><'color'>
+        # regexp
+        - root<'items'><[0-9]><'hogehoge-removed'>
           `,
             contentType: 'yaml',
             readOnly: false,
             theme: 'vs'
         };
 
-        this.checkedAlready = yaml.safeLoad(this.editorConfig.content);
+        this.checkedAlready = yaml.safeLoad(this.editorConfig.content) || [];
 
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
@@ -290,7 +297,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     updateEditorConfig() {
-        this.checkedAlready = yaml.safeLoad(this.editor.getValue());
+        this.checkedAlready = yaml.safeLoad(this.editor.getValue()) || [];
         this.updatePropertyDiffs(this.trial);
     }
 

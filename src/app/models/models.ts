@@ -68,7 +68,9 @@ export class IgnoreCase {
 }
 
 export class JudgementAddon {
-    config: object;
+    config: {
+        ignores: IgnoreCase[];
+    };
 }
 
 // TODO define needed parameters
