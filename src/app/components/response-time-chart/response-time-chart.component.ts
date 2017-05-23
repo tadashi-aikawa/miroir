@@ -2,6 +2,7 @@ import {Summary, Trial} from '../../models/models';
 import {AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import * as _ from 'lodash';
 import {Marker, Options} from 'highcharts';
+import * as Maths from '../../utils/maths';
 
 
 const statusToMarker = (status: number): Marker => {
@@ -37,9 +38,12 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
     }
 
     private createChartOptions(summary: Summary, trials: Trial[]): Options {
+        const oneAverage: number = _.meanBy(trials, (x: Trial) => x.one.response_sec);
+        const otherAverage: number = _.meanBy(trials, (x: Trial) => x.other.response_sec);
+
         return {
             chart: {
-                zoomType: 'x'
+                zoomType: 'xy'
             },
             title: {
                 text: 'Response time'
@@ -47,7 +51,37 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
             yAxis: {
                 title: {
                     text: 'sec'
-                }
+                },
+                plotLines: [
+                    {
+                        dashStyle: 'dot',
+                        color: 'rgba(100,100,255,0.5)',
+                        value: oneAverage,
+                        width: 2,
+                        zIndex: 2,
+                        label: {
+                            text: `${summary.one.name} average ${Maths.round(oneAverage, 3)}`,
+                            style: {
+                                color: 'rgba(100,100,255,0.75)'
+                            },
+                            align: 'right'
+                        }
+                    },
+                    {
+                        dashStyle: 'dot',
+                        color: 'rgba(255,100,100,0.5)',
+                        value: otherAverage,
+                        width: 2,
+                        zIndex: 2,
+                        label: {
+                            text: `${summary.other.name} average ${Maths.round(otherAverage, 3)}`,
+                            style: {
+                                color: 'rgba(255,100,100,0.75)'
+                            },
+                            align: 'right'
+                        }
+                    }
+                ]
             },
             tooltip: {
                 shared: true
