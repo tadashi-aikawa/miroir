@@ -186,7 +186,12 @@
                         </md-tab>
                         <md-tab label="Chart">
                             <div class="smart-padding">
-                                <div [ng2-highcharts]="chartOptions"></div>
+                                <app-response-time-chart
+                                    [summary]="activeReport.summary"
+                                    [trials]="filteredTrials"
+                                    (onPointClick)="showDetail($event)"
+                                >
+                                </app-response-time-chart>
                             </div>
                         </md-tab>
                     </md-tab-group>

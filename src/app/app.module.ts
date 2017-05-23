@@ -25,6 +25,7 @@ import {
     SummaryComponent
 } from './components/summary/summary.component';
 import {MergeViewerComponent} from './components/merge-viewer/merge-viewer.component';
+import {ResponseTimeChartComponent} from './components/response-time-chart/response-time-chart.component';
 import {CommonModule, HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {DetailDialogComponent} from './components/detail-dialog/detail-dialog.component';
 import {EditorComponent} from './components/editor/editor.component';
@@ -53,7 +54,8 @@ const appRoutes: Routes = [
         EditorComponent,
         HoverComponent,
         StatusCodeComponent,
-        StatusComponent
+        StatusComponent,
+        ResponseTimeChartComponent
     ],
     imports: [
         BrowserModule,

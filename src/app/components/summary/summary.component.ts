@@ -8,7 +8,6 @@ import {MdDialog, MdDialogRef, MdSidenav} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
-import {Marker, Options} from 'highcharts';
 import {LocalStorageService} from 'angular-2-local-storage';
 
 const filterFunction = (v, q) =>
@@ -19,16 +18,6 @@ const filterFunction = (v, q) =>
             return false;
         }
     });
-
-const statusToMarker = (status: number): Marker => {
-    const statusHead: number = Math.floor(status / 100);
-    const createMarker = (color: string): Marker =>
-        ({enabled: true, fillColor: color, lineColor: 'gray', lineWidth: 1, radius: 4});
-
-    return statusHead === 5 ? createMarker('red') :
-        statusHead === 4 ? createMarker('yellow') :
-            ({enabled: false});
-};
 
 interface RowData {
     trial: Trial;
@@ -74,7 +63,8 @@ export class SummaryComponent implements OnInit {
     loadingReportKey: string;
     tableSource = new LocalDataSource();
 
-    chartOptions: Options;
+    // TODO: Update after `onFilterChanged` if implemented by ng2-smart-table
+    filteredTrials: Trial[];
 
     constructor(private service: AwsService,
                 private _dialog: MdDialog,
@@ -96,8 +86,9 @@ export class SummaryComponent implements OnInit {
             if (ps.hashKey) {
                 this.showReport(ps.hashKey)
                     .then((r: Report) => {
+                        this.filteredTrials = r.trials;
                         if(ps.seq) {
-                            this.showDetail(r.trials, ps.seq - 1);
+                            this.showDetail(ps.seq - 1);
                         }
                     });
             }
@@ -173,9 +164,7 @@ export class SummaryComponent implements OnInit {
                         requestTime: t.request_time
                     }))).then(() => {
                         this.tableSource.getFilteredAndSorted()
-                            .then((es: RowData[]) => {
-                                this.chartOptions = this.createChartOptions(r.summary, es.map(x => x.trial));
-                            });
+                            .then((es: RowData[]) => this.filteredTrials = es.map(x => x.trial));
                         resolve(r);
                     });
                 })
@@ -263,25 +252,19 @@ export class SummaryComponent implements OnInit {
 
     onSelectRow(event: any) {
         event.source.getFilteredAndSorted().then((es: RowData[]) => {
-            this.showDetail(es.map(x => x.trial), es.findIndex(e => e === event.data));
+            this.filteredTrials = es.map(x => x.trial);
+            this.showDetail(es.findIndex(e => e === event.data));
         });
     }
 
     afterChangeTab(index: number): void {
         if (index === 1) {
             this.tableSource.getFilteredAndSorted()
-                .then((es: RowData[]) => {
-                    const nextOptions: Options = this.createChartOptions(this.activeReport.summary, es.map(x => x.trial));
-                    const toY: (Options) => number[] = options => options.series.map(x => x.data.map(d => d.y));
-
-                    if (!_.isEqual(toY(this.chartOptions), toY(nextOptions))) {
-                       this.chartOptions = nextOptions;
-                    }
-                });
+                .then((es: RowData[]) => this.filteredTrials = es.map(x => x.trial));
         }
     }
 
-    showDetail(trials: Trial[], index: number) {
+    showDetail(index: number) {
         const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '80vw',
             height: '97%'
@@ -290,7 +273,7 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.oneAccessPoint = this.activeReport.summary.one;
         dialogRef.componentInstance.otherAccessPoint = this.activeReport.summary.other;
         dialogRef.componentInstance.activeIndex = String(index);
-        dialogRef.componentInstance.trials = trials;
+        dialogRef.componentInstance.trials = this.filteredTrials;
 
         const ignorePropertyaddon: JudgementAddon = _.find(
             this.activeReport.addons.judgement,
@@ -352,93 +335,6 @@ export class SummaryComponent implements OnInit {
         this.settings = Object.assign({}, TABLE_SETTINGS,
             {columns: _.pick(TABLE_SETTINGS.columns, this.selectedValues)}
         );
-    }
-
-    private createChartOptions(summary: Summary, trials: Trial[]): Options {
-        return {
-            chart: {
-                zoomType: 'x'
-            },
-            title: {
-                text: 'Response time'
-            },
-            yAxis: {
-                title: {
-                    text: 'sec'
-                }
-            },
-            tooltip: {
-                shared: true
-            },
-            plotOptions: {
-                spline: {
-                    marker: {
-                        symbol: 'circle'
-                    },
-                    lineWidth: 2,
-                    pointStart: 1
-                },
-                area: {
-                    marker: {
-                        enabled: false
-                    },
-                    lineWidth: 1,
-                    pointStart: 1
-                },
-                series: {
-                    turboThreshold: 10000
-                }
-            },
-            series: [
-                {
-                    name: summary.one.name,
-                    color: 'rgba(100,100,255,0.5)',
-                    type: 'spline',
-                    data: trials.map(x => ({
-                        y: x.one.response_sec,
-                        name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
-                        marker: statusToMarker(x.one.status_code),
-                        events: {
-                            click: e => {
-                                this.showDetail(trials, e.point.index);
-                                return false;
-                            }
-                        }
-                    }))
-                },
-                {
-                    name: summary.other.name,
-                    color: 'rgba(255,100,100,0.5)',
-                    type: 'spline',
-                    data: trials.map(x => ({
-                        y: x.other.response_sec,
-                        name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
-                        marker: statusToMarker(x.other.status_code),
-                        events: {
-                            click: e => {
-                                this.showDetail(trials, e.point.index);
-                                return false;
-                            }
-                        }
-                    }))
-                },
-                {
-                    name: 'Numerical difference',
-                    color: 'rgba(100,255,100,0.5)',
-                    type: 'area',
-                    data: trials.map(x => ({
-                        y: x.responseSecDiff,
-                        name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
-                        events: {
-                            click: e => {
-                                this.showDetail(trials, e.point.index);
-                                return false;
-                            }
-                        }
-                    }))
-                }
-            ]
-        };
     }
 
 }
