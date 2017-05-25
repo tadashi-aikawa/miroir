@@ -67,6 +67,11 @@ export class IgnoreCase {
     conditions: Condition[];
 }
 
+export class CheckPoint {
+    vars: object;
+    cases: IgnoreCase[]
+}
+
 export class JudgementAddon {
     config: {
         ignores: IgnoreCase[];

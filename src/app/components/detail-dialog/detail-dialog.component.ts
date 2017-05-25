@@ -1,5 +1,5 @@
 import {
-    AccessPoint,
+    AccessPoint, CheckPoint,
     Condition,
     DiffKeys,
     EditorConfig,
@@ -56,6 +56,22 @@ function createConfig(one: string, other: string, oneContentType: string, otherC
         sideBySide: sideBySide,
         theme: 'vs'
     };
+}
+
+function toCheckedAlready(checkPoint: CheckPoint) {
+    const assignVars = (ignoreCase: IgnoreCase): IgnoreCase => _.omitBy(
+        _.reduce(checkPoint.vars, (result, v, k) => Object.assign({}, result, {
+            image: result.image ? result.image.replace(new RegExp(`{{ ${k} }}`, 'g'), v) : undefined,
+            link: result.link ? result.link.replace(new RegExp(`{{ ${k} }}`, 'g'), v) : undefined
+        }), ignoreCase),
+        v => v === undefined
+    );
+
+    return checkPoint.cases.map(assignVars);
+}
+
+function matchRegExp(pattern: string, target: string): boolean {
+    return new RegExp(pattern).test(target);
 }
 
 @Component({
@@ -125,24 +141,28 @@ export class DetailDialogComponent implements OnInit {
         // FIXME
         this.editorConfig = {
             content: `
-- title: something
-  conditions:
-    - added:
-        # regexp
-        - root<'items'><[0-9]><'hogehoge-added'>
-    - changed:
-        # regexp
-        - root<'items'><[0-9]><'hogehoge-changed'>
-    - removed:
-        # regexp
-        - root<'items'><[0-9]><'hogehoge-removed'>
+vars:
+  mimizou: https://avatars0.githubusercontent.com/u/9500018?v=3&s=460
+cases:
+  - title: something
+    image: '{{ mimizou }}'
+    conditions:
+      - added:
+          # regexp
+          - root<'items'><[0-9]><'hogehoge-added'>
+      - changed:
+          # regexp
+          - .+
+      - removed:
+          # regexp
+          - root<'items'><[0-9]><'hogehoge-removed'>
           `,
             contentType: 'yaml',
             readOnly: false,
             theme: 'vs'
         };
 
-        this.checkedAlready = yaml.safeLoad(this.editorConfig.content) || [];
+        this.checkedAlready = toCheckedAlready(yaml.safeLoad(this.editorConfig.content));
 
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
@@ -297,7 +317,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     updateEditorConfig() {
-        this.checkedAlready = yaml.safeLoad(this.editor.getValue()) || [];
+        this.checkedAlready = toCheckedAlready(yaml.safeLoad(this.editor.getValue()));
         this.updatePropertyDiffs(this.trial);
     }
 
@@ -326,8 +346,4 @@ export class DetailDialogComponent implements OnInit {
             )
         });
     }
-}
-
-function matchRegExp(pattern: string, target: string): boolean {
-    return new RegExp(pattern).test(target);
 }
