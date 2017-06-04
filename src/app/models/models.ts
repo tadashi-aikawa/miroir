@@ -7,6 +7,7 @@ export class DynamoResult {
 export class DynamoRow {
     hashkey: string;
     title: string;
+    description?: string;
     same_count: number;
     different_count: number;
     failure_count: number;
@@ -16,6 +17,7 @@ export class DynamoRow {
     end_time: string;
     with_zip: boolean;
     retry_hash?: string;
+    checklist?: string;
 
     deleting?: boolean;
     deleteErrorMessage?: string;
@@ -86,6 +88,7 @@ export class Addons {
 export class Report {
     key: string;
     title: string;
+    description?: string;
     summary: Summary;
     trials: Trial[];
     addons?: Addons;

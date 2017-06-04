@@ -38,6 +38,10 @@ div.ellipsis-text {
     padding: 20px;
 }
 
+.smart-padding-left {
+    padding-left: 20px;
+}
+
 .smart-padding-small {
     padding: 10px;
 }
