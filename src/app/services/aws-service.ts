@@ -111,6 +111,74 @@ export class AwsService {
         });
     }
 
+    async updateReportTitle(key: string, title: string): Promise<any> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        const s3 = new S3({
+            apiVersion: '2006-03-01',
+            accessKeyId: this.tmpAccessKeyId,
+            secretAccessKey: this.tmpSecretAccessKey,
+            sessionToken: this.tmpSessionToken
+        });
+
+        return new Promise<Report>((resolve, reject) => {
+            s3.getObject(
+                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`, Bucket: this.bucket},
+                (err, data) => {
+                    if (err) {
+                        reject(err.message);
+                    }
+
+                    const after = Object.assign(JSON.parse(data.Body.toString()), {title});
+                    s3.putObject(
+                        {
+                            Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`,
+                            Bucket: this.bucket,
+                            Body: JSON.stringify(after)
+                        },
+                        (err, data) => err ? reject(err.message) : resolve()
+                    );
+                }
+            );
+        });
+    }
+
+    async updateReportDescription(key: string, description: string): Promise<any> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        const s3 = new S3({
+            apiVersion: '2006-03-01',
+            accessKeyId: this.tmpAccessKeyId,
+            secretAccessKey: this.tmpSecretAccessKey,
+            sessionToken: this.tmpSessionToken
+        });
+
+        return new Promise<Report>((resolve, reject) => {
+            s3.getObject(
+                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`, Bucket: this.bucket},
+                (err, data) => {
+                    if (err) {
+                        reject(err.message);
+                    }
+
+                    const after = Object.assign(JSON.parse(data.Body.toString()), {description});
+                    s3.putObject(
+                        {
+                            Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`,
+                            Bucket: this.bucket,
+                            Body: JSON.stringify(after)
+                        },
+                        (err, data) => err ? reject(err.message) : resolve()
+                    );
+                }
+            );
+        });
+    }
+
     async fetchArchive(key: string): Promise<{name: string, body: Blob}> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
@@ -204,6 +272,70 @@ export class AwsService {
 
         return new Promise((resolve, reject) => {
             db.delete(params, (err, data) => {
+                return err ? reject(err.message) : resolve(data);
+            });
+        });
+    }
+
+    async updateSummaryTitle(key: string, title: string): Promise<any> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        // WARNING: this method is alpha
+        const db = new DynamoDB.DocumentClient({
+            service: new DynamoDB({
+                region: this.region,
+                accessKeyId: this.tmpAccessKeyId,
+                secretAccessKey: this.tmpSecretAccessKey,
+                sessionToken: this.tmpSessionToken
+            })
+        });
+
+        const params = {
+            TableName: this.table,
+            Key: {
+                hashkey: key
+            },
+            UpdateExpression: 'set #a = :title',
+            ExpressionAttributeNames: {'#a' : 'title'},
+            ExpressionAttributeValues: {':title' : title}
+        };
+
+        return new Promise((resolve, reject) => {
+            db.update(params, (err, data) => {
+                return err ? reject(err.message) : resolve(data);
+            });
+        });
+    }
+
+    async updateSummaryDescription(key: string, description: string): Promise<any> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        // WARNING: this method is alpha
+        const db = new DynamoDB.DocumentClient({
+            service: new DynamoDB({
+                region: this.region,
+                accessKeyId: this.tmpAccessKeyId,
+                secretAccessKey: this.tmpSecretAccessKey,
+                sessionToken: this.tmpSessionToken
+            })
+        });
+
+        const params = {
+            TableName: this.table,
+            Key: {
+                hashkey: key
+            },
+            UpdateExpression: 'set #a = :description',
+            ExpressionAttributeNames: {'#a' : 'description'},
+            ExpressionAttributeValues: {':description' : description}
+        };
+
+        return new Promise((resolve, reject) => {
+            db.update(params, (err, data) => {
                 return err ? reject(err.message) : resolve(data);
             });
         });

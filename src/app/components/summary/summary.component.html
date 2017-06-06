@@ -143,7 +143,10 @@
                             </button>
                         </md-menu>
                         <h2>
-                            {{activeReport.title}}
+                            <app-inline-editor type='single-line'
+                                               [value]="activeReport.title"
+                                               (onUpdate)="onUpdateTitle($event)">
+                            </app-inline-editor>
                             <a href={{createActiveReportLink()}}><span
                                 class="hashkey-text hvr-underline-from-center action-text">
                                     ({{activeReport.key.substring(0, 7)}})
@@ -158,7 +161,10 @@
                         </h2>
                     </div>
                     <div class="smart-padding-left">
-                        {{activeReport.description}}
+                        <app-inline-editor type='multi-line'
+                                           [value]="activeReport.description"
+                                           (onUpdate)="onUpdateDescription($event)">
+                        </app-inline-editor>
                     </div>
                     <div class="smart-padding">
                         <small>

@@ -4,7 +4,7 @@ import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
-import {MdDialog, MdDialogRef, MdSidenav} from '@angular/material';
+import {MdDialog, MdDialogRef, MdSidenav, MdSnackBar} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
@@ -69,7 +69,8 @@ export class SummaryComponent implements OnInit {
     constructor(private service: AwsService,
                 private _dialog: MdDialog,
                 private route: ActivatedRoute,
-                private localStorageService: LocalStorageService) {
+                private localStorageService: LocalStorageService,
+                private snackBar: MdSnackBar) {
     }
 
     ngOnInit(): void {
@@ -134,6 +135,40 @@ export class SummaryComponent implements OnInit {
 
     onSelectColumns(event) {
         this.updateColumnVisibility();
+    }
+
+    onUpdateTitle(title: string) {
+        this.activeReport.title = title;
+        // TODO: rollback since abnormal
+        Promise.all([
+            this.service.updateSummaryTitle(this.activeReport.key, title),
+            this.service.updateReportTitle(this.activeReport.key, title)
+        ])
+            .then(x => {
+                this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).title = title;
+                this.snackBar.open('', '[SUCCESS] Title updated', {duration: 3000});
+            })
+            .catch(err => {
+                this.activeReport.title = 'Unfortunate ERROR...';
+                this.snackBar.open(err, '[FAILURE] Title updated');
+            });
+    }
+
+    onUpdateDescription(description: string) {
+        this.activeReport.description = description;
+        // TODO: rollback since abnormal
+        Promise.all([
+            this.service.updateSummaryDescription(this.activeReport.key, description),
+            this.service.updateReportDescription(this.activeReport.key, description)
+        ])
+            .then(x => {
+                this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).description = description;
+                this.snackBar.open('', '[SUCCESS] Description updated', {duration: 3000});
+            })
+            .catch(err => {
+                this.activeReport.description = 'Unfortunate ERROR...';
+                this.snackBar.open(err, '[FAILURE] Description updated');
+            });
     }
 
     showReport(key: string): Promise<Report> {

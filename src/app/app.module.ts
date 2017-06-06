@@ -22,7 +22,7 @@ import {
     HoverComponent,
     StatusCodeComponent,
     StatusComponent,
-    SummaryComponent
+    SummaryComponent,
 } from './components/summary/summary.component';
 import {MergeViewerComponent} from './components/merge-viewer/merge-viewer.component';
 import {ResponseTimeChartComponent} from './components/response-time-chart/response-time-chart.component';
@@ -32,6 +32,7 @@ import {EditorComponent} from './components/editor/editor.component';
 import {AwsService} from './services/aws-service';
 import {AuthGuard} from './components/guard/auth.guard';
 import {LoginComponent} from './components/login/login.component';
+import {InlineEditorComponent} from './components/inline-editor/inline-editor.component';
 
 const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -53,6 +54,7 @@ const appRoutes: Routes = [
         EditorDialogComponent,
         EditorComponent,
         HoverComponent,
+        InlineEditorComponent,
         StatusCodeComponent,
         StatusComponent,
         ResponseTimeChartComponent
