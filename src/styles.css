@@ -92,6 +92,10 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
     cursor : pointer;
 }
 
+.icon-small {
+    font-size: 16px;
+}
+
 .icon-large {
     font-size: 28px;
 }

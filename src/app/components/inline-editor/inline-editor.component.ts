@@ -6,6 +6,7 @@ import {MdInputDirective, MdTextareaAutosize} from '@angular/material';
     styleUrls: ['../../../../node_modules/hover.css/css/hover.css'],
     template: `
         <div *ngIf="!editing" class="action-icon hvr-glow" (click)="onTextClick()">
+            <md-icon *ngIf="!value" class="icon-small">edit</md-icon>
             <span class="multi-line">{{value}}</span>
         </div>
         <md-input-container *ngIf="editing && type === 'single-line'">
