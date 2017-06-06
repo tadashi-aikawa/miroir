@@ -3,7 +3,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import {S3, DynamoDB, TemporaryCredentials, Credentials} from 'aws-sdk';
 import {ObjectList} from 'aws-sdk/clients/s3';
-import {DynamoResult, Pair, Report} from '../models/models';
+import {DynamoResult, Pair, Report, Trial} from '../models/models';
 import * as Encoding from 'encoding-japanese';
 import {LocalStorageService} from 'angular-2-local-storage';
 import {Router} from '@angular/router';
@@ -11,6 +11,25 @@ import DocumentClient = DynamoDB.DocumentClient;
 
 const DURATION_SECONDS: number = 86400;
 const JUMEAUX_RESULTS_PREFIX = 'jumeaux-results';
+
+
+function fetchObject<T>(s3: S3, bucket: string, objectKey: string): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        s3.getObject(
+            {Key: objectKey, Bucket: bucket},
+            (err, data) => err ? reject(err.message) : resolve(JSON.parse(data.Body.toString()))
+        );
+    })
+}
+
+function putObject<T>(s3: S3, bucket: string, objectKey: string, body: any): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        s3.putObject(
+            {Key: objectKey, Bucket: bucket, Body: body},
+            (err, data) => err ? reject(err.message) : resolve()
+        );
+    });
+}
 
 @Injectable()
 export class AwsService {
@@ -110,39 +129,24 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        return new Promise<Report>((resolve, reject) => {
-            this.s3.getObject(
-                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`, Bucket: this.bucket},
-                (err, data) => err ? reject(err.message) : resolve(JSON.parse(data.Body.toString()))
-            );
-        });
+        const [report, trials]: [Report, Trial[]] = await Promise.all<Report, Trial[]>([
+            fetchObject<Report>(this.s3, this.bucket, `${JUMEAUX_RESULTS_PREFIX}/${key}/report-without-trials.json`),
+            fetchObject<Trial[]>(this.s3, this.bucket, `${JUMEAUX_RESULTS_PREFIX}/${key}/trials.json`)
+        ]);
+
+        return Object.assign(report, {trials});
     }
 
-    async updateReportTitle(key: string, title: string): Promise<any> {
+    async updateReportTitle(key: string, title: string): Promise<void> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        return new Promise<Report>((resolve, reject) => {
-            this.s3.getObject(
-                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`, Bucket: this.bucket},
-                (err, data) => {
-                    if (err) {
-                        reject(err.message);
-                    }
+        const target = `${JUMEAUX_RESULTS_PREFIX}/${key}/report-without-trials.json`;
+        const withoutTrials: Report = await fetchObject<Report>(this.s3, this.bucket, target);
+        const after = Object.assign(withoutTrials, {title});
 
-                    const after = Object.assign(JSON.parse(data.Body.toString()), {title});
-                    this.s3.putObject(
-                        {
-                            Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`,
-                            Bucket: this.bucket,
-                            Body: JSON.stringify(after)
-                        },
-                        (err, data) => err ? reject(err.message) : resolve()
-                    );
-                }
-            );
-        });
+        return await putObject(this.s3, this.bucket, target, JSON.stringify(after));
     }
 
     async updateReportDescription(key: string, description: string): Promise<any> {
@@ -150,26 +154,11 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        return new Promise<Report>((resolve, reject) => {
-            this.s3.getObject(
-                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`, Bucket: this.bucket},
-                (err, data) => {
-                    if (err) {
-                        reject(err.message);
-                    }
+        const target = `${JUMEAUX_RESULTS_PREFIX}/${key}/report-without-trials.json`;
+        const withoutTrials: Report = await fetchObject<Report>(this.s3, this.bucket, target);
+        const after = Object.assign(withoutTrials, {description});
 
-                    const after = Object.assign(JSON.parse(data.Body.toString()), {description});
-                    this.s3.putObject(
-                        {
-                            Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`,
-                            Bucket: this.bucket,
-                            Body: JSON.stringify(after)
-                        },
-                        (err, data) => err ? reject(err.message) : resolve()
-                    );
-                }
-            );
-        });
+        return await putObject(this.s3, this.bucket, target, JSON.stringify(after));
     }
 
     async fetchArchive(key: string): Promise<{name: string, body: Blob}> {
