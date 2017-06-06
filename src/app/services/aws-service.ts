@@ -31,6 +31,15 @@ function putObject<T>(s3: S3, bucket: string, objectKey: string, body: any): Pro
     });
 }
 
+function deleteObjects(s3: S3, bucket: string, objectKeys: string[]): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        s3.deleteObjects(
+            {Bucket: bucket, Delete: {Objects: objectKeys.map(k => ({Key: k}))}},
+            (err, data) => err ? reject(err.message) : resolve()
+        );
+    });
+}
+
 @Injectable()
 export class AwsService {
     region = this.localStorageService.get<string>('region') || 'ap-northeast-1';
@@ -161,6 +170,33 @@ export class AwsService {
         return await putObject(this.s3, this.bucket, target, JSON.stringify(after));
     }
 
+    // TODO: Remove this function if jumeaux( < 0.9.0) become not be used
+    async convertReport(key: string): Promise<void> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        const oldPath = `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`;
+        const old: Report = await fetchObject<Report>(this.s3, this.bucket, oldPath);
+
+        await putObject(
+            this.s3,
+            this.bucket,
+            `${JUMEAUX_RESULTS_PREFIX}/${key}/trials.json`,
+            JSON.stringify(old.trials)
+        );
+
+        delete old.trials;
+        await putObject(
+            this.s3,
+            this.bucket,
+            `${JUMEAUX_RESULTS_PREFIX}/${key}/report-without-trials.json`,
+            JSON.stringify(old)
+        );
+
+        await deleteObjects(this.s3, this.bucket, [oldPath]);
+    }
+
     async fetchArchive(key: string): Promise<{name: string, body: Blob}> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
@@ -178,22 +214,17 @@ export class AwsService {
         });
     }
 
-    async removeTrials(s3Keys: string[]): Promise<any> {
+    async removeTrials(s3Keys: string[]): Promise<void> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
         // WARNING: this method is alpha
         if (s3Keys.length === 0) {
-            return Promise.resolve('ok');
+            return;
         }
 
-        return new Promise((resolve, reject) => {
-            this.s3.deleteObjects(
-                {Bucket: this.bucket, Delete: {Objects: s3Keys.map(k => ({Key: k}))}},
-                (err, data) => err ? reject(err.message) : resolve(data)
-            );
-        });
+        await deleteObjects(this.s3, this.bucket, s3Keys);
     }
 
     async fetchList(key: string): Promise<ObjectList> {

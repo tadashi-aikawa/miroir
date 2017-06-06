@@ -66,6 +66,9 @@ export class SummaryComponent implements OnInit {
     // TODO: Update after `onFilterChanged` if implemented by ng2-smart-table
     filteredTrials: Trial[];
 
+    // TODO: Remove this if jumeaux( < 0.9.0) become not be used
+    failureKey: string;
+
     constructor(private service: AwsService,
                 private _dialog: MdDialog,
                 private route: ActivatedRoute,
@@ -131,6 +134,17 @@ export class SummaryComponent implements OnInit {
     onClickRetryHash(retryHash: string, event) {
         this.showReport(retryHash);
         event.stopPropagation();
+    }
+
+    // TODO: Remove this function if jumeaux( < 0.9.0) become not be used
+    onClickConvertReport() {
+        this.service.convertReport(this.failureKey)
+            .then(x => {
+                this.showReport(this.failureKey);
+            })
+            .catch(err => {
+                this.snackBar.open(err, '[FAILURE] Convert');
+            });
     }
 
     onSelectColumns(event) {
@@ -204,6 +218,9 @@ export class SummaryComponent implements OnInit {
                     });
                 })
                 .catch(err => {
+                    // TODO: Remove this function if jumeaux( < 0.9.0) become not be used
+                    this.failureKey = key;
+
                     this.loadingReportKey = undefined;
                     this.errorMessages = [err];
                     reject(err);
