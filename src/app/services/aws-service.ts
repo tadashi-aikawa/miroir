@@ -23,14 +23,35 @@ export class AwsService {
     tmpSessionToken: string = this.localStorageService.get<string>('tmpSessionToken');
     tmpExpireTime: Date = new Date(this.localStorageService.get<Date>('tmpExpireTime'));
 
+    s3: S3;
+    db: DynamoDB.DocumentClient;
+
     constructor(private localStorageService: LocalStorageService,
                 private router: Router) {
         // DO NOTHING
     }
 
+    private reAssignClients(): void {
+        this.s3 = new S3({
+            apiVersion: '2006-03-01',
+            accessKeyId: this.tmpAccessKeyId,
+            secretAccessKey: this.tmpSecretAccessKey,
+            sessionToken: this.tmpSessionToken
+        });
+        this.db = new DynamoDB.DocumentClient({
+            service: new DynamoDB({
+                region: this.region,
+                accessKeyId: this.tmpAccessKeyId,
+                secretAccessKey: this.tmpSecretAccessKey,
+                sessionToken: this.tmpSessionToken
+            })
+        });
+    }
+
     updateRegion(region: string) {
         this.region = region;
         this.localStorageService.set('region', this.region);
+        this.reAssignClients();
     }
 
     updateTable(table: string) {
@@ -66,15 +87,8 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        const s3 = new S3({
-            apiVersion: '2006-03-01',
-            accessKeyId: this.tmpAccessKeyId,
-            secretAccessKey: this.tmpSecretAccessKey,
-            sessionToken: this.tmpSessionToken
-        });
-
         return new Promise<{ encoding: string, body: string }>((resolve, reject) => {
-            s3.getObject(
+            this.s3.getObject(
                 {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/${name}`, Bucket: this.bucket},
                 (err, data) => {
                     if (err) {
@@ -96,15 +110,8 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        const s3 = new S3({
-            apiVersion: '2006-03-01',
-            accessKeyId: this.tmpAccessKeyId,
-            secretAccessKey: this.tmpSecretAccessKey,
-            sessionToken: this.tmpSessionToken
-        });
-
         return new Promise<Report>((resolve, reject) => {
-            s3.getObject(
+            this.s3.getObject(
                 {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`, Bucket: this.bucket},
                 (err, data) => err ? reject(err.message) : resolve(JSON.parse(data.Body.toString()))
             );
@@ -116,15 +123,8 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        const s3 = new S3({
-            apiVersion: '2006-03-01',
-            accessKeyId: this.tmpAccessKeyId,
-            secretAccessKey: this.tmpSecretAccessKey,
-            sessionToken: this.tmpSessionToken
-        });
-
         return new Promise<Report>((resolve, reject) => {
-            s3.getObject(
+            this.s3.getObject(
                 {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`, Bucket: this.bucket},
                 (err, data) => {
                     if (err) {
@@ -132,7 +132,7 @@ export class AwsService {
                     }
 
                     const after = Object.assign(JSON.parse(data.Body.toString()), {title});
-                    s3.putObject(
+                    this.s3.putObject(
                         {
                             Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`,
                             Bucket: this.bucket,
@@ -150,15 +150,8 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        const s3 = new S3({
-            apiVersion: '2006-03-01',
-            accessKeyId: this.tmpAccessKeyId,
-            secretAccessKey: this.tmpSecretAccessKey,
-            sessionToken: this.tmpSessionToken
-        });
-
         return new Promise<Report>((resolve, reject) => {
-            s3.getObject(
+            this.s3.getObject(
                 {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`, Bucket: this.bucket},
                 (err, data) => {
                     if (err) {
@@ -166,7 +159,7 @@ export class AwsService {
                     }
 
                     const after = Object.assign(JSON.parse(data.Body.toString()), {description});
-                    s3.putObject(
+                    this.s3.putObject(
                         {
                             Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`,
                             Bucket: this.bucket,
@@ -184,16 +177,9 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        const s3 = new S3({
-            apiVersion: '2006-03-01',
-            accessKeyId: this.tmpAccessKeyId,
-            secretAccessKey: this.tmpSecretAccessKey,
-            sessionToken: this.tmpSessionToken
-        });
-
         const zipName = `${key.substring(0, 7)}.zip`;
         return new Promise<{name: string, body: Blob}>((resolve, reject) => {
-            s3.getObject(
+            this.s3.getObject(
                 {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/${zipName}`, Bucket: this.bucket},
                 (err, data) => err ? reject(err.message) : resolve({
                     name: zipName,
@@ -213,15 +199,8 @@ export class AwsService {
             return Promise.resolve('ok');
         }
 
-        const s3 = new S3({
-            apiVersion: '2006-03-01',
-            accessKeyId: this.tmpAccessKeyId,
-            secretAccessKey: this.tmpSecretAccessKey,
-            sessionToken: this.tmpSessionToken
-        });
-
         return new Promise((resolve, reject) => {
-            s3.deleteObjects(
+            this.s3.deleteObjects(
                 {Bucket: this.bucket, Delete: {Objects: s3Keys.map(k => ({Key: k}))}},
                 (err, data) => err ? reject(err.message) : resolve(data)
             );
@@ -233,15 +212,8 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        const s3 = new S3({
-            apiVersion: '2006-03-01',
-            accessKeyId: this.tmpAccessKeyId,
-            secretAccessKey: this.tmpSecretAccessKey,
-            sessionToken: this.tmpSessionToken
-        });
-
         return new Promise<ObjectList>((resolve, reject) => {
-            s3.listObjectsV2(
+            this.s3.listObjectsV2(
                 {Bucket: this.bucket, Prefix: `${JUMEAUX_RESULTS_PREFIX}/${key}`},
                 (err, data) => err ? reject(err.message) : resolve(data.Contents)
             );
@@ -254,15 +226,6 @@ export class AwsService {
         }
 
         // WARNING: this method is alpha
-        const db = new DynamoDB.DocumentClient({
-            service: new DynamoDB({
-                region: this.region,
-                accessKeyId: this.tmpAccessKeyId,
-                secretAccessKey: this.tmpSecretAccessKey,
-                sessionToken: this.tmpSessionToken
-            })
-        });
-
         const params = {
             TableName: this.table,
             Key: {
@@ -271,7 +234,7 @@ export class AwsService {
         };
 
         return new Promise((resolve, reject) => {
-            db.delete(params, (err, data) => {
+            this.db.delete(params, (err, data) => {
                 return err ? reject(err.message) : resolve(data);
             });
         });
@@ -283,15 +246,6 @@ export class AwsService {
         }
 
         // WARNING: this method is alpha
-        const db = new DynamoDB.DocumentClient({
-            service: new DynamoDB({
-                region: this.region,
-                accessKeyId: this.tmpAccessKeyId,
-                secretAccessKey: this.tmpSecretAccessKey,
-                sessionToken: this.tmpSessionToken
-            })
-        });
-
         const params = {
             TableName: this.table,
             Key: {
@@ -303,7 +257,7 @@ export class AwsService {
         };
 
         return new Promise((resolve, reject) => {
-            db.update(params, (err, data) => {
+            this.db.update(params, (err, data) => {
                 return err ? reject(err.message) : resolve(data);
             });
         });
@@ -315,15 +269,6 @@ export class AwsService {
         }
 
         // WARNING: this method is alpha
-        const db = new DynamoDB.DocumentClient({
-            service: new DynamoDB({
-                region: this.region,
-                accessKeyId: this.tmpAccessKeyId,
-                secretAccessKey: this.tmpSecretAccessKey,
-                sessionToken: this.tmpSessionToken
-            })
-        });
-
         const params = {
             TableName: this.table,
             Key: {
@@ -335,7 +280,7 @@ export class AwsService {
         };
 
         return new Promise((resolve, reject) => {
-            db.update(params, (err, data) => {
+            this.db.update(params, (err, data) => {
                 return err ? reject(err.message) : resolve(data);
             });
         });
@@ -345,15 +290,6 @@ export class AwsService {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
-
-        const db = new DynamoDB.DocumentClient({
-            service: new DynamoDB({
-                region: this.region,
-                accessKeyId: this.tmpAccessKeyId,
-                secretAccessKey: this.tmpSecretAccessKey,
-                sessionToken: this.tmpSessionToken
-            })
-        });
 
         const params = {
             TableName: this.table,
@@ -376,7 +312,7 @@ export class AwsService {
         };
 
         return new Promise<DynamoResult>((resolve, reject) => {
-            db.scan(params, (err, data: DocumentClient.ScanOutput) => {
+            this.db.scan(params, (err, data: DocumentClient.ScanOutput) => {
                 return err ? reject(err.message) : resolve(data as DynamoResult);
             });
         });
@@ -399,6 +335,7 @@ export class AwsService {
                 this.localStorageService.set('tmpSessionToken', this.tmpSessionToken);
                 this.localStorageService.set('tmpExpireTime', this.tmpExpireTime);
 
+                this.reAssignClients();
                 resolve()
             })
         });
