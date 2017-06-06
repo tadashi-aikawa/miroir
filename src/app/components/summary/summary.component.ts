@@ -138,6 +138,8 @@ export class SummaryComponent implements OnInit {
 
     // TODO: Remove this function if jumeaux( < 0.9.0) become not be used
     onClickConvertReport() {
+        this.loadingReportKey = this.failureKey;
+        this.errorMessages = undefined;
         this.service.convertReport(this.failureKey)
             .then(x => {
                 this.showReport(this.failureKey);
