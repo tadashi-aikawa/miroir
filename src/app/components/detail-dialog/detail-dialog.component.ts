@@ -83,6 +83,7 @@ function matchRegExp(pattern: string, target: string): boolean {
 })
 export class DetailDialogComponent implements OnInit {
     @Input() reportKey: string;
+    @Input() reportTitle: string;
     @Input() oneAccessPoint: AccessPoint;
     @Input() otherAccessPoint: AccessPoint;
     @Input() trials: Trial[];

@@ -305,6 +305,7 @@ export class SummaryComponent implements OnInit {
             height: '97%'
         });
         dialogRef.componentInstance.reportKey = this.activeReport.key;
+        dialogRef.componentInstance.reportTitle = this.activeReport.title;
         dialogRef.componentInstance.oneAccessPoint = this.activeReport.summary.one;
         dialogRef.componentInstance.otherAccessPoint = this.activeReport.summary.other;
         dialogRef.componentInstance.activeIndex = String(index);

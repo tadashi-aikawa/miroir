@@ -1,5 +1,9 @@
 <div class="center-vertical">
-    <div class="count-word">{{activeIndexNum + 1}} / {{options.length}}</div>
+    <div class="count-word">
+        <span>{{activeIndexNum + 1}} / {{options.length}}</span>
+        <span> ... </span>
+        <span>{{reportTitle}}</span>
+    </div>
     <div *ngIf="isLoading" style="width: 90%; padding-left: 10px;">
         <md-progress-bar mode="indeterminate"></md-progress-bar>
     </div>
