@@ -28,10 +28,10 @@ export class AwsService {
 
     constructor(private localStorageService: LocalStorageService,
                 private router: Router) {
-        // DO NOTHING
+        this.assignClients();
     }
 
-    private reAssignClients(): void {
+    private assignClients(): void {
         this.s3 = new S3({
             apiVersion: '2006-03-01',
             accessKeyId: this.tmpAccessKeyId,
@@ -51,7 +51,7 @@ export class AwsService {
     updateRegion(region: string) {
         this.region = region;
         this.localStorageService.set('region', this.region);
-        this.reAssignClients();
+        this.assignClients();
     }
 
     updateTable(table: string) {
@@ -335,7 +335,7 @@ export class AwsService {
                 this.localStorageService.set('tmpSessionToken', this.tmpSessionToken);
                 this.localStorageService.set('tmpExpireTime', this.tmpExpireTime);
 
-                this.reAssignClients();
+                this.assignClients();
                 resolve()
             })
         });
