@@ -316,6 +316,7 @@ export class AwsService {
             FilterExpression: [
                 'contains(hashkey, :hashkey)',
                 'contains(title, :title)',
+                'contains(description, :description)',
                 'contains(one_host, :one_host)',
                 'contains(other_host, :other_host)',
                 'contains(begin_time, :begin_time)',
@@ -324,6 +325,7 @@ export class AwsService {
             ExpressionAttributeValues: {
                 ':hashkey': keyWord,
                 ':title': keyWord,
+                ':description': keyWord,
                 ':one_host': keyWord,
                 ':other_host': keyWord,
                 ':begin_time': keyWord,

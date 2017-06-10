@@ -10,15 +10,28 @@ import {Change} from 'app/models/models';
     ],
     template: `
         <div *ngIf="!editing" class="action-icon hvr-glow" (click)="onTextClick()">
-            <md-icon *ngIf="!value" class="icon-small">edit</md-icon>
-            <span *ngIf="!markdown" class="multi-line">{{value}}</span>
-            <markdown *ngIf="markdown" [data]="value"></markdown>
+            <div *ngIf="value; then view else emptyView;"></div>
+
+            <ng-template #view>
+                <span *ngIf="!markdown" class="multi-line">{{value}}</span>
+                <markdown *ngIf="markdown" [data]="value"></markdown>
+            </ng-template>
+
+            <ng-template #emptyView>
+                <md-icon class="icon-small">edit</md-icon>
+            </ng-template>
         </div>
-        <md-input-container *ngIf="editing && type === 'single-line'">
-            <input mdInput [(ngModel)]="value">
-        </md-input-container>
-        <md-input-container *ngIf="editing && type === 'multi-line'" style="width: 50%;">
-            <textarea mdInput mdTextareaAutosize [(ngModel)]="value"></textarea>
+        <md-input-container *ngIf="editing" style="width: 100%;">
+            <div *ngIf="type === 'single-line'; then singleLineEditor"></div>
+            <div *ngIf="type === 'multi-line'; then multiLineEditor"></div>
+
+            <ng-template #singleLineEditor>
+                <input mdInput [(ngModel)]="value">
+            </ng-template>
+
+            <ng-template #multiLineEditor>
+                <textarea mdInput mdTextareaAutosize [(ngModel)]="value"></textarea>
+            </ng-template>
         </md-input-container>
     `
 })
