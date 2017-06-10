@@ -1,5 +1,8 @@
 import {ActivatedRoute} from '@angular/router';
-import {DynamoResult, DynamoRow, EditorConfig, JudgementAddon, Report, Summary, Trial} from '../../models/models';
+import {
+    Change, DynamoResult, DynamoRow, EditorConfig, JudgementAddon, Report, Summary,
+    Trial
+} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
@@ -153,36 +156,48 @@ export class SummaryComponent implements OnInit {
         this.updateColumnVisibility();
     }
 
-    onUpdateTitle(title: string) {
-        this.activeReport.title = title;
-        // TODO: rollback since abnormal
-        Promise.all([
-            this.service.updateSummaryTitle(this.activeReport.key, title),
-            this.service.updateReportTitle(this.activeReport.key, title)
-        ])
-            .then(x => {
-                this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).title = title;
-                this.snackBar.open('', '[SUCCESS] Title updated', {duration: 3000});
+    onUpdateTitle(title: Change<string>) {
+        this.service.fetchReport(this.activeReport.key)
+            .then((r: Report) => {
+                if (r.title !== title.previous) {
+                    return Promise.reject('Conflict?? Please reload and update again.');
+                }
+
+                this.activeReport.title = title.current;
+                // TODO: rollback since abnormal
+                return Promise.all([
+                    this.service.updateSummaryTitle(this.activeReport.key, title.current),
+                    this.service.updateReportTitle(this.activeReport.key, title.current)
+                ])
+            })
+            .then(_ => {
+                this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).title = title.current;
+                this.snackBar.open('', '[SUCCESS] Title updated', {duration: 2000});
             })
             .catch(err => {
-                this.activeReport.title = 'Unfortunate ERROR...';
                 this.snackBar.open(err, '[FAILURE] Title updated');
             });
     }
 
-    onUpdateDescription(description: string) {
-        this.activeReport.description = description;
-        // TODO: rollback since abnormal
-        Promise.all([
-            this.service.updateSummaryDescription(this.activeReport.key, description),
-            this.service.updateReportDescription(this.activeReport.key, description)
-        ])
-            .then(x => {
-                this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).description = description;
+    onUpdateDescription(description: Change<string>) {
+        this.service.fetchReport(this.activeReport.key)
+            .then((r: Report) => {
+                if (r.description !== description.previous) {
+                    return Promise.reject('Conflict?? Please reload and update again.');
+                }
+
+                this.activeReport.description = description.current;
+                // TODO: rollback since abnormal
+                return Promise.all([
+                    this.service.updateSummaryDescription(this.activeReport.key, description.current),
+                    this.service.updateReportDescription(this.activeReport.key, description.current)
+                ])
+            })
+            .then(_ => {
+                this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).description = description.current;
                 this.snackBar.open('', '[SUCCESS] Description updated', {duration: 3000});
             })
             .catch(err => {
-                this.activeReport.description = 'Unfortunate ERROR...';
                 this.snackBar.open(err, '[FAILURE] Description updated');
             });
     }

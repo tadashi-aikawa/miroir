@@ -1,5 +1,6 @@
 import {Component, Input, ViewChild, HostListener, EventEmitter, Output} from '@angular/core';
 import {MdInputDirective, MdTextareaAutosize} from '@angular/material';
+import {Change} from "app/models/models";
 
 @Component({
     selector: 'app-inline-editor',
@@ -20,7 +21,7 @@ import {MdInputDirective, MdTextareaAutosize} from '@angular/material';
 export class InlineEditorComponent {
     @Input() value: string;
     @Input() type: 'single-line' | 'multi-line' = 'single-line';
-    @Output() onUpdate = new EventEmitter<string>();
+    @Output() onUpdate = new EventEmitter<Change<string>>();
 
     editing: boolean = false;
     iconVisibility: boolean = false;
@@ -40,7 +41,10 @@ export class InlineEditorComponent {
     @HostListener('focusout') private onFocusOut() {
         this.editing = false;
         if (this.onUpdate !== null && this.previousValue !== this.value) {
-            this.onUpdate.emit(this.value);
+            this.onUpdate.emit({
+                previous: this.previousValue,
+                current: this.value
+            });
         }
     }
 

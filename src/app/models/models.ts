@@ -158,6 +158,11 @@ export class Pair<T> {
     other: T;
 }
 
+export class Change<T> {
+    previous: T;
+    current: T;
+}
+
 export class EditorConfig {
     content: string;
     contentType: string;
