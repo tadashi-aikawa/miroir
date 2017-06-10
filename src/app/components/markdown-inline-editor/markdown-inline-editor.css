@@ -34,7 +34,7 @@ textarea {
 }
 
 .balloon-right {
-    border: solid rgba(255, 128, 128, 0.2);
+    border: solid rgba(255, 128, 128, 0.5);
     border-radius: 15px;
     position: relative;
     margin-left: 30px;
@@ -43,7 +43,7 @@ textarea {
 .balloon-right::after {
     border-top: solid 14px transparent;
     border-bottom: solid 14px transparent;
-    border-right: solid 20px rgba(255, 128, 128, 0.2);
+    border-right: solid 20px rgba(255, 128, 128, 0.5);
     left: -20px;
     content: "";
     display: block;

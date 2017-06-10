@@ -74,7 +74,6 @@ div.ellipsis-text {
     padding-right: 20px;
 }
 
-
 tr.ng2-smart-row:hover,
 div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.selected:hover {
     background: rgba(27, 27, 202, 0.15);

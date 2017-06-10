@@ -1,6 +1,8 @@
 import {Component, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
-import {MdInputDirective, MdTextareaAutosize} from '@angular/material';
+import {MdDialog, MdInputDirective, MdTextareaAutosize} from '@angular/material';
 import {Change} from 'app/models/models';
+import {Hotkey, HotkeysService} from 'angular2-hotkeys';
+import {ConfirmDialogComponent} from "app/components/dialogs/confirm-dialog/confirm-dialog.component";
 
 @Component({
     selector: 'app-markdown-inline-editor',
@@ -21,9 +23,9 @@ import {Change} from 'app/models/models';
             </ng-template>
         </div>
         <div *ngIf="editing" style="display: flex;">
-            <markdown [data]="value"></markdown>
+            <markdown *ngIf="value" [data]="value"></markdown>
             <md-input-container class="balloon-right" style="flex: 1">
-                <div class="smart-padding">
+                <div class="smart-padding-xsmall">
                     <textarea mdInput mdTextareaAutosize [(ngModel)]="value"></textarea>
                 </div>
             </md-input-container>
@@ -41,15 +43,40 @@ export class MarkdownInlineEditorComponent {
     @ViewChild(MdInputDirective) input;
     @ViewChild(MdTextareaAutosize) autosize;
 
-    //noinspection JSUnusedLocalSymbols
-    @HostListener('focusout')
-    private onFocusOut() {
+    constructor(private _hotkeysService: HotkeysService,
+                private _dialog: MdDialog) {
+        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
+        _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
+
+        _hotkeysService.add([
+            new Hotkey('ctrl+enter', () => {this.update(); return false; }, ['TEXTAREA'], 'Update.'),
+            new Hotkey('esc', () => {this.cancel(); return false; }, ['TEXTAREA'], 'Update.')
+        ]);
+    }
+
+    private update() {
         this.editing = false;
         if (this.onUpdate !== null && this.previousValue !== this.value) {
             this.onUpdate.emit({
                 previous: this.previousValue,
                 current: this.value
             });
+        }
+    }
+
+    private cancel() {
+        if (this.previousValue !== this.value) {
+            const dialogRef = this._dialog.open(ConfirmDialogComponent);
+            dialogRef.componentInstance.message = 'Your changes will be broken.. OK?';
+            dialogRef.afterClosed().subscribe((cancel: boolean) => {
+                if (cancel) {
+                    this.editing = false;
+                    this.value = this.previousValue;
+                }
+            })
+        } else {
+            this.editing = false;
+            this.value = this.previousValue;
         }
     }
 
