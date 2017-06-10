@@ -144,8 +144,7 @@
                         </md-menu>
                         <h2>
                             <!--suppress HtmlUnknownAttribute -->
-                            <app-inline-editor type='single-line'
-                                               [value]="activeReport.title"
+                            <app-inline-editor [value]="activeReport.title"
                                                (onUpdate)="onUpdateTitle($event)">
                             </app-inline-editor>
                             <a href={{createActiveReportLink()}}><span
@@ -163,12 +162,11 @@
                     </div>
                     <div class="smart-padding-left">
                         <!--suppress HtmlUnknownAttribute -->
-                        <app-inline-editor type='multi-line'
-                                           markdown=true
-                                           [value]="activeReport.description"
-                                           (onUpdate)="onUpdateDescription($event)">
-                        </app-inline-editor>
+                        <app-markdown-inline-editor [value]="activeReport.description"
+                                                    (onUpdate)="onUpdateDescription($event)">
+                        </app-markdown-inline-editor>
                     </div>
+                    <hr/>
                     <div class="smart-padding">
                         <small>
                             <md-chip>{{activeReport.summary.one.name}}</md-chip>

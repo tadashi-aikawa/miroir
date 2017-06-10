@@ -34,6 +34,7 @@ import {AwsService} from './services/aws-service';
 import {AuthGuard} from './components/guard/auth.guard';
 import {LoginComponent} from './components/login/login.component';
 import {InlineEditorComponent} from './components/inline-editor/inline-editor.component';
+import {MarkdownInlineEditorComponent} from './components/markdown-inline-editor/markdown-inline-editor.component';
 
 const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -56,6 +57,7 @@ const appRoutes: Routes = [
         EditorComponent,
         HoverComponent,
         InlineEditorComponent,
+        MarkdownInlineEditorComponent,
         StatusCodeComponent,
         StatusComponent,
         ResponseTimeChartComponent

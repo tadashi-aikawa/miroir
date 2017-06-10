@@ -1,10 +1,11 @@
 import {Component, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
-import {MdInputDirective} from '@angular/material';
+import {MdInputDirective, MdTextareaAutosize} from '@angular/material';
 import {Change} from 'app/models/models';
 
 @Component({
-    selector: 'app-inline-editor',
+    selector: 'app-markdown-inline-editor',
     styleUrls: [
+        './markdown-inline-editor.css',
         '../../../../node_modules/hover.css/css/hover.css'
     ],
     template: `
@@ -12,19 +13,24 @@ import {Change} from 'app/models/models';
             <div *ngIf="value; then view else emptyView;"></div>
 
             <ng-template #view>
-                <span>{{value}}</span>
+                <markdown [data]="value"></markdown>
             </ng-template>
 
             <ng-template #emptyView>
                 <md-icon class="icon-small">edit</md-icon>
             </ng-template>
         </div>
-        <md-input-container *ngIf="editing" style="flex-grow: 1;">
-            <input mdInput [(ngModel)]="value">
-        </md-input-container>
+        <div *ngIf="editing" style="display: flex;">
+            <markdown [data]="value"></markdown>
+            <md-input-container class="balloon-right" style="flex: 1">
+                <div class="smart-padding">
+                    <textarea mdInput mdTextareaAutosize [(ngModel)]="value"></textarea>
+                </div>
+            </md-input-container>
+        </div>
     `
 })
-export class InlineEditorComponent {
+export class MarkdownInlineEditorComponent {
 
     @Input() value: string;
     @Output() onUpdate = new EventEmitter<Change<string>>();
@@ -33,6 +39,7 @@ export class InlineEditorComponent {
     previousValue: string;
 
     @ViewChild(MdInputDirective) input;
+    @ViewChild(MdTextareaAutosize) autosize;
 
     //noinspection JSUnusedLocalSymbols
     @HostListener('focusout')
@@ -50,6 +57,7 @@ export class InlineEditorComponent {
         this.previousValue = this.value;
         this.editing = true;
         setTimeout(() => {
+            this.autosize.resizeToFitContent();
             this.input.focus();
         }, 1);
     }
