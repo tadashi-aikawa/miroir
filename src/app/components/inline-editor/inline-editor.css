@@ -1,0 +1,35 @@
+:host >>> markdown {
+    font-size: 85%;
+}
+
+:host >>> markdown table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+}
+
+:host >>> markdown table th {
+    font-size: 90%;
+    width: 25%;
+    padding: 4px;
+    text-align: left;
+    vertical-align: top;
+    color: #444;
+    background-color: #ccc;
+    border: 1px solid #fff;
+    border-right-color: #ccc;
+    border-bottom-color: #ccc;
+}
+
+:host >>> markdown table td {
+    font-size: 80%;
+    padding: 4px;
+    background-color: #fafafa;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+
+textarea {
+    font-size: 80%;
+}

@@ -28,6 +28,7 @@
     "@types/js-yaml": "^3.5.30",
     "angular-2-local-storage": "^1.0.1",
     "angular2-hotkeys": "^2.0.1",
+    "angular2-markdown": "^1.6.0",
     "aws-sdk": "^2.34.0",
     "aws-sdk-webpack": "2.18.0",
     "core-js": "^2.4.1",

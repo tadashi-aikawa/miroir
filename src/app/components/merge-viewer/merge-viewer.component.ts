@@ -7,7 +7,6 @@ declare const require: any;
 
 @Component({
     selector: 'app-merge-viewer',
-    styleUrls: ['./merge-viewer.css'],
     template: `<div #view class="monaco-editor" style="height: 65vh;"></div>`,
 })
 export class MergeViewerComponent implements AfterViewInit, OnDestroy {

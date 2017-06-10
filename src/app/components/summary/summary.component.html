@@ -143,6 +143,7 @@
                             </button>
                         </md-menu>
                         <h2>
+                            <!--suppress HtmlUnknownAttribute -->
                             <app-inline-editor type='single-line'
                                                [value]="activeReport.title"
                                                (onUpdate)="onUpdateTitle($event)">
@@ -161,7 +162,9 @@
                         </h2>
                     </div>
                     <div class="smart-padding-left">
+                        <!--suppress HtmlUnknownAttribute -->
                         <app-inline-editor type='multi-line'
+                                           markdown=true
                                            [value]="activeReport.description"
                                            (onUpdate)="onUpdateDescription($event)">
                         </app-inline-editor>

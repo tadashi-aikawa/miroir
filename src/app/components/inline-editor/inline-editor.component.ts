@@ -1,14 +1,18 @@
-import {Component, Input, ViewChild, HostListener, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
 import {MdInputDirective, MdTextareaAutosize} from '@angular/material';
-import {Change} from "app/models/models";
+import {Change} from 'app/models/models';
 
 @Component({
     selector: 'app-inline-editor',
-    styleUrls: ['../../../../node_modules/hover.css/css/hover.css'],
+    styleUrls: [
+        './inline-editor.css',
+        '../../../../node_modules/hover.css/css/hover.css'
+    ],
     template: `
         <div *ngIf="!editing" class="action-icon hvr-glow" (click)="onTextClick()">
             <md-icon *ngIf="!value" class="icon-small">edit</md-icon>
-            <span class="multi-line">{{value}}</span>
+            <span *ngIf="!markdown" class="multi-line">{{value}}</span>
+            <markdown *ngIf="markdown" [data]="value"></markdown>
         </div>
         <md-input-container *ngIf="editing && type === 'single-line'">
             <input mdInput [(ngModel)]="value">
@@ -19,8 +23,10 @@ import {Change} from "app/models/models";
     `
 })
 export class InlineEditorComponent {
+
     @Input() value: string;
     @Input() type: 'single-line' | 'multi-line' = 'single-line';
+    @Input() markdown: boolean = false;
     @Output() onUpdate = new EventEmitter<Change<string>>();
 
     editing: boolean = false;
@@ -30,15 +36,21 @@ export class InlineEditorComponent {
     @ViewChild(MdInputDirective) input;
     @ViewChild(MdTextareaAutosize) autosize;
 
-    @HostListener('mouseover') private onMouseOver() {
+    //noinspection JSUnusedLocalSymbols
+    @HostListener('mouseover')
+    private onMouseOver() {
         this.iconVisibility = true;
     }
 
-    @HostListener('mouseleave') private onMouseLeave() {
+    //noinspection JSUnusedLocalSymbols
+    @HostListener('mouseleave')
+    private onMouseLeave() {
         this.iconVisibility = false;
     }
 
-    @HostListener('focusout') private onFocusOut() {
+    //noinspection JSUnusedLocalSymbols
+    @HostListener('focusout')
+    private onFocusOut() {
         this.editing = false;
         if (this.onUpdate !== null && this.previousValue !== this.value) {
             this.onUpdate.emit({

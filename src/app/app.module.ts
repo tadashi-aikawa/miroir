@@ -11,6 +11,7 @@ import {SelectModule} from 'ng-select';
 import {HotkeyModule} from 'angular2-hotkeys';
 import {Ng2HighchartsModule} from 'ng2-highcharts';
 import {ExpansionPanelsModule} from 'ng2-expansion-panels';
+import {MarkdownModule} from 'angular2-markdown';
 
 import 'hammerjs';
 
@@ -75,7 +76,8 @@ const appRoutes: Routes = [
         LocalStorageModule.withConfig({
             prefix: 'jumeaux-viewer',
             storageType: 'localStorage'
-        })
+        }),
+        MarkdownModule.forRoot()
     ],
     entryComponents: [
         DetailDialogComponent,
