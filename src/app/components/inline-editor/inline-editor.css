@@ -32,3 +32,23 @@
 textarea {
     font-size: 80%;
 }
+
+.balloon {
+    background-color: rgba(255, 128, 128, 0.2);
+    border-radius: 15px;
+    position: relative;
+    padding: 20px;
+}
+
+.balloon::after {
+    border-top: solid 14px transparent;
+    border-bottom: solid 14px transparent;
+    border-right: solid 20px rgba(255, 128, 128, 0.2);
+    left: -20px;
+    content: "";
+    display: block;
+    height: 0;
+    top: 30%;
+    position: absolute;
+    width: 0;
+}

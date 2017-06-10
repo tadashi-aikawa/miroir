@@ -21,18 +21,23 @@ import {Change} from 'app/models/models';
                 <md-icon class="icon-small">edit</md-icon>
             </ng-template>
         </div>
-        <md-input-container *ngIf="editing" style="width: 100%;">
-            <div *ngIf="type === 'single-line'; then singleLineEditor"></div>
-            <div *ngIf="type === 'multi-line'; then multiLineEditor"></div>
-
-            <ng-template #singleLineEditor>
-                <input mdInput [(ngModel)]="value">
-            </ng-template>
-
-            <ng-template #multiLineEditor>
-                <textarea mdInput mdTextareaAutosize [(ngModel)]="value"></textarea>
-            </ng-template>
-        </md-input-container>
+        <div style="display: flex;">
+            <md-input-container *ngIf="editing" style="flex-grow: 1;">
+                <div *ngIf="type === 'single-line'; then singleLineEditor"></div>
+                <div *ngIf="type === 'multi-line'; then multiLineEditor"></div>
+    
+                <ng-template #singleLineEditor>
+                    <input mdInput [(ngModel)]="value">
+                </ng-template>
+    
+                <ng-template #multiLineEditor>
+                    <textarea mdInput mdTextareaAutosize [(ngModel)]="value"></textarea>
+                </ng-template>
+            </md-input-container>
+            <div *ngIf="editing && markdown" class="balloon" style="flex-grow: 1; margin-left: 40px;">
+                <markdown [data]="value"></markdown>
+            </div>
+        </div>
     `
 })
 export class InlineEditorComponent {
