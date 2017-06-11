@@ -1,4 +1,5 @@
 import {Component, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
+import {trigger, transition, style, animate} from '@angular/animations';
 import {MdDialog, MdInputDirective, MdTextareaAutosize} from '@angular/material';
 import {Change} from 'app/models/models';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
@@ -10,23 +11,55 @@ import {ConfirmDialogComponent} from "app/components/dialogs/confirm-dialog/conf
         './markdown-inline-editor.css',
         '../../../../node_modules/hover.css/css/hover.css'
     ],
-    template: `
-        <div *ngIf="!editing" class="action-icon hvr-glow" (click)="onTextClick()">
-            <div *ngIf="value; then view else emptyView;"></div>
+    animations: [
+        trigger(
+            'feed',
+            [
+                transition(':enter', [
+                    style({opacity: 0}),
+                    animate('250ms', style({opacity: 1}))
+                ]),
+                transition(':leave', [
+                    style({opacity: 1}),
+                    animate('250ms', style({opacity: 0}))
+                ])
+            ]
+        )
+    ],
+    template: `        
+        <div style="display: flex;">
+            <div *ngIf="!editing" class="action-icon hvr-glow" (click)="onTextClick()">
+                <div *ngIf="value; then view else emptyView;"></div>
 
-            <ng-template #view>
-                <markdown [data]="value"></markdown>
-            </ng-template>
+                <ng-template #view>
+                    <markdown [data]="value"></markdown>
+                </ng-template>
 
-            <ng-template #emptyView>
-                <md-icon class="icon-small">edit</md-icon>
-            </ng-template>
-        </div>
-        <div *ngIf="editing" style="display: flex;">
-            <markdown *ngIf="value" [data]="value"></markdown>
-            <md-input-container class="balloon-right" style="flex: 1">
+                <ng-template #emptyView>
+                    <md-icon class="icon-small">edit</md-icon>
+                </ng-template>
+            </div>
+            
+            <markdown *ngIf="value && editing" [data]="value"></markdown>
+
+            <md-input-container *ngIf="editing" [@feed] class="balloon-right" style="flex: 1">
                 <div class="smart-padding-xsmall">
                     <textarea mdInput mdTextareaAutosize [(ngModel)]="value"></textarea>
+                </div>
+                <hr/>
+                <div class="smart-padding-left-small">
+                    <md-icon class="action-icon-large hvr-buzz-out"
+                             style="font-size: 22px; margin-left: 10px;"
+                             mdTooltip="Save (Ctrl+Enter)"
+                             (click)="update()">
+                        check
+                    </md-icon>
+                    <md-icon class="action-icon-large hvr-buzz-out"
+                             style="font-size: 22px; margin-left: 10px;"
+                             mdTooltip="Cancel (ESC)"
+                             (click)="cancel()">
+                        cancel
+                    </md-icon>
                 </div>
             </md-input-container>
         </div>

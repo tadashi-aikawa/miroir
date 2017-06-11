@@ -7,8 +7,8 @@ import {MdDialogRef} from '@angular/material';
         <md-dialog-content>{{message}}</md-dialog-content>
         <md-dialog-actions>
             <div class="smart-padding-without-bottom">
-                <button md-raised-button color="primary" (click)="onClickOk()">OK</button>
-                <button md-raised-button color="secondary" md-dialog-close>Cancel</button>
+                <button md-raised-button (click)="onClickOk()">OK</button>
+                <button md-raised-button md-dialog-close>Cancel</button>
             </div>
         </md-dialog-actions>
     `,

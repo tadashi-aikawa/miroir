@@ -42,6 +42,10 @@ div.ellipsis-text {
     padding-left: 20px;
 }
 
+.smart-padding-left-small {
+    padding-left: 10px;
+}
+
 .smart-padding-small {
     padding: 10px;
 }
@@ -85,6 +89,7 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
 
 .action-icon-large {
     font-size: 35px;
+    cursor: pointer;
 }
 
 .action-text {
