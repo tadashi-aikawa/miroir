@@ -7,12 +7,20 @@ md-sidenav-container {
     min-height: calc(100vh - 64px)
 }
 
+.summary-card-title {
+    width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .summary-card.mat-card {
     margin: 10px;
     transition: all 0.5s ease;
     box-shadow:2px 2px 5px;
     border:0 solid #000;
     display: block;
+    width: 250px;
 }
 
 .summary-card:hover {

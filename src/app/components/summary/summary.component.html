@@ -34,7 +34,7 @@
             </div>
             <div *ngIf="!searchingSummary && !searchErrorMessage">
                 <md-card *ngFor="let row of rows"
-                         [mdTooltip]="row.description"
+                         [mdTooltip]="row.title"
                          mdTooltipPosition="right"
                          (click)="onClickCard(row, $event)"
                          [ngClass]="activeReport && row.hashkey == activeReport.key ?
@@ -42,11 +42,13 @@
                                 ['hvr-curl-bottom-right', 'summary-card']"
                 >
                     <md-card-header>
-                        <md-card-title>
+                        <md-card-title class="summary-card-title">
                             {{row.title}}
-                            <span class="card-hashkey-text">({{row.hashkey.substring(0, 7)}})</span>
                         </md-card-title>
-                        <md-card-subtitle>{{row.begin_time}}</md-card-subtitle>
+                        <md-card-subtitle>
+                            {{row.begin_time}}
+                            <span class="card-hashkey-text">({{row.hashkey.substring(0, 7)}})</span>
+                        </md-card-subtitle>
                     </md-card-header>
                     <md-card-content>
                         <md-chip-list>
