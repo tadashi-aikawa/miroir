@@ -253,7 +253,8 @@ export class SummaryComponent implements OnInit {
         this.service.fetchReport(key)
             .then(x => {
                 row.downloading = false;
-                fileSaver.saveAs(new Blob([JSON.stringify(x, null, 4)]), 'report.json');
+                const reportName = `${row.title}-${key.substring(0, 7)}.json`;
+                fileSaver.saveAs(new Blob([JSON.stringify(x)]), reportName);
             })
             .catch(err => {
                 row.downloading = false;
