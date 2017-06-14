@@ -34,8 +34,6 @@
             </div>
             <div *ngIf="!searchingSummary && !searchErrorMessage">
                 <md-card *ngFor="let row of rows"
-                         [mdTooltip]="row.title"
-                         mdTooltipPosition="right"
                          (click)="onClickCard(row, $event)"
                          [ngClass]="activeReport && row.hashkey == activeReport.key ?
                             ['hvr-curl-bottom-right', 'summary-card', 'summary-card-active'] :
@@ -52,7 +50,9 @@
                         </md-select>
                     </div>
                     <md-card-header>
-                        <md-card-title class="summary-card-title">
+                        <md-card-title class="summary-card-title"
+                                       [mdTooltip]="row.title"
+                                       mdTooltipPosition="above">
                             {{row.title}}
                         </md-card-title>
                         <md-card-subtitle>
@@ -143,10 +143,9 @@
             </ng-template>
             <ng-template #report>
                 <div *ngIf="activeReport">
-                    <div style="float: right;" class="center-vertical">
+                    <div class="center-vertical" style="flex-direction: row-reverse;">
+                        <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}</small>
                         <md-icon>access_time</md-icon>
-                        <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}
-                        </small>
                     </div>
                     <div class="center-vertical">
                         <button md-icon-button [mdMenuTriggerFor]="menu">
