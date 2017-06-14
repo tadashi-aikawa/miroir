@@ -1,3 +1,5 @@
+import CheckStatus from '../constants/check-status';
+
 export class DynamoResult {
     Count: number;
     ScannedCount: number;
@@ -18,11 +20,13 @@ export class DynamoRow {
     with_zip: boolean;
     retry_hash?: string;
     checklist?: string;
+    check_status: CheckStatus;
 
     deleting?: boolean;
     deleteErrorMessage?: string;
     downloading?: boolean;
     downloadErrorMessage?: string;
+    updatingErrorMessage?: string;
 }
 
 export class PropertyDiffs {

@@ -15,6 +15,7 @@ md-sidenav-container {
 }
 
 .summary-card.mat-card {
+    overflow: hidden;
     margin: 10px;
     transition: all 0.5s ease;
     box-shadow:2px 2px 5px;
@@ -57,4 +58,56 @@ md-sidenav-container {
     color: darkgray;
     padding-right: 10px;
     min-height: calc(100vh - 64px)
+}
+
+.check-status {
+    transform: rotate(25deg) translate(36px, -4px);
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 20px;
+    line-height: 20px;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+}
+
+md-select {
+    position: absolute;
+    z-index: 2;
+    opacity: 0;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 20px;
+    line-height: 20px;
+}
+
+.check-status.todo {
+    background: rgba(255, 0, 0, 0.75);
+}
+
+.check-status.looking {
+    background: rgba(113, 130, 0, 0.4);
+}
+
+.check-status.looked {
+    background: rgba(16, 97, 200, 0.75);
+}
+
+.check-status.confirming {
+    background: rgba(113, 130, 0, 0.4);
+}
+
+.check-status.confirmed {
+    background: rgba(70, 180, 0, 0.75);
+}
+
+.check-status.creating-issue {
+    background: rgba(113, 130, 0, 0.4);
+}
+
+.check-status.closed {
+    background: rgba(54, 68, 60, 0.4);
 }

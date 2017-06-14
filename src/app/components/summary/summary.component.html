@@ -41,6 +41,16 @@
                             ['hvr-curl-bottom-right', 'summary-card', 'summary-card-active'] :
                                 ['hvr-curl-bottom-right', 'summary-card']"
                 >
+                    <div [ngClass]="'check-status '+row.check_status">
+                        {{toDisplay(row.check_status)}}
+                        <md-select (change)="onSelectCheckStatus(row.hashkey, $event)"
+                                   (click)="$event.stopPropagation();"
+                                   [(ngModel)]="row.check_status">
+                            <md-option *ngFor="let status of statuses" [value]="status">
+                                {{toDisplay(status)}}
+                            </md-option>
+                        </md-select>
+                    </div>
                     <md-card-header>
                         <md-card-title class="summary-card-title">
                             {{row.title}}
@@ -81,6 +91,14 @@
                                 <md-chip color="warn" selected="true" [mdTooltip]="row.downloadErrorMessage"
                                          mdTooltipPosition="after">
                                     Fail to download!!
+                                </md-chip>
+                            </md-chip-list>
+                        </span>
+                        <span *ngIf="row.updatingErrorMessage">
+                            <md-chip-list class="smart-padding-without-bottom">
+                                <md-chip color="warn" selected="true" [mdTooltip]="row.updatingErrorMessage"
+                                         mdTooltipPosition="after">
+                                    Fail to update check status!!
                                 </md-chip>
                             </md-chip-list>
                         </span>

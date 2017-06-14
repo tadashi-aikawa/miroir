@@ -8,6 +8,7 @@ import * as Encoding from 'encoding-japanese';
 import {LocalStorageService} from 'angular-2-local-storage';
 import {Router} from '@angular/router';
 import DocumentClient = DynamoDB.DocumentClient;
+import CheckStatus from '../constants/check-status';
 
 const DURATION_SECONDS: number = 86400;
 const JUMEAUX_RESULTS_PREFIX = 'jumeaux-results';
@@ -297,6 +298,29 @@ export class AwsService {
             UpdateExpression: 'set #a = :description',
             ExpressionAttributeNames: {'#a' : 'description'},
             ExpressionAttributeValues: {':description' : description}
+        };
+
+        return new Promise((resolve, reject) => {
+            this.db.update(params, (err, data) => {
+                return err ? reject(err.message) : resolve(data);
+            });
+        });
+    }
+
+    async updateStatus(key: string, status: CheckStatus): Promise<any> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        // WARNING: this method is alpha
+        const params = {
+            TableName: this.table,
+            Key: {
+                hashkey: key
+            },
+            UpdateExpression: 'set #a = :check_status',
+            ExpressionAttributeNames: {'#a' : 'check_status'},
+            ExpressionAttributeValues: {':check_status' : status}
         };
 
         return new Promise((resolve, reject) => {

@@ -12,6 +12,7 @@ import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import {LocalStorageService} from 'angular-2-local-storage';
+import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 
 const filterFunction = (v, q) =>
     q.split(' and ').every(x => {
@@ -71,6 +72,9 @@ export class SummaryComponent implements OnInit {
 
     // TODO: Remove this if jumeaux( < 0.9.0) become not be used
     failureKey: string;
+
+    statuses: CheckStatus[] = CheckStatuses.values;
+    toDisplay: (key: CheckStatus) => string = CheckStatuses.toDisplay;
 
     constructor(private service: AwsService,
                 private _dialog: MdDialog,
@@ -137,6 +141,16 @@ export class SummaryComponent implements OnInit {
     onClickRetryHash(retryHash: string, event) {
         this.showReport(retryHash);
         event.stopPropagation();
+    }
+
+    onSelectCheckStatus(key: string, event) {
+        const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
+
+        row.updatingErrorMessage = undefined;
+        this.service.updateStatus(key, event.value)
+            .catch(err => {
+                row.updatingErrorMessage = err;
+            })
     }
 
     // TODO: Remove this function if jumeaux( < 0.9.0) become not be used
