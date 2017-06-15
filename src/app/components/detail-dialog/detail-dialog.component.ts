@@ -171,7 +171,7 @@ export class DetailDialogComponent implements OnInit {
     ngOnInit(): void {
         // FIXME
         this.editorConfig = {
-            content: `
+            content: this.settingsService.checkList || `
 vars:
   mimizou: https://avatars0.githubusercontent.com/u/9500018?v=3&s=460
 cases:
@@ -348,6 +348,7 @@ cases:
 
     updateEditorConfig() {
         this.checkedAlready = toCheckedAlready(yaml.safeLoad(this.editor.getValue()));
+        this.settingsService.checkList = this.editor.getValue();
         this.updatePropertyDiffs(this.trial);
     }
 

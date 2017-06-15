@@ -100,4 +100,12 @@ export class SettingsService {
         this.localStorageService.set('selectedColumnNames', value);
     }
 
+    get checkList(): string {
+        return this.localStorageService.get<string>('checkList');
+    }
+
+    set checkList(value: string) {
+        this.localStorageService.set('checkList', value);
+    }
+
 }
