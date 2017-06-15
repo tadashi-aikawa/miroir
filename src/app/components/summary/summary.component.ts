@@ -1,6 +1,12 @@
 import {ActivatedRoute} from '@angular/router';
 import {
-    Change, DynamoResult, DynamoRow, EditorConfig, JudgementAddon, Report, Summary,
+    Change,
+    DynamoResult,
+    DynamoRow,
+    EditorConfig,
+    JudgementAddon,
+    Report,
+    Summary,
     Trial
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
@@ -11,8 +17,8 @@ import {MdDialog, MdDialogRef, MdSidenav, MdSnackBar} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
-import {LocalStorageService} from 'angular-2-local-storage';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
+import {SettingsService} from '../../services/settings-service';
 
 const filterFunction = (v, q) =>
     q.split(' and ').every(x => {
@@ -57,9 +63,9 @@ export class SummaryComponent implements OnInit {
     settings: any;
     errorMessages: string[];
 
-    selectedValues: string[] = this.localStorageService.get<string[]>('selectedColumnNames') ||
+    selectedValues: string[] = this.settingsService.selectedColumnNames ||
         Object.keys(TABLE_SETTINGS.columns);
-    optionColumns: {value: string, label: string}[] = _.map(
+    optionColumns: { value: string, label: string }[] = _.map(
         TABLE_SETTINGS.columns,
         (v, k) => ({value: k, label: v.title})
     );
@@ -79,7 +85,7 @@ export class SummaryComponent implements OnInit {
     constructor(private service: AwsService,
                 private _dialog: MdDialog,
                 private route: ActivatedRoute,
-                private localStorageService: LocalStorageService,
+                private settingsService: SettingsService,
                 private snackBar: MdSnackBar) {
     }
 
@@ -98,7 +104,7 @@ export class SummaryComponent implements OnInit {
                 this.showReport(ps.hashKey)
                     .then((r: Report) => {
                         this.filteredTrials = r.trials;
-                        if(ps.seq) {
+                        if (ps.seq) {
                             this.showDetail(ps.seq - 1);
                         }
                     });
@@ -416,7 +422,7 @@ export class SummaryComponent implements OnInit {
     }
 
     private updateColumnVisibility() {
-        this.localStorageService.set('selectedColumnNames', this.selectedValues);
+        this.settingsService.selectedColumnNames = this.selectedValues;
         this.settings = Object.assign({}, TABLE_SETTINGS,
             {columns: _.pick(TABLE_SETTINGS.columns, this.selectedValues)}
         );

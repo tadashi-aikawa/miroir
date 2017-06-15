@@ -31,6 +31,7 @@ import {CommonModule, HashLocationStrategy, LocationStrategy} from '@angular/com
 import {DetailDialogComponent} from './components/detail-dialog/detail-dialog.component';
 import {EditorComponent} from './components/editor/editor.component';
 import {AwsService} from './services/aws-service';
+import {SettingsService} from './services/settings-service';
 import {AuthGuard} from './components/guard/auth.guard';
 import {LoginComponent} from './components/login/login.component';
 import {InlineEditorComponent} from './components/inline-editor/inline-editor.component';
@@ -95,6 +96,7 @@ const appRoutes: Routes = [
     ],
     providers: [
         AwsService,
+        SettingsService,
         AuthGuard,
         {provide: LocationStrategy, useClass: HashLocationStrategy}
     ],

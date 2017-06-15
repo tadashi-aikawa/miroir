@@ -16,8 +16,8 @@ import {MdDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
-import {LocalStorageService} from 'angular-2-local-storage';
 import * as _ from 'lodash';
+import {SettingsService} from '../../services/settings-service';
 
 
 interface RowData {
@@ -90,7 +90,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() ignores: IgnoreCase[] = [];
     @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
-    @Input() unifiedDiff: boolean = this.localStorageService.get<boolean>('unifiedDiff');
+    @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
 
     @ViewChild('selector') selector;
     @ViewChild('mergeView') mergeView;
@@ -108,7 +108,7 @@ export class DetailDialogComponent implements OnInit {
     errorMessage: string;
     mergeViewConfig: MergeViewConfig;
     editorConfig: EditorConfig;
-    displayedQueries: {key: string, value: string}[];
+    displayedQueries: { key: string, value: string }[];
 
     get activeIndexNum(): number {
         return Number(this.activeIndex)
@@ -117,7 +117,7 @@ export class DetailDialogComponent implements OnInit {
     constructor(private service: AwsService,
                 @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService,
-                private localStorageService: LocalStorageService) {
+                private settingsService: SettingsService) {
         // To prevent from unexpected close
         dialogRef._containerInstance.dialogConfig = {disableClose: true};
 
@@ -125,16 +125,46 @@ export class DetailDialogComponent implements OnInit {
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
         _hotkeysService.add([
-            new Hotkey('d', () => {this.changeTab(0); return false; }, null, 'Move `Diff viewer` tab.'),
-            new Hotkey('q', () => {this.changeTab(1); return false; }, null, 'Move `Query parameters` tab.'),
-            new Hotkey('p', () => {this.changeTab(2); return false; }, null, 'Move `Property diffs` tab.'),
-            new Hotkey('i', () => {this.mergeView.moveToPreviousDiff(true); return false; }, null, 'Move to next diff.'),
-            new Hotkey('j', () => {this.showPreviousTrial(); return false; }, null, 'Show previous trial.'),
-            new Hotkey('k', () => {this.mergeView.moveToNextDiff(true); return false; }, null, 'Move to previous diff.'),
-            new Hotkey('l', () => {this.showNextTrial(); return false; }, null, 'Show next trial.'),
-            new Hotkey('w', () => {this.closeDialog(); return false; }, null, 'Close this dialog'),
-            new Hotkey('/', () => {this.openSelector(); return false; }, null, 'Open trial list'),
-            new Hotkey('?', () => {this.toggleCheatSheet(); return false; }, null, 'Open/Close cheat sheet')
+            new Hotkey('d', () => {
+                this.changeTab(0);
+                return false;
+            }, null, 'Move `Diff viewer` tab.'),
+            new Hotkey('q', () => {
+                this.changeTab(1);
+                return false;
+            }, null, 'Move `Query parameters` tab.'),
+            new Hotkey('p', () => {
+                this.changeTab(2);
+                return false;
+            }, null, 'Move `Property diffs` tab.'),
+            new Hotkey('i', () => {
+                this.mergeView.moveToPreviousDiff(true);
+                return false;
+            }, null, 'Move to next diff.'),
+            new Hotkey('j', () => {
+                this.showPreviousTrial();
+                return false;
+            }, null, 'Show previous trial.'),
+            new Hotkey('k', () => {
+                this.mergeView.moveToNextDiff(true);
+                return false;
+            }, null, 'Move to previous diff.'),
+            new Hotkey('l', () => {
+                this.showNextTrial();
+                return false;
+            }, null, 'Show next trial.'),
+            new Hotkey('w', () => {
+                this.closeDialog();
+                return false;
+            }, null, 'Close this dialog'),
+            new Hotkey('/', () => {
+                this.openSelector();
+                return false;
+            }, null, 'Open trial list'),
+            new Hotkey('?', () => {
+                this.toggleCheatSheet();
+                return false;
+            }, null, 'Open/Close cheat sheet')
         ]);
     }
 
@@ -221,7 +251,7 @@ cases:
         if (trial.hasResponse()) {
             const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
             Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
-                .then((rs: {encoding: string, body: string}[]) => {
+                .then((rs: { encoding: string, body: string }[]) => {
                     this.isLoading = false;
                     this.errorMessage = undefined;
                     this.mergeViewConfig = createConfig(
@@ -295,8 +325,7 @@ cases:
 
     changeDiffType(unifiedDiff: boolean) {
         this.unifiedDiff = unifiedDiff;
-        this.localStorageService.set('unifiedDiff', unifiedDiff);
-
+        this.settingsService.unifiedDiff = unifiedDiff;
         this.mergeViewConfig.sideBySide = !unifiedDiff;
 
         // We must initialize mergeView after set config.

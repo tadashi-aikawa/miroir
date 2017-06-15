@@ -1,14 +1,14 @@
 import {Injectable} from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
-import {S3, DynamoDB, TemporaryCredentials, Credentials} from 'aws-sdk';
+import {Credentials, DynamoDB, S3, TemporaryCredentials} from 'aws-sdk';
 import {ObjectList} from 'aws-sdk/clients/s3';
-import {DynamoResult, Pair, Report, Trial} from '../models/models';
+import {DynamoResult, Report, Trial} from '../models/models';
 import * as Encoding from 'encoding-japanese';
-import {LocalStorageService} from 'angular-2-local-storage';
 import {Router} from '@angular/router';
-import DocumentClient = DynamoDB.DocumentClient;
 import CheckStatus from '../constants/check-status';
+import {SettingsService} from './settings-service';
+import DocumentClient = DynamoDB.DocumentClient;
 
 const DURATION_SECONDS: number = 86400;
 const JUMEAUX_RESULTS_PREFIX = 'jumeaux-results';
@@ -43,19 +43,19 @@ function deleteObjects(s3: S3, bucket: string, objectKeys: string[]): Promise<vo
 
 @Injectable()
 export class AwsService {
-    region = this.localStorageService.get<string>('region') || 'ap-northeast-1';
-    table: string = this.localStorageService.get<string>('table');
-    bucket: string = this.localStorageService.get<string>('bucket');
+    region = this.settingsService.region || 'ap-northeast-1';
+    table: string = this.settingsService.table;
+    bucket: string = this.settingsService.bucket;
     tmpCredentials: TemporaryCredentials;
-    tmpAccessKeyId: string = this.localStorageService.get<string>('tmpAccessKeyId');
-    tmpSecretAccessKey: string = this.localStorageService.get<string>('tmpSecretAccessKey');
-    tmpSessionToken: string = this.localStorageService.get<string>('tmpSessionToken');
-    tmpExpireTime: Date = new Date(this.localStorageService.get<Date>('tmpExpireTime'));
+    tmpAccessKeyId: string = this.settingsService.tmpAccessKeyId;
+    tmpSecretAccessKey: string = this.settingsService.tmpSecretAccessKey;
+    tmpSessionToken: string = this.settingsService.tmpSessionToken;
+    tmpExpireTime: Date = this.settingsService.tmpExpireTime;
 
     s3: S3;
     db: DynamoDB.DocumentClient;
 
-    constructor(private localStorageService: LocalStorageService,
+    constructor(private settingsService: SettingsService,
                 private router: Router) {
         this.assignClients();
     }
@@ -79,18 +79,18 @@ export class AwsService {
 
     updateRegion(region: string) {
         this.region = region;
-        this.localStorageService.set('region', this.region);
+        this.settingsService.region = region;
         this.assignClients();
     }
 
     updateTable(table: string) {
         this.table = table;
-        this.localStorageService.set('table', this.table);
+        this.settingsService.table = table;
     }
 
     updateBucket(bucket: string) {
         this.bucket = bucket;
-        this.localStorageService.set('bucket', this.bucket);
+        this.settingsService.bucket = bucket
     }
 
     login(accessKeyId: string, secretAccessKey: string): Promise<any> {
@@ -103,12 +103,10 @@ export class AwsService {
     }
 
     logout() {
-        this.localStorageService.remove(
-            'tmpAccessKeyId',
-            'tmpSecretAccessKey',
-            'tmpSessionToken',
-            'tmpExpireTime'
-        )
+        this.settingsService.removeTmpAccessKeyId();
+        this.settingsService.removeTmpSecretAccessKeyId();
+        this.settingsService.removeTmpSessionToken();
+        this.settingsService.removeTmpExpireTime();
     }
 
     async fetchTrial(key: string, name: string): Promise<{ encoding: string, body: string }> {
@@ -376,10 +374,10 @@ export class AwsService {
                 this.tmpSessionToken = this.tmpCredentials.sessionToken;
                 this.tmpExpireTime = this.tmpCredentials.expireTime;
 
-                this.localStorageService.set('tmpAccessKeyId', this.tmpAccessKeyId);
-                this.localStorageService.set('tmpSecretAccessKey', this.tmpSecretAccessKey);
-                this.localStorageService.set('tmpSessionToken', this.tmpSessionToken);
-                this.localStorageService.set('tmpExpireTime', this.tmpExpireTime);
+                this.settingsService.tmpAccessKeyId = this.tmpAccessKeyId;
+                this.settingsService.tmpSecretAccessKey = this.tmpSecretAccessKey;
+                this.settingsService.tmpSessionToken = this.tmpSessionToken;
+                this.settingsService.tmpExpireTime = this.tmpExpireTime;
 
                 this.assignClients();
                 resolve()
