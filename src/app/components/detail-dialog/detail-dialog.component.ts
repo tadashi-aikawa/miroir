@@ -4,7 +4,7 @@ import {
     DiffKeys,
     EditorConfig,
     IgnoreCase,
-    MergeViewConfig,
+    DiffViewConfig,
     PropertyDiffs,
     PropertyDiffsByCognition,
     Trial
@@ -46,7 +46,7 @@ const filterFunction = (v, q) =>
         }
     });
 
-function createConfig(one: string, other: string, oneContentType: string, otherContentType: string, sideBySide: boolean): MergeViewConfig {
+function createConfig(one: string, other: string, oneContentType: string, otherContentType: string, sideBySide: boolean): DiffViewConfig {
     return {
         leftContent: one,
         leftContentType: oneContentType,
@@ -93,7 +93,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
 
     @ViewChild('selector') selector;
-    @ViewChild('mergeView') mergeView;
+    @ViewChild('diffView') diffView;
     @ViewChild('editor') editor;
 
     queryTableSettings: any;
@@ -106,7 +106,7 @@ export class DetailDialogComponent implements OnInit {
     options: IOption[];
     isLoading: boolean;
     errorMessage: string;
-    mergeViewConfig: MergeViewConfig;
+    diffViewConfig: DiffViewConfig;
     editorConfig: EditorConfig;
     displayedQueries: { key: string, value: string }[];
 
@@ -138,7 +138,7 @@ export class DetailDialogComponent implements OnInit {
                 return false;
             }, null, 'Move `Property diffs` tab.'),
             new Hotkey('i', () => {
-                this.mergeView.moveToPreviousDiff(true);
+                this.diffView.moveToPreviousDiff(true);
                 return false;
             }, null, 'Move to next diff.'),
             new Hotkey('j', () => {
@@ -146,7 +146,7 @@ export class DetailDialogComponent implements OnInit {
                 return false;
             }, null, 'Show previous trial.'),
             new Hotkey('k', () => {
-                this.mergeView.moveToNextDiff(true);
+                this.diffView.moveToNextDiff(true);
                 return false;
             }, null, 'Move to previous diff.'),
             new Hotkey('l', () => {
@@ -254,7 +254,7 @@ cases:
                 .then((rs: { encoding: string, body: string }[]) => {
                     this.isLoading = false;
                     this.errorMessage = undefined;
-                    this.mergeViewConfig = createConfig(
+                    this.diffViewConfig = createConfig(
                         rs[0].body, rs[1].body,
                         toLanguage(trial.one.content_type), toLanguage(trial.other.content_type),
                         !this.unifiedDiff
@@ -268,11 +268,11 @@ cases:
                 });
         } else {
             this.errorMessage = undefined;
-            // We must initialize mergeView after set config.
+            // We must initialize diffView after set config.
             // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
             setTimeout(() => {
                 this.isLoading = false;
-                this.mergeViewConfig = createConfig('No file', 'No file', 'text', 'text', !this.unifiedDiff);
+                this.diffViewConfig = createConfig('No file', 'No file', 'text', 'text', !this.unifiedDiff);
             }, 100);
         }
 
@@ -326,9 +326,9 @@ cases:
     changeDiffType(unifiedDiff: boolean) {
         this.unifiedDiff = unifiedDiff;
         this.settingsService.unifiedDiff = unifiedDiff;
-        this.mergeViewConfig.sideBySide = !unifiedDiff;
+        this.diffViewConfig.sideBySide = !unifiedDiff;
 
-        // We must initialize mergeView after set config.
+        // We must initialize diffView after set config.
         // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
         this.isLoading = true;
         setTimeout(() => {
@@ -337,8 +337,8 @@ cases:
     }
 
     afterChangeTab(index: number): void {
-        if (index === 0 && this.mergeView) {
-            this.mergeView.updateView();
+        if (index === 0 && this.diffView) {
+            this.diffView.updateView();
         }
 
         if (index === 2 && this.editor) {

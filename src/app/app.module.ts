@@ -25,7 +25,7 @@ import {
     StatusComponent,
     SummaryComponent,
 } from './components/summary/summary.component';
-import {MergeViewerComponent} from './components/merge-viewer/merge-viewer.component';
+import {DiffViewerComponent} from './components/diff-viewer/diff-viewer.component';
 import {ResponseTimeChartComponent} from './components/response-time-chart/response-time-chart.component';
 import {CommonModule, HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {DetailDialogComponent} from './components/detail-dialog/detail-dialog.component';
@@ -52,7 +52,7 @@ const appRoutes: Routes = [
         LoginComponent,
         RootComponent,
         SummaryComponent,
-        MergeViewerComponent,
+        DiffViewerComponent,
         DetailDialogComponent,
         DeleteConfirmDialogComponent,
         ConfirmDialogComponent,

@@ -1,16 +1,16 @@
 import {AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild} from '@angular/core';
-import {MergeViewConfig} from '../../models/models';
+import {DiffViewConfig} from '../../models/models';
 
 declare const monaco: any;
 declare const require: any;
 
 
 @Component({
-    selector: 'app-merge-viewer',
+    selector: 'app-diff-viewer',
     template: `<div #view class="monaco-editor" style="height: 65vh;"></div>`,
 })
-export class MergeViewerComponent implements AfterViewInit, OnDestroy {
-    @Input() config: MergeViewConfig;
+export class DiffViewerComponent implements AfterViewInit, OnDestroy {
+    @Input() config: DiffViewConfig;
     diffEditor: any;
     diffNavigator: any;
 
@@ -38,7 +38,7 @@ export class MergeViewerComponent implements AfterViewInit, OnDestroy {
             this.diffEditor.setModel({
                 original: monaco.editor.createModel(this.config.leftContent, this.config.leftContentType),
                 modified: monaco.editor.createModel(this.config.rightContent, this.config.rightContentType)
-            })
+            });
         });
     }
 

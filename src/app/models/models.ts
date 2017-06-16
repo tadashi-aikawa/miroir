@@ -76,7 +76,7 @@ export class IgnoreCase {
 
 export class CheckPoint {
     vars: object;
-    cases: IgnoreCase[]
+    cases: IgnoreCase[];
 }
 
 export class JudgementAddon {
@@ -175,7 +175,7 @@ export class EditorConfig {
     theme?: string;
 }
 
-export class MergeViewConfig {
+export class DiffViewConfig {
     leftContent: string;
     leftContentType: string;
     rightContent: string;
