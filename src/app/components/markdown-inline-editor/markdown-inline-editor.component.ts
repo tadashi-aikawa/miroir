@@ -70,7 +70,7 @@ export class MarkdownInlineEditorComponent {
     @Input() value: string;
     @Output() onUpdate = new EventEmitter<Change<string>>();
 
-    editing: boolean = false;
+    editing = false;
     previousValue: string;
 
     @ViewChild(MdInputDirective) input;
@@ -87,7 +87,7 @@ export class MarkdownInlineEditorComponent {
         ]);
     }
 
-    private update() {
+    update() {
         this.editing = false;
         if (this.onUpdate !== null && this.previousValue !== this.value) {
             this.onUpdate.emit({
@@ -97,7 +97,7 @@ export class MarkdownInlineEditorComponent {
         }
     }
 
-    private cancel() {
+    cancel() {
         if (this.previousValue !== this.value) {
             const dialogRef = this._dialog.open(ConfirmDialogComponent);
             dialogRef.componentInstance.message = 'Your changes will be broken.. OK?';
@@ -106,14 +106,14 @@ export class MarkdownInlineEditorComponent {
                     this.editing = false;
                     this.value = this.previousValue;
                 }
-            })
+            });
         } else {
             this.editing = false;
             this.value = this.previousValue;
         }
     }
 
-    private onTextClick() {
+    onTextClick() {
         this.previousValue = this.value;
         this.editing = true;
         setTimeout(() => {
