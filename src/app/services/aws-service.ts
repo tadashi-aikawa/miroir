@@ -5,12 +5,13 @@ import {Credentials, DynamoDB, S3, TemporaryCredentials} from 'aws-sdk';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {DynamoResult, Report, Trial} from '../models/models';
 import * as Encoding from 'encoding-japanese';
+import * as _ from 'lodash';
 import {Router} from '@angular/router';
 import CheckStatus from '../constants/check-status';
 import {SettingsService} from './settings-service';
 import DocumentClient = DynamoDB.DocumentClient;
 
-const DURATION_SECONDS: number = 86400;
+const DURATION_SECONDS = 86400;
 const JUMEAUX_RESULTS_PREFIX = 'jumeaux-results';
 
 
@@ -20,7 +21,7 @@ function fetchObject<T>(s3: S3, bucket: string, objectKey: string): Promise<T> {
             {Key: objectKey, Bucket: bucket},
             (err, data) => err ? reject(err.message) : resolve(JSON.parse(data.Body.toString()))
         );
-    })
+    });
 }
 
 function putObject<T>(s3: S3, bucket: string, objectKey: string, body: any): Promise<void> {
@@ -90,7 +91,7 @@ export class AwsService {
 
     updateBucket(bucket: string) {
         this.bucket = bucket;
-        this.settingsService.bucket = bucket
+        this.settingsService.bucket = bucket;
     }
 
     login(accessKeyId: string, secretAccessKey: string): Promise<any> {
@@ -333,28 +334,25 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
+        const not = keyWord.slice(0, 1) === '!';
+
+        const toFilterExpression = key => `contains(${key}, :${key})`;
+        const toExpressionAttributePair = key => [`:${key}`, not ? keyWord.slice(1) : keyWord];
+        const keys = [
+            'hashkey',
+            'title',
+            'description',
+            'one_host',
+            'other_host',
+            'begin_time',
+            'paths',
+            'check_status'
+        ];
+
         const params = {
             TableName: this.table,
-            FilterExpression: [
-                'contains(hashkey, :hashkey)',
-                'contains(title, :title)',
-                'contains(description, :description)',
-                'contains(one_host, :one_host)',
-                'contains(other_host, :other_host)',
-                'contains(begin_time, :begin_time)',
-                'contains(paths, :paths)',
-                'contains(check_status, :check_status)'
-            ].join(' OR '),
-            ExpressionAttributeValues: {
-                ':hashkey': keyWord,
-                ':title': keyWord,
-                ':description': keyWord,
-                ':one_host': keyWord,
-                ':other_host': keyWord,
-                ':begin_time': keyWord,
-                ':paths': keyWord,
-                ':check_status': keyWord
-            }
+            FilterExpression: `${not ? 'NOT ' : ''}(${keys.map(toFilterExpression).join(' OR ')})`,
+            ExpressionAttributeValues: _(keys).map(toExpressionAttributePair).fromPairs().value()
         };
 
         return new Promise<DynamoResult>((resolve, reject) => {
@@ -382,8 +380,8 @@ export class AwsService {
                 this.settingsService.tmpExpireTime = this.tmpExpireTime;
 
                 this.assignClients();
-                resolve()
-            })
+                resolve();
+            });
         });
     }
 
