@@ -342,7 +342,8 @@ export class AwsService {
                 'contains(one_host, :one_host)',
                 'contains(other_host, :other_host)',
                 'contains(begin_time, :begin_time)',
-                'contains(paths, :paths)'
+                'contains(paths, :paths)',
+                'contains(check_status, :check_status)'
             ].join(' OR '),
             ExpressionAttributeValues: {
                 ':hashkey': keyWord,
@@ -351,7 +352,8 @@ export class AwsService {
                 ':one_host': keyWord,
                 ':other_host': keyWord,
                 ':begin_time': keyWord,
-                ':paths': keyWord
+                ':paths': keyWord,
+                ':check_status': keyWord
             }
         };
 
