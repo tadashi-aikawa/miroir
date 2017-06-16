@@ -71,7 +71,7 @@ function toCheckedAlready(checkPoint: CheckPoint) {
 }
 
 function matchRegExp(pattern: string, target: string): boolean {
-    return new RegExp(pattern).test(target);
+    return new RegExp(`^${pattern}$`).test(target);
 }
 
 @Component({
@@ -111,7 +111,7 @@ export class DetailDialogComponent implements OnInit {
     displayedQueries: { key: string, value: string }[];
 
     get activeIndexNum(): number {
-        return Number(this.activeIndex)
+        return Number(this.activeIndex);
     }
 
     constructor(private service: AwsService,
@@ -296,9 +296,9 @@ cases:
         );
 
         const diffsWithoutIgnored: DiffKeys = {
-            added: trial.diff_keys.added.filter(x => !_.includes(_.flatMap(ignoredDiffs, x => x.added), x)),
-            changed: trial.diff_keys.changed.filter(x => !_.includes(_.flatMap(ignoredDiffs, x => x.changed), x)),
-            removed: trial.diff_keys.removed.filter(x => !_.includes(_.flatMap(ignoredDiffs, x => x.removed), x)),
+            added: trial.diff_keys.added.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.added), x)),
+            changed: trial.diff_keys.changed.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.changed), x)),
+            removed: trial.diff_keys.removed.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.removed), x)),
         };
 
         const checkedAlreadyDiffs: PropertyDiffs[] = this.checkedAlready.map(
@@ -306,9 +306,9 @@ cases:
         );
 
         const unknownDiffs: DiffKeys = {
-            added: diffsWithoutIgnored.added.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, x => x.added), x)),
-            changed: diffsWithoutIgnored.changed.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, x => x.changed), x)),
-            removed: diffsWithoutIgnored.removed.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, x => x.removed), x)),
+            added: diffsWithoutIgnored.added.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, y => y.added), x)),
+            changed: diffsWithoutIgnored.changed.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, y => y.changed), x)),
+            removed: diffsWithoutIgnored.removed.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, y => y.removed), x)),
         };
 
         this.propertyDiffsByCognition = Object.assign(new PropertyDiffsByCognition(), {
@@ -353,7 +353,7 @@ cases:
     }
 
     createActiveTrialLink() {
-        return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`
+        return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`;
     }
 
     private createPropertyDiff(ignore: IgnoreCase, path: string, diff_keys: DiffKeys): PropertyDiffs {
