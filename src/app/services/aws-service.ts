@@ -5,7 +5,6 @@ import {Credentials, DynamoDB, S3, TemporaryCredentials} from 'aws-sdk';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {DynamoResult, Report, Trial} from '../models/models';
 import * as Encoding from 'encoding-japanese';
-import * as _ from 'lodash';
 import {Router} from '@angular/router';
 import CheckStatus from '../constants/check-status';
 import {SettingsService} from './settings-service';
@@ -197,13 +196,13 @@ export class AwsService {
         await deleteObjects(this.s3, this.bucket, [oldPath]);
     }
 
-    async fetchArchive(key: string): Promise<{ name: string, body: Blob }> {
+    async fetchArchive(key: string): Promise<{name: string, body: Blob}> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
         const zipName = `${key.substring(0, 7)}.zip`;
-        return new Promise<{ name: string, body: Blob }>((resolve, reject) => {
+        return new Promise<{name: string, body: Blob}>((resolve, reject) => {
             this.s3.getObject(
                 {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/${zipName}`, Bucket: this.bucket},
                 (err, data) => err ? reject(err.message) : resolve({
@@ -272,8 +271,8 @@ export class AwsService {
                 hashkey: key
             },
             UpdateExpression: 'set #a = :title',
-            ExpressionAttributeNames: {'#a': 'title'},
-            ExpressionAttributeValues: {':title': title}
+            ExpressionAttributeNames: {'#a' : 'title'},
+            ExpressionAttributeValues: {':title' : title}
         };
 
         return new Promise((resolve, reject) => {
@@ -295,8 +294,8 @@ export class AwsService {
                 hashkey: key
             },
             UpdateExpression: 'set #a = :description',
-            ExpressionAttributeNames: {'#a': 'description'},
-            ExpressionAttributeValues: {':description': description}
+            ExpressionAttributeNames: {'#a' : 'description'},
+            ExpressionAttributeValues: {':description' : description}
         };
 
         return new Promise((resolve, reject) => {
@@ -318,8 +317,8 @@ export class AwsService {
                 hashkey: key
             },
             UpdateExpression: 'set #a = :check_status',
-            ExpressionAttributeNames: {'#a': 'check_status'},
-            ExpressionAttributeValues: {':check_status': status}
+            ExpressionAttributeNames: {'#a' : 'check_status'},
+            ExpressionAttributeValues: {':check_status' : status}
         };
 
         return new Promise((resolve, reject) => {
@@ -334,43 +333,26 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        const q: Object = _(keyWord.split(' '))
-            .map(x => x.split(':'))
-            .fromPairs()
-            .value();
-
         const params = {
             TableName: this.table,
-            FilterExpression: _(
-                _.pickBy({
-                    hashkey: 'key',
-                    title: 'title',
-                    description: 'note',
-                    one_host: 'one_host',
-                    other_host: 'other_host',
-                    begin_time: 'time',
-                    paths: 'path',
-                    check_status: 'status'
-                }, (v, k) => v in q))
-                .map((v, k) => {
-                    if (q[v].startsWith('!')) {
-                        q[v] = q[v].slice(1);
-                        return `NOT contains(${k}, :${v})`;
-                    } else {
-                        return `contains(${k}, :${v})`;
-                    }
-                })
-                .join(' AND '),
-            ExpressionAttributeValues: _.omitBy({
-                ':key': q['key'],
-                ':title': q['title'],
-                ':note': q['note'],
-                ':one_host': q['one_host'],
-                ':other_host': q['other_host'],
-                ':time': q['time'],
-                ':path': q['path'],
-                ':status': q['status']
-            }, _.isUndefined)
+            FilterExpression: [
+                'contains(hashkey, :hashkey)',
+                'contains(title, :title)',
+                'contains(description, :description)',
+                'contains(one_host, :one_host)',
+                'contains(other_host, :other_host)',
+                'contains(begin_time, :begin_time)',
+                'contains(paths, :paths)'
+            ].join(' OR '),
+            ExpressionAttributeValues: {
+                ':hashkey': keyWord,
+                ':title': keyWord,
+                ':description': keyWord,
+                ':one_host': keyWord,
+                ':other_host': keyWord,
+                ':begin_time': keyWord,
+                ':paths': keyWord
+            }
         };
 
         return new Promise<DynamoResult>((resolve, reject) => {
