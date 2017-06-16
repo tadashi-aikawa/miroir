@@ -292,7 +292,7 @@ cases:
 
     private updatePropertyDiffs(trial: Trial) {
         const ignoredDiffs: PropertyDiffs[] = this.ignores.map(
-            x => this.createPropertyDiff(x, trial.path, trial.diff_keys)
+            x => this.createPropertyDiff(x, trial.path, trial.name, trial.diff_keys)
         );
 
         const diffsWithoutIgnored: DiffKeys = {
@@ -302,7 +302,7 @@ cases:
         };
 
         const checkedAlreadyDiffs: PropertyDiffs[] = this.checkedAlready.map(
-            x => this.createPropertyDiff(x, trial.path, diffsWithoutIgnored)
+            x => this.createPropertyDiff(x, trial.path, trial.name, diffsWithoutIgnored)
         );
 
         const unknownDiffs: DiffKeys = {
@@ -356,10 +356,13 @@ cases:
         return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`;
     }
 
-    private createPropertyDiff(ignore: IgnoreCase, path: string, diff_keys: DiffKeys): PropertyDiffs {
+    private createPropertyDiff(ignore: IgnoreCase, path: string, name: string, diff_keys: DiffKeys): PropertyDiffs {
         const validConditions: Condition[] = _.filter(
             ignore.conditions,
-            (c: Condition) => !c.path || matchRegExp(c.path, path)
+            (c: Condition) => _.every([
+                !c.path || matchRegExp(c.path, path),
+                !c.name || matchRegExp(c.name, name)
+            ])
         );
 
         return Object.assign(new PropertyDiffs(), {

@@ -60,6 +60,7 @@ export class PropertyDiffsByCognition {
 
 export class Condition {
     path?: string;
+    name?: string;
     added?: string[];
     changed?: string[];
     removed?: string[];
