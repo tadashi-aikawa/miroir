@@ -7,7 +7,7 @@ import {
     DiffViewConfig,
     PropertyDiffs,
     PropertyDiffsByCognition,
-    Trial
+    Trial, Pair
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
@@ -45,6 +45,50 @@ const filterFunction = (v, q) =>
             return false;
         }
     });
+
+const applyIgnores = (contents: Pair<string>, languages: Pair<string>,
+                      ignoreDiffs: PropertyDiffs[], prefix: string): Pair<string> => {
+    if (languages.one !== 'json' || languages.other !== 'json') {
+        return {one: contents.one, other: contents.other};
+    }
+
+    const titleAndPaths = (f: Function): {title, path}[] => _.flatMap(
+        ignoreDiffs,
+        (d: PropertyDiffs) => f(d).map(p => ({
+            title: d.title,
+            path: p.replace('root', '').replace(/></g, '.').replace(/([<>'])/g, '')
+        })));
+
+    const jsonOne = JSON.parse(contents.one);
+    const jsonOther = JSON.parse(contents.other);
+
+    titleAndPaths(x => x.added).forEach(x => {
+        _.set(jsonOne, x.path, `<-- [${prefix}] (added) ${x.title} -->`);
+        _.set(jsonOther, x.path, `<-- [${prefix}] (added) ${x.title} -->`);
+    });
+    titleAndPaths(x => x.changed).forEach(x => {
+        _.set(jsonOne, x.path, `<-- [${prefix}] (changed) ${x.title} -->`);
+        _.set(jsonOther, x.path, `<-- [${prefix}] (changed) ${x.title} -->`);
+    });
+    titleAndPaths(x => x.removed).forEach(x => {
+        _.set(jsonOne, x.path, `<-- [${prefix}] (removed) ${x.title} -->`);
+        _.set(jsonOther, x.path, `<-- [${prefix}] (removed) ${x.title} -->`);
+    });
+
+    const sortStringify = (obj): string =>
+        JSON.stringify(
+            obj,
+            (_, v) => (!(v instanceof Array || v === null) && typeof v === 'object') ?
+                Object.keys(v).sort().reduce((r, k) => { r[k] = v[k]; return r; }, {}) : v,
+            4
+        );
+
+    return {
+        one: sortStringify(jsonOne),
+        other: sortStringify(jsonOther)
+    };
+};
+
 
 function createConfig(one: string, other: string, oneContentType: string, otherContentType: string, sideBySide: boolean): DiffViewConfig {
     return {
@@ -91,6 +135,8 @@ export class DetailDialogComponent implements OnInit {
     @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
+    @Input() hideIgnoredDiff: boolean = this.settingsService.hideIgnoredDiff;
+    @Input() hideCheckedAlreadyDiff: boolean = this.settingsService.hideCheckedAlreadyDiff;
 
     @ViewChild('selector') selector;
     @ViewChild('diffView') diffView;
@@ -254,9 +300,26 @@ cases:
                 .then((rs: { encoding: string, body: string }[]) => {
                     this.isLoading = false;
                     this.errorMessage = undefined;
+
+                    const bodyPair: Pair<string> = {one: rs[0].body, other: rs[1].body};
+                    const languagePair: Pair<string> = {
+                        one: toLanguage(trial.one.content_type),
+                        other: toLanguage(trial.other.content_type)
+                    };
+
+                    const bodyPair2: Pair<string> = this.hideIgnoredDiff ? applyIgnores(
+                        bodyPair, languagePair, this.propertyDiffsByCognition.ignored, 'IGNORED'
+                    ) : {one: bodyPair.one, other: bodyPair.other};
+
+                    const bodyPair3: Pair<string> = this.hideCheckedAlreadyDiff ? applyIgnores(
+                        bodyPair2, languagePair, this.propertyDiffsByCognition.checkedAlready, 'CHECKD_ALREADY'
+                    ) : {one: bodyPair2.one, other: bodyPair2.other};
+
                     this.diffViewConfig = createConfig(
-                        rs[0].body, rs[1].body,
-                        toLanguage(trial.one.content_type), toLanguage(trial.other.content_type),
+                        bodyPair3.one,
+                        bodyPair3.other,
+                        languagePair.one,
+                        languagePair.other,
                         !this.unifiedDiff
                     );
                     this.oneExpectedEncoding = rs[0].encoding;
@@ -334,6 +397,18 @@ cases:
         setTimeout(() => {
             this.isLoading = false;
         }, 1);
+    }
+
+    changeHideIgnoredDiff(hideIgnored: boolean) {
+        this.hideIgnoredDiff = hideIgnored;
+        this.settingsService.hideIgnoredDiff = hideIgnored;
+        this.showTrial(this.trial);
+    }
+
+    changeHideCheckedAlreadyDiff(hideCheckedAlready: boolean) {
+        this.hideCheckedAlreadyDiff = hideCheckedAlready;
+        this.settingsService.hideCheckedAlreadyDiff = hideCheckedAlready;
+        this.showTrial(this.trial);
     }
 
     afterChangeTab(index: number): void {

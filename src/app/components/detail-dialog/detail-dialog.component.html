@@ -77,7 +77,25 @@
             <div style="padding-top: 40px; padding-left: 10px;">
                 <div>
                     <md-button-toggle [checked]="unifiedDiff" (change)="changeDiffType($event.source.checked)">
-                        <md-icon>view_agenda</md-icon>
+                        <md-icon mdTooltip="Toggl diff kind">view_agenda</md-icon>
+                    </md-button-toggle>
+                </div>
+                <div>
+                    <md-button-toggle [checked]="hideIgnoredDiff"
+                                      (change)="changeHideIgnoredDiff($event.source.checked)">
+                        <md-icon style="color: green;"
+                                 mdTooltip="Toggl ignored properties visibility">
+                            visibility_off
+                        </md-icon>
+                    </md-button-toggle>
+                </div>
+                <div>
+                    <md-button-toggle [checked]="hideCheckedAlreadyDiff"
+                                      (change)="changeHideCheckedAlreadyDiff($event.source.checked)">
+                        <md-icon style="color: red;"
+                                 mdTooltip="Toggl checked already properties visibility">
+                            visibility_off
+                        </md-icon>
                     </md-button-toggle>
                 </div>
             </div>

@@ -45,7 +45,7 @@ export class SettingsService {
     }
 
     removeTmpAccessKeyId() {
-        this.localStorageService.remove('tmpAccessKeyId')
+        this.localStorageService.remove('tmpAccessKeyId');
     }
 
     get tmpSecretAccessKey(): string {
@@ -57,7 +57,7 @@ export class SettingsService {
     }
 
     removeTmpSecretAccessKeyId() {
-        this.localStorageService.remove('tmpSecretAccessKeyId')
+        this.localStorageService.remove('tmpSecretAccessKeyId');
     }
 
     get tmpSessionToken(): string {
@@ -69,7 +69,7 @@ export class SettingsService {
     }
 
     removeTmpSessionToken() {
-        this.localStorageService.remove('tmpSessionToken')
+        this.localStorageService.remove('tmpSessionToken');
     }
 
     get tmpExpireTime(): Date {
@@ -81,7 +81,7 @@ export class SettingsService {
     }
 
     removeTmpExpireTime() {
-        this.localStorageService.remove('tmpExpireTime')
+        this.localStorageService.remove('tmpExpireTime');
     }
 
     get unifiedDiff(): boolean {
@@ -90,6 +90,22 @@ export class SettingsService {
 
     set unifiedDiff(value: boolean) {
         this.localStorageService.set('unifiedDiff', value);
+    }
+
+    get hideIgnoredDiff(): boolean {
+        return this.localStorageService.get<boolean>('hideIgnoredDiff');
+    }
+
+    set hideIgnoredDiff(value: boolean) {
+        this.localStorageService.set('hideIgnoredDiff', value);
+    }
+
+    get hideCheckedAlreadyDiff(): boolean {
+        return this.localStorageService.get<boolean>('hideCheckedAlreadyDiff');
+    }
+
+    set hideCheckedAlreadyDiff(value: boolean) {
+        this.localStorageService.set('hideCheckedAlreadyDiff', value);
     }
 
     get selectedColumnNames(): string[] {
