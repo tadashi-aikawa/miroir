@@ -4,6 +4,7 @@ import {
     DynamoResult,
     DynamoRow,
     EditorConfig,
+    IgnoreCase,
     JudgementAddon,
     Report,
     Summary,
@@ -19,6 +20,69 @@ import * as _ from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 import {SettingsService} from '../../services/settings-service';
+import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
+
+@Component({
+    template: `
+        <span [class]="status">{{renderValue}}</span>
+    `,
+    styles: [
+        '.server-error { color: red; font-weight: bold;}',
+        '.client-error { color: blue; font-weight: bold;}',
+        '.success { color: green; }'
+    ],
+})
+export class StatusCodeComponent implements ViewCell, OnInit {
+    renderValue: string;
+    status: string;
+    @Input() value: string | number;
+
+    ngOnInit(): void {
+        const v = String(this.value);
+        this.renderValue = v;
+        this.status = v[0] === '5' ? 'server-error' :
+            v[0] === '4' ? 'client-error' : 'success';
+    }
+}
+
+
+@Component({
+    template: `
+        <span [mdTooltip]="hoverValue">{{renderValue}}</span>
+    `
+})
+export class HoverComponent implements ViewCell, OnInit {
+    renderValue: string;
+    hoverValue: string;
+    @Input() value: string | number;
+
+    ngOnInit(): void {
+        this.renderValue = `${String(this.value).split('&').length} queries`;
+        this.hoverValue = String(this.value);
+    }
+}
+
+@Component({
+    template: `
+        <md-chip-list>
+            <md-chip [color]="kind" selected="true">{{renderValue}}</md-chip>
+        </md-chip-list>
+    `
+})
+export class StatusComponent implements ViewCell, OnInit {
+    renderValue: string;
+    kind: string;
+    @Input() value: string | number;
+
+    ngOnInit(): void {
+        const v = String(this.value);
+        this.renderValue = v;
+        this.kind = v === 'same' ? 'primary' :
+            v === 'different' ? 'accent' :
+                v === 'failure' ? 'warn' : '';
+    }
+}
+
 
 const filterFunction = (v, q) =>
     q.split(' and ').every(x => {
@@ -28,6 +92,50 @@ const filterFunction = (v, q) =>
             return false;
         }
     });
+
+const TABLE_SETTINGS = {
+    columns: {
+        seq: {title: 'Seq', filterFunction, width: '100px'},
+        name: {title: 'Name', filterFunction},
+        path: {title: 'Path', filterFunction},
+        status: {
+            title: 'Status',
+            type: 'custom',
+            renderComponent: StatusComponent,
+            filterFunction,
+            width: '100px'
+        },
+        queries: {
+            title: 'Queries',
+            type: 'custom',
+            renderComponent: HoverComponent,
+            filterFunction,
+            width: '100px'
+        },
+        hasUnknownDiff: {title: 'Unknown', width: '50px'},
+        oneByte: {title: '<- Byte', filterFunction, width: '100px'},
+        otherByte: {title: 'Byte ->', filterFunction, width: '100px'},
+        oneSec: {title: '<- Sec', filterFunction, width: '100px'},
+        otherSec: {title: 'Sec ->', filterFunction, width: '100px'},
+        oneStatus: {
+            title: '<- Status',
+            type: 'custom',
+            renderComponent: StatusCodeComponent,
+            filterFunction,
+            width: '100px'
+        },
+        otherStatus: {
+            title: 'Status ->',
+            type: 'custom',
+            renderComponent: StatusCodeComponent,
+            filterFunction,
+            width: '100px'
+        },
+        requestTime: {title: 'Request time', filterFunction}
+    },
+    actions: false
+};
+
 
 interface RowData {
     trial: Trial;
@@ -42,6 +150,7 @@ interface RowData {
     oneStatus: number;
     otherStatus: number;
     requestTime: string;
+    hasUnknownDiff: boolean;
 }
 
 @Component({
@@ -55,7 +164,7 @@ interface RowData {
 export class SummaryComponent implements OnInit {
     @ViewChild('sidenav') sideNav: MdSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
-    word: string = '';
+    word = '';
 
     searchingSummary: boolean;
     searchErrorMessage: string;
@@ -70,6 +179,8 @@ export class SummaryComponent implements OnInit {
         (v, k) => ({value: k, label: v.title})
     );
     activeReport: Report;
+    checkedAlready: IgnoreCase[];
+    ignores: IgnoreCase[];
     loadingReportKey: string;
     tableSource = new LocalDataSource();
 
@@ -92,7 +203,7 @@ export class SummaryComponent implements OnInit {
     ngOnInit(): void {
         setTimeout(() => {
             this.sideNav.open().then(() => {
-                setTimeout(() => this.keyWord.nativeElement.click(), 100)
+                setTimeout(() => this.keyWord.nativeElement.click(), 100);
             });
         }, 0);
         this.route.params.subscribe(ps => {
@@ -103,7 +214,7 @@ export class SummaryComponent implements OnInit {
             if (ps.hashKey) {
                 this.showReport(ps.hashKey)
                     .then((r: Report) => {
-                        this.filteredTrials = r.trials;
+                        this.filteredTrials = r.trials.map(x => Object.assign(new Trial(), x));
                         if (ps.seq) {
                             this.showDetail(ps.seq - 1);
                         }
@@ -114,7 +225,6 @@ export class SummaryComponent implements OnInit {
 
     onSearchReports(keyword: string) {
         this.searchReport(keyword);
-        //this.router.navigate(['/report', keyword], {replaceUrl: true})
     }
 
     searchReport(keyword: string): Promise<DynamoRow[]> {
@@ -140,7 +250,6 @@ export class SummaryComponent implements OnInit {
 
     onClickCard(row: DynamoRow, event) {
         this.showReport(row.hashkey);
-        //this.router.navigate(['/report', this.word, row.hashkey], {replaceUrl: true});
         event.stopPropagation();
     }
 
@@ -156,7 +265,7 @@ export class SummaryComponent implements OnInit {
         this.service.updateStatus(key, event.value)
             .catch(err => {
                 row.updatingErrorMessage = err;
-            })
+            });
     }
 
     // TODO: Remove this function if jumeaux( < 0.9.0) become not be used
@@ -188,7 +297,7 @@ export class SummaryComponent implements OnInit {
                 return Promise.all([
                     this.service.updateSummaryTitle(this.activeReport.key, title.current),
                     this.service.updateReportTitle(this.activeReport.key, title.current)
-                ])
+                ]);
             })
             .then(_ => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).title = title.current;
@@ -211,7 +320,7 @@ export class SummaryComponent implements OnInit {
                 return Promise.all([
                     this.service.updateSummaryDescription(this.activeReport.key, description.current),
                     this.service.updateReportDescription(this.activeReport.key, description.current)
-                ])
+                ]);
             })
             .then(_ => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).description = description.current;
@@ -233,22 +342,35 @@ export class SummaryComponent implements OnInit {
 
                     r.trials = r.trials.map(t => Object.assign(new Trial(), t));
                     this.activeReport = r;
+                    this.checkedAlready = toCheckedAlready(this.settingsService.checkList);
+                    const ignorePropertyAddOn: JudgementAddon = _.find(
+                        this.activeReport.addons.judgement,
+                        x => x.name.match(/ignore_properties/gi) !== null
+                    );
+                    this.ignores = ignorePropertyAddOn ? ignorePropertyAddOn.config.ignores : [];
+
                     this.updateColumnVisibility();
-                    this.tableSource.load(r.trials.map(t => (<RowData>{
-                        trial: t,
-                        seq: t.seq,
-                        name: t.name,
-                        path: t.path,
-                        status: t.status,
-                        queries: Object.keys(t.queries).map(k => `${k}=${t.queries[k]}`).join('&'),
-                        oneByte: t.one.byte,
-                        otherByte: t.other.byte,
-                        oneSec: t.one.response_sec,
-                        otherSec: t.other.response_sec,
-                        oneStatus: t.one.status_code,
-                        otherStatus: t.other.status_code,
-                        requestTime: t.request_time
-                    }))).then(() => {
+                    this.tableSource.load(
+                        r.trials.map(t => {
+                            const c = createPropertyDiffs(t, this.ignores, this.checkedAlready);
+                            return <RowData>{
+                                trial: t,
+                                seq: t.seq,
+                                name: t.name,
+                                path: t.path,
+                                status: t.status,
+                                queries: Object.keys(t.queries).map(k => `${k}=${t.queries[k]}`).join('&'),
+                                oneByte: t.one.byte,
+                                otherByte: t.other.byte,
+                                oneSec: t.one.response_sec,
+                                otherSec: t.other.response_sec,
+                                oneStatus: t.one.status_code,
+                                otherStatus: t.other.status_code,
+                                requestTime: t.request_time,
+                                hasUnknownDiff: c ? !c.unknown.isEmpty() : false
+                            };
+                        })
+                    ).then(() => {
                         this.tableSource.getFilteredAndSorted()
                             .then((es: RowData[]) => this.filteredTrials = es.map(x => x.trial));
                         resolve(r);
@@ -365,15 +487,7 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.otherAccessPoint = this.activeReport.summary.other;
         dialogRef.componentInstance.activeIndex = String(index);
         dialogRef.componentInstance.trials = this.filteredTrials;
-
-        const ignorePropertyaddon: JudgementAddon = _.find(
-            this.activeReport.addons.judgement,
-            x => x.name.match(/ignore_properties/gi) !== null
-        );
-        if (ignorePropertyaddon) {
-            dialogRef.componentInstance.ignores = ignorePropertyaddon.config.ignores;
-        }
-
+        dialogRef.componentInstance.ignores = this.ignores;
     }
 
     showRequestsAsJson() {
@@ -418,7 +532,7 @@ export class SummaryComponent implements OnInit {
     }
 
     createActiveReportLink() {
-        return `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}`
+        return `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}`;
     }
 
     private updateColumnVisibility() {
@@ -499,105 +613,3 @@ export class EditorDialogComponent implements OnInit {
         };
     }
 }
-
-@Component({
-    template: `
-        <span [class]="status">{{renderValue}}</span>
-    `,
-    styles: [
-        '.server-error { color: red; font-weight: bold;}',
-        '.client-error { color: blue; font-weight: bold;}',
-        '.success { color: green; }'
-    ],
-})
-export class StatusCodeComponent implements ViewCell, OnInit {
-    renderValue: string;
-    status: string;
-    @Input() value: string | number;
-
-    ngOnInit(): void {
-        const v = String(this.value);
-        this.renderValue = v;
-        this.status = v[0] === '5' ? 'server-error' :
-            v[0] === '4' ? 'client-error' : 'success';
-    }
-}
-
-@Component({
-    template: `
-        <span [mdTooltip]="hoverValue">{{renderValue}}</span>
-    `
-})
-export class HoverComponent implements ViewCell, OnInit {
-    renderValue: string;
-    hoverValue: string;
-    @Input() value: string | number;
-
-    ngOnInit(): void {
-        this.renderValue = `${String(this.value).split('&').length} queries`;
-        this.hoverValue = String(this.value);
-    }
-}
-
-@Component({
-    template: `
-        <md-chip-list>
-            <md-chip [color]="kind" selected="true">{{renderValue}}</md-chip>
-        </md-chip-list>
-    `
-})
-export class StatusComponent implements ViewCell, OnInit {
-    renderValue: string;
-    kind: string;
-    @Input() value: string | number;
-
-    ngOnInit(): void {
-        const v = String(this.value);
-        this.renderValue = v;
-        this.kind = v === 'same' ? 'primary' :
-            v === 'different' ? 'accent' :
-                v === 'failure' ? 'warn' : '';
-    }
-}
-
-const TABLE_SETTINGS = {
-    columns: {
-        seq: {title: 'Seq', filterFunction, width: '100px'},
-        name: {title: 'Name', filterFunction},
-        path: {title: 'Path', filterFunction},
-        status: {
-            title: 'Status',
-            type: 'custom',
-            renderComponent: StatusComponent,
-            filterFunction,
-            width: '100px'
-        },
-        queries: {
-            title: 'Queries',
-            type: 'custom',
-            renderComponent: HoverComponent,
-            filterFunction,
-            width: '100px'
-        },
-        oneByte: {title: '<- Byte', filterFunction, width: '100px'},
-        otherByte: {title: 'Byte ->', filterFunction, width: '100px'},
-        oneSec: {title: '<- Sec', filterFunction, width: '100px'},
-        otherSec: {title: 'Sec ->', filterFunction, width: '100px'},
-        oneStatus: {
-            title: '<- Status',
-            type: 'custom',
-            renderComponent: StatusCodeComponent,
-            filterFunction,
-            width: '100px'
-        },
-        otherStatus: {
-            title: 'Status ->',
-            type: 'custom',
-            renderComponent: StatusCodeComponent,
-            filterFunction,
-            width: '100px'
-        },
-        requestTime: {title: 'Request time', filterFunction}
-    },
-    actions: false
-};

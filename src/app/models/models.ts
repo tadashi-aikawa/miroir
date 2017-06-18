@@ -138,7 +138,7 @@ export class Trial {
     path: string;
     request_time: string;
     status: string;
-    diff_keys: DiffKeys;
+    diff_keys?: DiffKeys;
 
     hasResponse(): boolean {
         return this.one.file !== undefined && this.other.file !== undefined;

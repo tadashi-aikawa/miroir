@@ -10,7 +10,6 @@ import {
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import * as yaml from 'js-yaml';
 import {MdDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
@@ -223,7 +222,7 @@ cases:
             theme: 'vs'
         };
 
-        this.checkedAlready = toCheckedAlready(yaml.safeLoad(this.editorConfig.content));
+        this.checkedAlready = toCheckedAlready(this.editorConfig.content);
 
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
@@ -332,11 +331,9 @@ cases:
         })));
 
         // Property diffs
-        if (trial.diff_keys) {
-            this.propertyDiffsByCognition = createPropertyDiffs(
-                trial, this.ignores, this.checkedAlready
-            );
-        }
+        this.propertyDiffsByCognition = createPropertyDiffs(
+            trial, this.ignores, this.checkedAlready
+        );
     }
 
     changeTab(index: number): void {
@@ -380,7 +377,7 @@ cases:
     }
 
     updateEditorConfig() {
-        this.checkedAlready = toCheckedAlready(yaml.safeLoad(this.editor.getValue()));
+        this.checkedAlready = toCheckedAlready(this.editor.getValue());
         this.settingsService.checkList = this.editor.getValue();
         this.propertyDiffsByCognition = createPropertyDiffs(
             this.trial, this.ignores, this.checkedAlready
