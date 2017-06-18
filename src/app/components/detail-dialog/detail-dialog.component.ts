@@ -96,7 +96,7 @@ function createConfig(one: string, other: string, oneContentType: string, otherC
         leftContentType: oneContentType,
         rightContent: other,
         rightContentType: otherContentType,
-        readOnly: false,
+        readOnly: true,
         sideBySide: sideBySide,
         theme: 'vs'
     };
@@ -235,7 +235,7 @@ cases:
           - root<'items'><[0-9]><'hogehoge-removed'>
           `,
             contentType: 'yaml',
-            readOnly: false,
+            readOnly: true,
             theme: 'vs'
         };
 
