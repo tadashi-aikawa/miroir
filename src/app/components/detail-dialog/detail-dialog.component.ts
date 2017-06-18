@@ -218,7 +218,7 @@ cases:
           - root<'items'><[0-9]><'hogehoge-removed'>
           `,
             contentType: 'yaml',
-            readOnly: true,
+            readOnly: false,
             theme: 'vs'
         };
 
