@@ -1,13 +1,12 @@
 import {
-    AccessPoint, CheckPoint,
-    Condition,
-    DiffKeys,
+    AccessPoint,
+    DiffViewConfig,
     EditorConfig,
     IgnoreCase,
-    DiffViewConfig,
+    Pair,
     PropertyDiffs,
     PropertyDiffsByCognition,
-    Trial, Pair
+    Trial
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
@@ -18,6 +17,7 @@ import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
 import * as _ from 'lodash';
 import {SettingsService} from '../../services/settings-service';
+import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 
 
 interface RowData {
@@ -100,22 +100,6 @@ function createConfig(one: string, other: string, oneContentType: string, otherC
         sideBySide: sideBySide,
         theme: 'vs'
     };
-}
-
-function toCheckedAlready(checkPoint: CheckPoint) {
-    const assignVars = (ignoreCase: IgnoreCase): IgnoreCase => _.omitBy(
-        _.reduce(checkPoint.vars, (result, v, k) => Object.assign({}, result, {
-            image: result.image ? result.image.replace(new RegExp(`{{ ${k} }}`, 'g'), v) : undefined,
-            link: result.link ? result.link.replace(new RegExp(`{{ ${k} }}`, 'g'), v) : undefined
-        }), ignoreCase),
-        v => v === undefined
-    );
-
-    return checkPoint.cases.map(assignVars);
-}
-
-function matchRegExp(pattern: string, target: string): boolean {
-    return new RegExp(`^${pattern}$`).test(target);
 }
 
 @Component({
@@ -349,36 +333,10 @@ cases:
 
         // Property diffs
         if (trial.diff_keys) {
-            this.updatePropertyDiffs(trial);
+            this.propertyDiffsByCognition = createPropertyDiffs(
+                trial, this.ignores, this.checkedAlready
+            );
         }
-    }
-
-    private updatePropertyDiffs(trial: Trial) {
-        const ignoredDiffs: PropertyDiffs[] = this.ignores.map(
-            x => this.createPropertyDiff(x, trial.path, trial.name, trial.diff_keys)
-        );
-
-        const diffsWithoutIgnored: DiffKeys = {
-            added: trial.diff_keys.added.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.added), x)),
-            changed: trial.diff_keys.changed.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.changed), x)),
-            removed: trial.diff_keys.removed.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.removed), x)),
-        };
-
-        const checkedAlreadyDiffs: PropertyDiffs[] = this.checkedAlready.map(
-            x => this.createPropertyDiff(x, trial.path, trial.name, diffsWithoutIgnored)
-        );
-
-        const unknownDiffs: DiffKeys = {
-            added: diffsWithoutIgnored.added.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, y => y.added), x)),
-            changed: diffsWithoutIgnored.changed.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, y => y.changed), x)),
-            removed: diffsWithoutIgnored.removed.filter(x => !_.includes(_.flatMap(checkedAlreadyDiffs, y => y.removed), x)),
-        };
-
-        this.propertyDiffsByCognition = Object.assign(new PropertyDiffsByCognition(), {
-            unknown: Object.assign(new PropertyDiffs(), unknownDiffs),
-            checkedAlready: checkedAlreadyDiffs,
-            ignored: ignoredDiffs
-        });
     }
 
     changeTab(index: number): void {
@@ -424,35 +382,13 @@ cases:
     updateEditorConfig() {
         this.checkedAlready = toCheckedAlready(yaml.safeLoad(this.editor.getValue()));
         this.settingsService.checkList = this.editor.getValue();
-        this.updatePropertyDiffs(this.trial);
+        this.propertyDiffsByCognition = createPropertyDiffs(
+            this.trial, this.ignores, this.checkedAlready
+        );
     }
 
     createActiveTrialLink() {
         return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`;
     }
 
-    private createPropertyDiff(ignore: IgnoreCase, path: string, name: string, diff_keys: DiffKeys): PropertyDiffs {
-        const validConditions: Condition[] = _.filter(
-            ignore.conditions,
-            (c: Condition) => _.every([
-                !c.path || matchRegExp(c.path, path),
-                !c.name || matchRegExp(c.name, name)
-            ])
-        );
-
-        return Object.assign(new PropertyDiffs(), {
-            title: ignore.title,
-            image: ignore.image,
-            link: ignore.link,
-            added: diff_keys.added.filter(
-                x => _(validConditions).flatMap(c => c.added).compact().some(c => matchRegExp(c, x))
-            ),
-            changed: diff_keys.changed.filter(
-                x => _(validConditions).flatMap(c => c.changed).compact().some(c => matchRegExp(c, x))
-            ),
-            removed: diff_keys.removed.filter(
-                x => _(validConditions).flatMap(c => c.removed).compact().some(c => matchRegExp(c, x))
-            )
-        });
-    }
 }
