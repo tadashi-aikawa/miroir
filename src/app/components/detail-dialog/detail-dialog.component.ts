@@ -290,13 +290,13 @@ cases:
                         other: toLanguage(trial.other.content_type)
                     };
 
-                    const bodyPair2: Pair<string> = this.hideIgnoredDiff ? applyIgnores(
-                        bodyPair, languagePair, this.propertyDiffsByCognition.ignored, 'IGNORED'
-                    ) : {one: bodyPair.one, other: bodyPair.other};
+                    const bodyPair2: Pair<string> = this.hideIgnoredDiff && this.propertyDiffsByCognition ?
+                        applyIgnores(bodyPair, languagePair, this.propertyDiffsByCognition.ignored, 'IGNORED') :
+                        {one: bodyPair.one, other: bodyPair.other};
 
-                    const bodyPair3: Pair<string> = this.hideCheckedAlreadyDiff ? applyIgnores(
-                        bodyPair2, languagePair, this.propertyDiffsByCognition.checkedAlready, 'CHECKD_ALREADY'
-                    ) : {one: bodyPair2.one, other: bodyPair2.other};
+                    const bodyPair3: Pair<string> = this.hideCheckedAlreadyDiff && this.propertyDiffsByCognition ?
+                        applyIgnores(bodyPair2, languagePair, this.propertyDiffsByCognition.checkedAlready, 'CHECKD_ALREADY') :
+                        {one: bodyPair2.one, other: bodyPair2.other};
 
                     this.diffViewConfig = createConfig(
                         bodyPair3.one,
