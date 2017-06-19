@@ -331,7 +331,7 @@ export class SummaryComponent implements OnInit {
             });
     }
 
-    showReport(key: string): Promise<Report> {
+    showReport(key: string, analysis=false): Promise<Report> {
         return new Promise<Report>((resolve, reject) => {
             this.loadingReportKey = key;
             this.activeReport = undefined;
@@ -352,7 +352,7 @@ export class SummaryComponent implements OnInit {
                     this.updateColumnVisibility();
                     this.tableSource.load(
                         r.trials.map(t => {
-                            const c = createPropertyDiffs(t, this.ignores, this.checkedAlready);
+                            const c = analysis && createPropertyDiffs(t, this.ignores, this.checkedAlready);
                             return <RowData>{
                                 trial: t,
                                 seq: t.seq,
@@ -367,7 +367,7 @@ export class SummaryComponent implements OnInit {
                                 oneStatus: t.one.status_code,
                                 otherStatus: t.other.status_code,
                                 requestTime: t.request_time,
-                                hasUnknownDiff: c ? !c.unknown.isEmpty() : false
+                                hasUnknownDiff: analysis ? (c ? !c.unknown.isEmpty() : false) : undefined
                             };
                         })
                     ).then(() => {
