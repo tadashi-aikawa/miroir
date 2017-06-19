@@ -6,6 +6,24 @@ import {LocalStorageService} from 'angular-2-local-storage';
 import DocumentClient = DynamoDB.DocumentClient;
 
 
+const CHECKLIST_DEFAULT = `
+vars:
+  mimizou: https://avatars0.githubusercontent.com/u/9500018?v=3&s=460
+cases:
+  - title: something
+    image: '{{ mimizou }}'
+    conditions:
+      - added:
+          # regexp
+          - root<'items'><[0-9]><'hogehoge-added'>
+      - changed:
+          # regexp
+          - .+
+      - removed:
+          # regexp
+          - root<'items'><[0-9]><'hogehoge-removed'>
+`;
+
 @Injectable()
 export class SettingsService {
 
@@ -117,7 +135,7 @@ export class SettingsService {
     }
 
     get checkList(): string {
-        return this.localStorageService.get<string>('checkList');
+        return this.localStorageService.get<string>('checkList') || CHECKLIST_DEFAULT;
     }
 
     set checkList(value: string) {

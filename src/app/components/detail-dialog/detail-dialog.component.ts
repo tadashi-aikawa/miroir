@@ -200,23 +200,7 @@ export class DetailDialogComponent implements OnInit {
     ngOnInit(): void {
         // FIXME
         this.editorConfig = {
-            content: this.settingsService.checkList || `
-vars:
-  mimizou: https://avatars0.githubusercontent.com/u/9500018?v=3&s=460
-cases:
-  - title: something
-    image: '{{ mimizou }}'
-    conditions:
-      - added:
-          # regexp
-          - root<'items'><[0-9]><'hogehoge-added'>
-      - changed:
-          # regexp
-          - .+
-      - removed:
-          # regexp
-          - root<'items'><[0-9]><'hogehoge-removed'>
-          `,
+            content: this.settingsService.checkList,
             contentType: 'yaml',
             readOnly: false,
             theme: 'vs'
