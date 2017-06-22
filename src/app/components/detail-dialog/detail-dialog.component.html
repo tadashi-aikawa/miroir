@@ -61,30 +61,28 @@
     <md-tab label="Diff viewer">
         <div style="display: flex;">
             <div style="flex: 1;">
-                <div *ngIf="isLoading" class="center" style="height: 50vh;">
-                    <md-spinner style="width: 50vh; height: 50vh;"></md-spinner>
-                </div>
-                <div *ngIf="!isLoading && !errorMessage">
-                    <app-diff-viewer #diffView
-                                     [config]="diffViewConfig"
-                    >
-                    </app-diff-viewer>
+                <div *ngIf="isLoading" style="width: 90%; padding-left: 10px;">
+                    <md-progress-bar mode="indeterminate"></md-progress-bar>
                 </div>
                 <div *ngIf="errorMessage">
-                    {{errorMessage}}
+                    <span class="error-message">{{errorMessage}}</span>
                 </div>
+                <app-diff-viewer #diffView
+                                 [config]="diffViewConfig"
+                >
+                </app-diff-viewer>
             </div>
             <div style="padding-top: 40px; padding-left: 10px;">
                 <div>
                     <md-button-toggle [checked]="unifiedDiff" (change)="changeDiffType($event.source.checked)">
-                        <md-icon mdTooltip="Toggl diff kind">view_agenda</md-icon>
+                        <md-icon title="Toggl diff kind">view_agenda</md-icon>
                     </md-button-toggle>
                 </div>
                 <div>
                     <md-button-toggle [checked]="hideIgnoredDiff"
                                       (change)="changeHideIgnoredDiff($event.source.checked)">
                         <md-icon style="color: green;"
-                                 mdTooltip="Toggl ignored properties visibility">
+                                 title="Toggl ignored properties visibility">
                             visibility_off
                         </md-icon>
                     </md-button-toggle>
@@ -93,7 +91,7 @@
                     <md-button-toggle [checked]="hideCheckedAlreadyDiff"
                                       (change)="changeHideCheckedAlreadyDiff($event.source.checked)">
                         <md-icon style="color: red;"
-                                 mdTooltip="Toggl checked already properties visibility">
+                                 title="Toggl checked already properties visibility">
                             visibility_off
                         </md-icon>
                     </md-button-toggle>

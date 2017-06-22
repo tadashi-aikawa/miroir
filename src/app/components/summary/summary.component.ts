@@ -48,7 +48,7 @@ export class StatusCodeComponent implements ViewCell, OnInit {
 
 @Component({
     template: `
-        <span [mdTooltip]="hoverValue">{{renderValue}}</span>
+        <span [title]="hoverValue">{{renderValue}}</span>
     `
 })
 export class HoverComponent implements ViewCell, OnInit {

@@ -51,8 +51,8 @@
                     </div>
                     <md-card-header>
                         <md-card-title class="summary-card-title"
-                                       [mdTooltip]="row.title"
-                                       mdTooltipPosition="above">
+                                       title={{row.title}}
+                                       >
                             {{row.title}}
                         </md-card-title>
                         <md-card-subtitle>
@@ -76,8 +76,9 @@
                         </span>
                         <span *ngIf="row.deleteErrorMessage">
                             <md-chip-list class="smart-padding-without-bottom">
-                                <md-chip color="warn" selected="true" [mdTooltip]="row.deleteErrorMessage"
-                                         mdTooltipPosition="after">
+                                <md-chip color="warn" selected="true"
+                                         title={{row.deleteErrorMessage}}
+                                         >
                                     Fail to delete!!
                                 </md-chip>
                             </md-chip-list>
@@ -88,16 +89,18 @@
                         </span>
                         <span *ngIf="row.downloadErrorMessage">
                             <md-chip-list class="smart-padding-without-bottom">
-                                <md-chip color="warn" selected="true" [mdTooltip]="row.downloadErrorMessage"
-                                         mdTooltipPosition="after">
+                                <md-chip color="warn" selected="true"
+                                         title={{row.downloadErrorMessage}}
+                                >
                                     Fail to download!!
                                 </md-chip>
                             </md-chip-list>
                         </span>
                         <span *ngIf="row.updatingErrorMessage">
                             <md-chip-list class="smart-padding-without-bottom">
-                                <md-chip color="warn" selected="true" [mdTooltip]="row.updatingErrorMessage"
-                                         mdTooltipPosition="after">
+                                <md-chip color="warn" selected="true"
+                                         title={{row.updatingErrorMessage}}
+                                >
                                     Fail to update check status!!
                                 </md-chip>
                             </md-chip-list>

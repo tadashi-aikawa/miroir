@@ -268,23 +268,15 @@ export class DetailDialogComponent implements OnInit {
                     this.isLoading = false;
                     this.errorMessage = undefined;
 
-                    const bodyPair: Pair<string> = {one: rs[0].body, other: rs[1].body};
                     const languagePair: Pair<string> = {
                         one: toLanguage(trial.one.content_type),
                         other: toLanguage(trial.other.content_type)
                     };
-
-                    const bodyPair2: Pair<string> = this.hideIgnoredDiff && this.propertyDiffsByCognition ?
-                        applyIgnores(bodyPair, languagePair, this.propertyDiffsByCognition.ignored, 'IGNORED') :
-                        {one: bodyPair.one, other: bodyPair.other};
-
-                    const bodyPair3: Pair<string> = this.hideCheckedAlreadyDiff && this.propertyDiffsByCognition ?
-                        applyIgnores(bodyPair2, languagePair, this.propertyDiffsByCognition.checkedAlready, 'CHECKD_ALREADY') :
-                        {one: bodyPair2.one, other: bodyPair2.other};
+                    const bodyPair = this.maskIgnores({one: rs[0].body, other: rs[1].body}, languagePair);
 
                     this.diffViewConfig = createConfig(
-                        bodyPair3.one,
-                        bodyPair3.other,
+                        bodyPair.one,
+                        bodyPair.other,
                         languagePair.one,
                         languagePair.other,
                         !this.unifiedDiff
@@ -320,6 +312,16 @@ export class DetailDialogComponent implements OnInit {
         );
     }
 
+    private maskIgnores(bodyPair: Pair<string>, languagePair: Pair<string>) {
+        const bodyApplyIgnoredPair: Pair<string> = this.hideIgnoredDiff && this.propertyDiffsByCognition ?
+            applyIgnores(bodyPair, languagePair, this.propertyDiffsByCognition.ignored, 'IGNORED') :
+            {one: bodyPair.one, other: bodyPair.other};
+
+        return this.hideCheckedAlreadyDiff && this.propertyDiffsByCognition ?
+            applyIgnores(bodyApplyIgnoredPair, languagePair, this.propertyDiffsByCognition.checkedAlready, 'CHECKD_ALREADY') :
+            {one: bodyApplyIgnoredPair.one, other: bodyApplyIgnoredPair.other};
+    }
+
     changeTab(index: number): void {
         this.activeTabIndex = String(index);
         this.afterChangeTab(index);
@@ -328,25 +330,20 @@ export class DetailDialogComponent implements OnInit {
     changeDiffType(unifiedDiff: boolean) {
         this.unifiedDiff = unifiedDiff;
         this.settingsService.unifiedDiff = unifiedDiff;
-        this.diffViewConfig.sideBySide = !unifiedDiff;
-
-        // We must initialize diffView after set config.
-        // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
-        this.isLoading = true;
-        setTimeout(() => {
-            this.isLoading = false;
-        }, 1);
+        this.diffViewConfig = Object.assign({}, this.diffViewConfig, {sideBySide: !unifiedDiff});
     }
 
     changeHideIgnoredDiff(hideIgnored: boolean) {
         this.hideIgnoredDiff = hideIgnored;
         this.settingsService.hideIgnoredDiff = hideIgnored;
+        // TODO: Repalce to maskIgnores()
         this.showTrial(this.trial);
     }
 
     changeHideCheckedAlreadyDiff(hideCheckedAlready: boolean) {
         this.hideCheckedAlreadyDiff = hideCheckedAlready;
         this.settingsService.hideCheckedAlreadyDiff = hideCheckedAlready;
+        // TODO: Repalce to maskIgnores()
         this.showTrial(this.trial);
     }
 

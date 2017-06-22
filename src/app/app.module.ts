@@ -37,6 +37,7 @@ import {LoginComponent} from './components/login/login.component';
 import {InlineEditorComponent} from './components/inline-editor/inline-editor.component';
 import {MarkdownInlineEditorComponent} from './components/markdown-inline-editor/markdown-inline-editor.component';
 import {ConfirmDialogComponent} from './components/dialogs/confirm-dialog/confirm-dialog.component';
+import {MonacoEditorLoader} from './services/monaco-editor-loader';
 
 const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -98,6 +99,7 @@ const appRoutes: Routes = [
         AwsService,
         SettingsService,
         AuthGuard,
+        MonacoEditorLoader,
         {provide: LocationStrategy, useClass: HashLocationStrategy}
     ],
     bootstrap: [AppComponent]
