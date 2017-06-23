@@ -15,7 +15,8 @@
     <md-sidenav-container style="flex: 1">
         <md-sidenav #sidenav mode="side" class="app-sidenav" align="start">
             <md-input-container>
-                <input mdInput #keyWord [(ngModel)]="word" (keyup.enter)="onSearchReports(word)">
+                <input mdInput #keyWord title="Free word search"
+                       [(ngModel)]="word" (keyup.enter)="onSearchReports(word)">
                 <md-placeholder>
                     <md-icon>search</md-icon>
                     Search word
@@ -27,7 +28,7 @@
             </div>
             <div *ngIf="searchErrorMessage">
                 <md-chip-list>
-                    <md-chip color="warn" selected="true" [mdTooltip]="searchErrorMessage" mdTooltipPosition="after">
+                    <md-chip color="warn" selected="true" title={{searchErrorMessage}}>
                         Error!!
                     </md-chip>
                 </md-chip-list>

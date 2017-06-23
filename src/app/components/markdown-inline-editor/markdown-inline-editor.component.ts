@@ -1,9 +1,9 @@
-import {Component, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
-import {trigger, transition, style, animate} from '@angular/animations';
+import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {animate, style, transition, trigger} from '@angular/animations';
 import {MdDialog, MdInputDirective, MdTextareaAutosize} from '@angular/material';
 import {Change} from 'app/models/models';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
-import {ConfirmDialogComponent} from "app/components/dialogs/confirm-dialog/confirm-dialog.component";
+import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/confirm-dialog.component';
 
 @Component({
     selector: 'app-markdown-inline-editor',
@@ -26,7 +26,7 @@ import {ConfirmDialogComponent} from "app/components/dialogs/confirm-dialog/conf
             ]
         )
     ],
-    template: `        
+    template: `
         <div style="display: flex;">
             <div *ngIf="!editing" class="action-icon hvr-glow" (click)="onTextClick()">
                 <div *ngIf="value; then view else emptyView;"></div>
@@ -39,7 +39,7 @@ import {ConfirmDialogComponent} from "app/components/dialogs/confirm-dialog/conf
                     <md-icon class="icon-small">edit</md-icon>
                 </ng-template>
             </div>
-            
+
             <markdown *ngIf="value && editing" [data]="value"></markdown>
 
             <md-input-container *ngIf="editing" [@feed] class="balloon-right" style="flex: 1">
@@ -50,13 +50,13 @@ import {ConfirmDialogComponent} from "app/components/dialogs/confirm-dialog/conf
                 <div class="smart-padding-left-small">
                     <md-icon class="action-icon-large hvr-buzz-out"
                              style="font-size: 22px; margin-left: 10px;"
-                             mdTooltip="Save (Ctrl+Enter)"
+                             title="Save (Ctrl+Enter)"
                              (click)="update()">
                         check
                     </md-icon>
                     <md-icon class="action-icon-large hvr-buzz-out"
                              style="font-size: 22px; margin-left: 10px;"
-                             mdTooltip="Cancel (ESC)"
+                             title="Cancel (ESC)"
                              (click)="cancel()">
                         cancel
                     </md-icon>
@@ -82,8 +82,14 @@ export class MarkdownInlineEditorComponent {
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
         _hotkeysService.add([
-            new Hotkey('ctrl+enter', () => {this.update(); return false; }, ['TEXTAREA'], 'Update.'),
-            new Hotkey('esc', () => {this.cancel(); return false; }, ['TEXTAREA'], 'Update.')
+            new Hotkey('ctrl+enter', () => {
+                this.update();
+                return false;
+            }, ['TEXTAREA'], 'Update.'),
+            new Hotkey('esc', () => {
+                this.cancel();
+                return false;
+            }, ['TEXTAREA'], 'Update.')
         ]);
     }
 
