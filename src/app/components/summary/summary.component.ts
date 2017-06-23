@@ -273,7 +273,7 @@ export class SummaryComponent implements OnInit {
         this.loadingReportKey = this.failureKey;
         this.errorMessages = undefined;
         this.service.convertReport(this.failureKey)
-            .then(x => {
+            .then(_ => {
                 this.showReport(this.failureKey);
             })
             .catch(err => {
@@ -331,7 +331,7 @@ export class SummaryComponent implements OnInit {
             });
     }
 
-    showReport(key: string, analysis=false): Promise<Report> {
+    showReport(key: string, analysis = false): Promise<Report> {
         return new Promise<Report>((resolve, reject) => {
             this.loadingReportKey = key;
             this.activeReport = undefined;
@@ -593,7 +593,6 @@ export class DeleteConfirmDialogComponent {
         <h2 md-dialog-title>{{title}}</h2>
         <app-editor #editor
                     [config]="editorConfig"
-                    height='85vh'
         >
         </app-editor>
     `,
