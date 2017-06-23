@@ -148,6 +148,10 @@ export class Trial {
         return this.one.url.split('?')[1];
     }
 
+    get queryString(): string {
+        return Object.keys(this.queries).map(k => `${k}=${this.queries[k]}`).join('&');
+    }
+
     get responseSecDiff(): number {
         return Math.round((this.other.response_sec - this.one.response_sec) * 100) / 100;
     }

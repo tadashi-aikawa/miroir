@@ -112,6 +112,13 @@ const TABLE_SETTINGS = {
             filterFunction,
             width: '100px'
         },
+        originQueries: {
+            title: 'OriginQueries',
+            type: 'custom',
+            renderComponent: HoverComponent,
+            filterFunction,
+            width: '100px'
+        },
         hasUnknownDiff: {title: 'Unknown', width: '50px'},
         oneByte: {title: '<- Byte', filterFunction, width: '100px'},
         otherByte: {title: 'Byte ->', filterFunction, width: '100px'},
@@ -359,7 +366,8 @@ export class SummaryComponent implements OnInit {
                                 name: t.name,
                                 path: t.path,
                                 status: t.status,
-                                queries: t.originQueryString,
+                                queries: t.queryString,
+                                originQueries: t.originQueryString,
                                 oneByte: t.one.byte,
                                 otherByte: t.other.byte,
                                 oneSec: t.one.response_sec,
