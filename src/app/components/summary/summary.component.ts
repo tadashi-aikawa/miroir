@@ -359,7 +359,7 @@ export class SummaryComponent implements OnInit {
                                 name: t.name,
                                 path: t.path,
                                 status: t.status,
-                                queries: Object.keys(t.queries).map(k => `${k}=${t.queries[k]}`).join('&'),
+                                queries: t.originQueryString,
                                 oneByte: t.one.byte,
                                 otherByte: t.other.byte,
                                 oneSec: t.one.response_sec,

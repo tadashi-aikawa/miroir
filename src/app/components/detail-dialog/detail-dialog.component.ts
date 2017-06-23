@@ -143,6 +143,10 @@ export class DetailDialogComponent implements OnInit {
         return Number(this.activeIndex);
     }
 
+    get trial(): Trial {
+        return this.trials[this.activeIndex];
+    }
+
     constructor(private service: AwsService,
                 @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService,
@@ -222,10 +226,6 @@ export class DetailDialogComponent implements OnInit {
             actions: false
         };
         this.showTrial(this.trial);
-    }
-
-    get trial(): Trial {
-        return this.trials[this.activeIndex];
     }
 
     toggleCheatSheet(): void {

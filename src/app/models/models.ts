@@ -144,6 +144,10 @@ export class Trial {
         return this.one.file !== undefined && this.other.file !== undefined;
     }
 
+    get originQueryString(): string {
+        return this.one.url.split('?')[1];
+    }
+
     get responseSecDiff(): number {
         return Math.round((this.other.response_sec - this.one.response_sec) * 100) / 100;
     }
