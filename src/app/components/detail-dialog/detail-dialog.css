@@ -10,6 +10,21 @@
     padding-top: 5px;
 }
 
+.origin-queries {
+    font-size: 50%;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.origin-queries:hover {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: break-word;
+}
+
 .count-word {
     color: gray;
     font-size:75%;

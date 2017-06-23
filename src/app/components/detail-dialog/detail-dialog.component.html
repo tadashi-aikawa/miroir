@@ -57,6 +57,8 @@
     </div>
 </div>
 <hr/>
+<div class="origin-queries">{{trial.one.url.split('?')[1]}}</div>
+<hr/>
 <md-tab-group  [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
     <md-tab label="Diff viewer">
         <div style="display: flex;">
