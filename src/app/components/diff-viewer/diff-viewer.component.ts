@@ -81,7 +81,8 @@ export class DiffViewerComponent implements AfterViewInit, OnDestroy, OnChanges 
     }
 
     updateView() {
-        this.diffEditor.layout();
+        // XXX: More simple solutions?
+        updateFromConfig(this.diffEditor, this.config);
     }
 
 }

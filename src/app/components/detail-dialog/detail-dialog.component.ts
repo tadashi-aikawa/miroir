@@ -324,7 +324,6 @@ export class DetailDialogComponent implements OnInit {
 
     changeTab(index: number): void {
         this.activeTabIndex = String(index);
-        this.afterChangeTab(index);
     }
 
     changeDiffType(unifiedDiff: boolean) {
