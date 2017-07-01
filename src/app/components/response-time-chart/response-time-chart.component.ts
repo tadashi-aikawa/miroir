@@ -17,7 +17,8 @@ const statusToMarker = (status: number): Marker => {
 
 @Component({
     selector: 'app-response-time-chart',
-    template: `<div [ng2-highcharts]="chartOptions"></div>`
+    template: `
+        <div [ng2-highcharts]="chartOptions"></div>`
 })
 export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
     @Input() summary: Summary;

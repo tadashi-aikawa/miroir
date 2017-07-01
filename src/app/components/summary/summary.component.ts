@@ -36,6 +36,7 @@ export class StatusCodeComponent implements ViewCell, OnInit {
     renderValue: string;
     status: string;
     @Input() value: string | number;
+    @Input() rowData: any;
 
     ngOnInit(): void {
         const v = String(this.value);
@@ -55,6 +56,7 @@ export class HoverComponent implements ViewCell, OnInit {
     renderValue: string;
     hoverValue: string;
     @Input() value: string | number;
+    @Input() rowData: any;
 
     ngOnInit(): void {
         this.renderValue = `${String(this.value).split('&').length} queries`;
@@ -73,6 +75,7 @@ export class StatusComponent implements ViewCell, OnInit {
     renderValue: string;
     kind: string;
     @Input() value: string | number;
+    @Input() rowData: any;
 
     ngOnInit(): void {
         const v = String(this.value);
@@ -487,7 +490,8 @@ export class SummaryComponent implements OnInit {
     showDetail(index: number) {
         const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '80vw',
-            height: '97%'
+            height: '97%',
+            disableClose: true
         });
         dialogRef.componentInstance.reportKey = this.activeReport.key;
         dialogRef.componentInstance.reportTitle = this.activeReport.title;

@@ -64,6 +64,7 @@ export class AwsService {
     private assignClients(): void {
         this.s3 = new S3({
             apiVersion: '2006-03-01',
+            region: this.region,
             accessKeyId: this.tmpAccessKeyId,
             secretAccessKey: this.tmpSecretAccessKey,
             sessionToken: this.tmpSessionToken

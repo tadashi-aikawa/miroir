@@ -1,12 +1,18 @@
 <div class="center-vertical">
+    <a href={{createActiveTrialLink()}} class="smart-padding-xsmall-right" tabindex="-1">
+        <md-icon class="action-icon hvr-buzz-out" title="Open this trial">link</md-icon>
+    </a>
     <div class="count-word">
         <span>{{activeIndexNum + 1}} / {{options.length}}</span>
         <span> ... </span>
         <span>{{reportTitle}}</span>
     </div>
-    <div *ngIf="isLoading" style="width: 90%; padding-left: 10px;">
-        <md-progress-bar mode="indeterminate"></md-progress-bar>
-    </div>
+    <md-icon class="action-icon hvr-buzz-out"
+             style="margin-left: auto;"
+             title="[w] Close dialog"
+             (click)="closeDialog()">
+        close
+    </md-icon>
 </div>
 <div style="display: flex;">
     <ng-select #selector
@@ -20,9 +26,6 @@
                (selected)="showTrial(trial)"
     >
     </ng-select>
-    <div>
-        <a href={{createActiveTrialLink()}}><md-icon class="action-icon hvr-buzz-out">link</md-icon></a>
-    </div>
 </div>
 <div style="display: flex; justify-content: space-around">
     <div>
@@ -57,15 +60,15 @@
     </div>
 </div>
 <hr/>
-<div class="origin-queries">{{trial.queryString}}</div>
+<div class="origin-queries" *ngIf="!isLoading">{{trial.queryString}}</div>
+<div *ngIf="isLoading" style="width: 90%; padding-left: 10px;">
+    <md-progress-bar mode="indeterminate"></md-progress-bar>
+</div>
 <hr/>
 <md-tab-group  [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
     <md-tab label="Diff viewer">
         <div style="display: flex;">
             <div style="flex: 1;">
-                <div *ngIf="isLoading" style="width: 90%; padding-left: 10px;">
-                    <md-progress-bar mode="indeterminate"></md-progress-bar>
-                </div>
                 <div *ngIf="errorMessage">
                     <span class="error-message">{{errorMessage}}</span>
                 </div>

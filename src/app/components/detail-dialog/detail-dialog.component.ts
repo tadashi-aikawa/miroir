@@ -51,7 +51,7 @@ const applyIgnores = (contents: Pair<string>, languages: Pair<string>,
         return {one: contents.one, other: contents.other};
     }
 
-    const titleAndPaths = (f: Function): {title, path}[] => _.flatMap(
+    const titleAndPaths = (f: Function): { title, path }[] => _.flatMap(
         ignoreDiffs,
         (d: PropertyDiffs) => f(d).map(p => ({
             title: d.title,
@@ -78,7 +78,10 @@ const applyIgnores = (contents: Pair<string>, languages: Pair<string>,
         JSON.stringify(
             obj,
             (_, v) => (!(v instanceof Array || v === null) && typeof v === 'object') ?
-                Object.keys(v).sort().reduce((r, k) => { r[k] = v[k]; return r; }, {}) : v,
+                Object.keys(v).sort().reduce((r, k) => {
+                    r[k] = v[k];
+                    return r;
+                }, {}) : v,
             4
         );
 
@@ -151,9 +154,6 @@ export class DetailDialogComponent implements OnInit {
                 @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService,
                 private settingsService: SettingsService) {
-        // To prevent from unexpected close
-        dialogRef._containerInstance.dialogConfig = {disableClose: true};
-
         // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
