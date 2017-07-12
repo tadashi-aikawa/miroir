@@ -8,8 +8,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        @-webkit-keyframes blink {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0.1;
+            }
+        }
+        .blink {
+            -webkit-animation-name: blink;
+            -webkit-animation-duration: 0.65s;
+            -webkit-animation-iteration-count:infinite;
+            -webkit-animation-timing-function:ease-in-out;
+            -webkit-animation-direction: alternate;
+            -webkit-animation-delay: 0s;
+        }
+    </style>
 </head>
 <body>
-<app-root>Loading...</app-root>
+<app-root>
+    <div style="width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center;">
+        <div class="center-horizontal blink">
+            <img src="assets/jumeaux.png" style="width: 512px; height: 512px;"/>
+            <h1>Now Loading...</h1>
+        </div>
+    </div>
+</app-root>
 </body>
 </html>
