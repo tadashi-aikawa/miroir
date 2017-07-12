@@ -1,7 +1,7 @@
 h1 {
-  color: #369;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 250%;
+    color: #369;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 250%;
 }
 
 md-sidenav {
@@ -9,4 +9,10 @@ md-sidenav {
     flex-direction: column;
     padding: 20px;
     width: 400px;
+}
+
+.navbar-title {
+    padding: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 125%;
 }
