@@ -54,7 +54,7 @@ md-sidenav-container {
 }
 
 .sidebar {
-    background-color: rgb(103, 58, 183);
+    background-color: #3f51b5;
     color: darkgray;
     padding-right: 10px;
     min-height: calc(100vh - 64px)
