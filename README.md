@@ -1,5 +1,7 @@
 # jumeaux-viewer
 
+![](./src/assets/jumeaux.png)
+
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
 Demo: https://tadashi-aikawa.github.io/jumeaux-viewer/
@@ -25,7 +27,7 @@ $ yarn install
 ## Development server
 
 ```
-$ ng serve
+$ yarn start
 ```
 
 Then access to `http://localhost:4200/`
