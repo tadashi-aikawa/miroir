@@ -1,6 +1,6 @@
 # jumeaux-viewer
 
-![](./src/assets/jumeaux.png)
+<img src="./src/assets/jumeaux.png" width="500" height="500">
 
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
