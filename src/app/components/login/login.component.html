@@ -1,12 +1,32 @@
 <div class="center-horizontal">
     <h2>Login</h2>
-    <md-input-container>
-        <input mdInput [(ngModel)]="accessKeyId" placeholder="Access key ID" (keyup.enter)="login()">
-    </md-input-container>
-    <md-input-container>
-        <input mdInput [(ngModel)]="secretAccessKey" placeholder="Secret access key" type="password"
-               (keyup.enter)="login()">
-    </md-input-container>
+
+
+    <div *ngIf="useLocalStack; then endpoint else credentials"></div>
+    <ng-template #credentials>
+        <md-input-container>
+            <input mdInput
+                   [(ngModel)]="accessKeyId"
+                   placeholder="Access key ID"
+                   (keyup.enter)="login()"
+            >
+        </md-input-container>
+        <md-input-container>
+            <input mdInput
+                   type="password"
+                   placeholder="Secret access key"
+                   [(ngModel)]="secretAccessKey"
+                   (keyup.enter)="login()"
+            >
+        </md-input-container>
+    </ng-template>
+    <ng-template #endpoint>
+        <md-input-container>
+            <input mdInput [(ngModel)]="localStackEndpoint" placeholder="Host (ex. http://localhost)"
+                   (keyup.enter)="login()">
+        </md-input-container>
+    </ng-template>
+
     <div class="center-vertical">
         <a href="https://github.com/localstack/localstack">
             <img src="https://www.yextstatic.com/cms/spark/localstack_small.png" height="45px"/>
@@ -14,12 +34,11 @@
         <md-slide-toggle [(ngModel)]="useLocalStack" class="smart-padding-left-small">
         </md-slide-toggle>
     </div>
-    <md-input-container *ngIf="useLocalStack">
-        <input mdInput [(ngModel)]="localStackEndpoint" placeholder="Host (ex. http://localhost)" (keyup.enter)="login()">
-    </md-input-container>
+
     <div *ngIf="authenticating">
         Login...
         <md-progress-bar mode="indeterminate"></md-progress-bar>
     </div>
+
     <span *ngIf="errorMessage" class="error-message">{{errorMessage}}</span>
 </div>
