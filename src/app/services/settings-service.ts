@@ -102,6 +102,22 @@ export class SettingsService {
         this.localStorageService.remove('tmpExpireTime');
     }
 
+    get useLocalStack(): boolean {
+        return this.localStorageService.get<boolean>('useLocalStack');
+    }
+
+    set useLocalStack(value: boolean) {
+        this.localStorageService.set('useLocalStack', value);
+    }
+
+    get localStackEndpoint(): string {
+        return this.localStorageService.get<string>('localStackEndpoint');
+    }
+
+    set localStackEndpoint(value: string) {
+        this.localStorageService.set('localStackEndpoint', value);
+    }
+
     get unifiedDiff(): boolean {
         return this.localStorageService.get<boolean>('unifiedDiff');
     }

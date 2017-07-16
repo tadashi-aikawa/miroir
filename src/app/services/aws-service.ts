@@ -52,6 +52,8 @@ export class AwsService {
     tmpSecretAccessKey: string = this.settingsService.tmpSecretAccessKey;
     tmpSessionToken: string = this.settingsService.tmpSessionToken;
     tmpExpireTime: Date = this.settingsService.tmpExpireTime;
+    useLocalStack: boolean = this.settingsService.useLocalStack || false;
+    localStackEndpoint: string = this.settingsService.localStackEndpoint || 'http://localhost';
 
     s3: S3;
     db: DynamoDB.DocumentClient;
@@ -67,14 +69,16 @@ export class AwsService {
             region: this.region,
             accessKeyId: this.tmpAccessKeyId,
             secretAccessKey: this.tmpSecretAccessKey,
-            sessionToken: this.tmpSessionToken
+            sessionToken: this.tmpSessionToken,
+            endpoint: this.useLocalStack ? `${this.localStackEndpoint}:4572` : undefined
         });
         this.db = new DynamoDB.DocumentClient({
             service: new DynamoDB({
                 region: this.region,
                 accessKeyId: this.tmpAccessKeyId,
                 secretAccessKey: this.tmpSecretAccessKey,
-                sessionToken: this.tmpSessionToken
+                sessionToken: this.tmpSessionToken,
+                endpoint: this.useLocalStack ? `${this.localStackEndpoint}:4569` : undefined
             })
         });
     }
@@ -95,12 +99,18 @@ export class AwsService {
         this.settingsService.bucket = bucket;
     }
 
-    login(accessKeyId: string, secretAccessKey: string): Promise<any> {
+    login(accessKeyId: string, secretAccessKey: string,
+          useLocalStack: boolean = false, localStackEndpoint?: string): Promise<any> {
         this.tmpCredentials = new TemporaryCredentials({DurationSeconds: DURATION_SECONDS}, <Credentials>{
             accessKeyId: accessKeyId,
             secretAccessKey: secretAccessKey
         });
-
+        this.useLocalStack = useLocalStack;
+        this.settingsService.useLocalStack = useLocalStack;
+        if (useLocalStack) {
+            this.localStackEndpoint = localStackEndpoint;
+            this.settingsService.localStackEndpoint = localStackEndpoint;
+        }
         return this.refresh();
     }
 
@@ -366,14 +376,23 @@ export class AwsService {
     private refresh(): Promise<any> {
         return new Promise((resolve, reject) => {
             this.tmpCredentials.refresh(err => {
-                if (err) {
-                    reject(err);
-                }
+                if (this.useLocalStack) {
+                    // TODO: Remove if LocalStack implements STS whose endpoint url can be changed
+                    console.log('Ignore status 403 from STS because of LocalStack mode.');
+                    this.tmpAccessKeyId = 'hoge';
+                    this.tmpSecretAccessKey = 'hoge';
+                    this.tmpSessionToken = 'hoge';
+                    this.tmpExpireTime = new Date(9999, 1, 1, 0, 0, 0);
+                } else {
+                    if (err) {
+                        reject(err);
+                    }
 
-                this.tmpAccessKeyId = this.tmpCredentials.accessKeyId;
-                this.tmpSecretAccessKey = this.tmpCredentials.secretAccessKey;
-                this.tmpSessionToken = this.tmpCredentials.sessionToken;
-                this.tmpExpireTime = this.tmpCredentials.expireTime;
+                    this.tmpAccessKeyId = this.tmpCredentials.accessKeyId;
+                    this.tmpSecretAccessKey = this.tmpCredentials.secretAccessKey;
+                    this.tmpSessionToken = this.tmpCredentials.sessionToken;
+                    this.tmpExpireTime = this.tmpCredentials.expireTime;
+                }
 
                 this.settingsService.tmpAccessKeyId = this.tmpAccessKeyId;
                 this.settingsService.tmpSecretAccessKey = this.tmpSecretAccessKey;

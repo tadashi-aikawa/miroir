@@ -7,6 +7,12 @@
         <input mdInput [(ngModel)]="secretAccessKey" placeholder="Secret access key" type="password"
                (keyup.enter)="login()">
     </md-input-container>
+    <md-slide-toggle [(ngModel)]="useLocalStack">
+        Use <a href="https://github.com/localstack/localstack">LocalStack</a>
+    </md-slide-toggle>
+    <md-input-container *ngIf="useLocalStack">
+        <input mdInput [(ngModel)]="localStackEndpoint" placeholder="http://localhost" (keyup.enter)="login()">
+    </md-input-container>
     <div *ngIf="authenticating">
         Login...
         <md-progress-bar mode="indeterminate"></md-progress-bar>

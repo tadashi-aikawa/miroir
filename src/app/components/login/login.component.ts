@@ -10,6 +10,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 export class LoginComponent implements OnInit {
     accessKeyId: string;
     secretAccessKey: string;
+    useLocalStack = this.awsService.useLocalStack;
+    localStackEndpoint = this.awsService.localStackEndpoint;
     returnUrl: string;
     authenticating: boolean;
     errorMessage: undefined;
@@ -28,7 +30,7 @@ export class LoginComponent implements OnInit {
     login() {
         this.errorMessage = undefined;
         this.authenticating = true;
-        this.awsService.login(this.accessKeyId, this.secretAccessKey)
+        this.awsService.login(this.accessKeyId, this.secretAccessKey, this.useLocalStack, this.localStackEndpoint)
             .then(() => {
                 this.authenticating = false;
                 this.router.navigate([this.returnUrl])

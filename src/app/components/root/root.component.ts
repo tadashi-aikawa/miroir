@@ -10,6 +10,8 @@ export class RootComponent {
     region: string = this.awsService.region;
     table: string = this.awsService.table;
     bucket: string = this.awsService.bucket;
+    useLocalStack: boolean = this.awsService.useLocalStack;
+    localStackEndpoint: string = this.awsService.localStackEndpoint;
 
     constructor(private awsService: AwsService) {
         // DO NOTHING
