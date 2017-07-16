@@ -7,9 +7,13 @@
         <input mdInput [(ngModel)]="secretAccessKey" placeholder="Secret access key" type="password"
                (keyup.enter)="login()">
     </md-input-container>
-    <md-slide-toggle [(ngModel)]="useLocalStack">
-        Use <a href="https://github.com/localstack/localstack">LocalStack</a>
-    </md-slide-toggle>
+    <div class="center-vertical">
+        <a href="https://github.com/localstack/localstack">
+            <img src="https://www.yextstatic.com/cms/spark/localstack_small.png" height="45px"/>
+        </a>
+        <md-slide-toggle [(ngModel)]="useLocalStack" class="smart-padding-left-small">
+        </md-slide-toggle>
+    </div>
     <md-input-container *ngIf="useLocalStack">
         <input mdInput [(ngModel)]="localStackEndpoint" placeholder="Host (ex. http://localhost)" (keyup.enter)="login()">
     </md-input-container>
