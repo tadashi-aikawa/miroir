@@ -11,7 +11,7 @@
         Use <a href="https://github.com/localstack/localstack">LocalStack</a>
     </md-slide-toggle>
     <md-input-container *ngIf="useLocalStack">
-        <input mdInput [(ngModel)]="localStackEndpoint" placeholder="http://localhost" (keyup.enter)="login()">
+        <input mdInput [(ngModel)]="localStackEndpoint" placeholder="Host (ex. http://localhost)" (keyup.enter)="login()">
     </md-input-container>
     <div *ngIf="authenticating">
         Login...
