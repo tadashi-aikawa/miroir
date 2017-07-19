@@ -1,0 +1,22 @@
+- hosts: all
+  connection: local
+  become: yes
+  tasks:
+    - name: Install vim
+      apt:
+        name: vim
+
+    - name: Download install script for pip
+      get_url:
+        url: https://bootstrap.pypa.io/get-pip.py
+        dest: /tmp/get-pip.py
+    - name: Install pip
+      shell: python /tmp/get-pip.py
+
+    - name: Install package dependencies
+      pip:
+        name: '{{ item }}'
+      with_items:
+        - docker-py
+        - awscli
+

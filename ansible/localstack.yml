@@ -1,0 +1,46 @@
+- hosts: all
+  connection: local
+  become: yes
+  environment:
+    AWS_DEFAULT_REGION: "ap-northeast-1"
+    AWS_ACCESS_KEY_ID: "hoge"
+    AWS_SECRET_ACCESS_KEY: "hoge" 
+  tasks:
+    - name: LocalStack is running as container
+      docker_container:
+        name: localstack
+        image: atlassianlabs/localstack
+        ports: 
+          - 4567:4567
+          - 4568:4568
+          - 4569:4569
+          - 4570:4570
+          - 4571:4571
+          - 4572:4572
+          - 4573:4573
+          - 4574:4574
+          - 4575:4575
+          - 4576:4576
+          - 4577:4577
+          - 4578:4578
+          - 4579:4579
+          - 4580:4580
+          - 4581:4581
+        restart: yes
+        restart_policy: always
+
+    - wait_for:
+        port: 4572
+        delay: 10
+
+    - name: Create S3 bucket
+      command: aws --endpoint-url=http://localhost:4572 s3 mb s3://mamansoft-jumeaux-viewer/
+
+    - name: Create DynamoDB table
+      command: |
+        aws --endpoint-url=http://localhost:4569 dynamodb create-table \
+            --table-name jumeaux-viewer \
+            --attribute-definitions AttributeName=hashkey,AttributeType=S \
+            --key-schema AttributeName=hashkey,KeyType=HASH \
+            --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
+

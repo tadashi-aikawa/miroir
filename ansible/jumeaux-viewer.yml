@@ -1,0 +1,22 @@
+- hosts: all
+  connection: local
+  become: yes
+  tasks:
+    - name: Clone
+      git:
+        repo: https://github.com/tadashi-aikawa/jumeaux-viewer.git
+        dest: /tmp/jumeaux-viewer/
+    - name: Create image
+      docker_image:
+        name: tadashi-aikawa/jumeaux-viewer
+        path: /tmp/jumeaux-viewer
+        dockerfile: Dockerfile.localstack
+    - name: Run container
+      docker_container:
+        name: jumeaux-viewer
+        image: tadashi-aikawa/jumeaux-viewer
+        ports:
+          - 8888:80
+        restart: yes
+        restart_policy: always
+
