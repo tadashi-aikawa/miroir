@@ -21,6 +21,7 @@ import {
     DeleteConfirmDialogComponent,
     EditorDialogComponent,
     HoverComponent,
+    LabelsComponent,
     StatusCodeComponent,
     StatusComponent,
     SummaryComponent,
@@ -61,6 +62,7 @@ const appRoutes: Routes = [
         EditorDialogComponent,
         EditorComponent,
         HoverComponent,
+        LabelsComponent,
         InlineEditorComponent,
         MarkdownInlineEditorComponent,
         StatusCodeComponent,
@@ -94,6 +96,7 @@ const appRoutes: Routes = [
         ConfirmDialogComponent,
         EditorDialogComponent,
         HoverComponent,
+        LabelsComponent,
         StatusCodeComponent,
         StatusComponent,
         LogoLoadingComponent

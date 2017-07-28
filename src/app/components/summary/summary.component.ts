@@ -66,6 +66,17 @@ export class HoverComponent implements ViewCell, OnInit {
 
 @Component({
     template: `
+        <md-chip-list *ngFor="let v of this.value">
+            <md-chip>{{this.v}}</md-chip>
+        </md-chip-list>
+    `
+})
+export class LabelsComponent {
+    @Input() value: string[];
+}
+
+@Component({
+    template: `
         <md-chip-list>
             <md-chip [color]="kind" selected="true">{{renderValue}}</md-chip>
         </md-chip-list>
@@ -122,7 +133,21 @@ const TABLE_SETTINGS = {
             filterFunction,
             width: '100px'
         },
-        hasUnknownDiff: {title: 'Unknown', width: '50px'},
+        unknown: {title: 'Unknown', width: '50px'},
+        checkedAlready: {
+            title: 'CheckedAlready',
+            type: 'custom',
+            renderComponent: LabelsComponent,
+            filterFunction,
+            width: '600px'
+        },
+        ignored: {
+            title: 'Ignored',
+            type: 'custom',
+            renderComponent: LabelsComponent,
+            filterFunction,
+            width: '600px'
+        },
         oneByte: {title: '<- Byte', filterFunction, width: '100px'},
         otherByte: {title: 'Byte ->', filterFunction, width: '100px'},
         oneSec: {title: '<- Sec', filterFunction, width: '100px'},
@@ -160,7 +185,9 @@ interface RowData {
     oneStatus: number;
     otherStatus: number;
     requestTime: string;
-    hasUnknownDiff: boolean;
+    unknown: string;
+    checkedAlready: string[];
+    ignored: string[];
 }
 
 @Component({
@@ -377,7 +404,15 @@ export class SummaryComponent implements OnInit {
                                 oneStatus: t.one.status_code,
                                 otherStatus: t.other.status_code,
                                 requestTime: t.request_time,
-                                hasUnknownDiff: analysis ? (c ? !c.unknown.isEmpty() : false) : undefined
+                                unknown: analysis ?
+                                    (c ? (c.unknown.isEmpty() ? '' : '!!!!') : '') :
+                                    '(・ω・)',
+                                checkedAlready: analysis ?
+                                    (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
+                                    ['(・ω・)'],
+                                ignored: analysis ?
+                                    (c ? _(c.ignored).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
+                                    ['(・ω・)'],
                             };
                         })
                     ).then(() => {
