@@ -101,7 +101,9 @@ export class StatusComponent implements ViewCell, OnInit {
 const filterFunction = (v, q) =>
     q.split(' and ').every(x => {
         try {
-            return new RegExp(x).test(v);
+            return x.startsWith('not ') ?
+                !new RegExp(x.replace(/^not /, '')).test(v) :
+                new RegExp(x).test(v);
         } catch (e) {
             return false;
         }
