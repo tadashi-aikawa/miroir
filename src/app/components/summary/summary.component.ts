@@ -109,6 +109,17 @@ const filterFunction = (v, q) =>
         }
     });
 
+const arrayFilterFunction = (vs: any[], q) =>
+    q.split(' and ').every(x => {
+        try {
+            return x.startsWith('not ') ?
+                !vs.every(v => new RegExp(x.replace(/^not /, '')).test(v)) :
+                vs.some(v => new RegExp(x).test(v));
+        } catch (e) {
+            return false;
+        }
+    });
+
 const TABLE_SETTINGS = {
     columns: {
         seq: {title: 'Seq', filterFunction, width: '100px'},
@@ -140,14 +151,14 @@ const TABLE_SETTINGS = {
             title: 'CheckedAlready',
             type: 'custom',
             renderComponent: LabelsComponent,
-            filterFunction,
+            filterFunction: arrayFilterFunction,
             width: '600px'
         },
         ignored: {
             title: 'Ignored',
             type: 'custom',
             renderComponent: LabelsComponent,
-            filterFunction,
+            filterFunction: arrayFilterFunction,
             width: '600px'
         },
         oneByte: {title: '<- Byte', filterFunction, width: '100px'},
