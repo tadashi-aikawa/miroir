@@ -102,7 +102,7 @@ const filterFunction = (v, q) =>
     q.split(' and ').every(x => {
         try {
             return x.startsWith('not ') ?
-                !new RegExp(x.replace(/^not /, '')).test(v) :
+                (v ? !new RegExp(x.replace(/^not /, '')).test(v) : true) :
                 new RegExp(x).test(v);
         } catch (e) {
             return false;
@@ -113,7 +113,7 @@ const arrayFilterFunction = (vs: any[], q) =>
     q.split(' and ').every(x => {
         try {
             return x.startsWith('not ') ?
-                !vs.every(v => new RegExp(x.replace(/^not /, '')).test(v)) :
+                (vs.length > 0 ? !vs.every(v => new RegExp(x.replace(/^not /, '')).test(v)) : true) :
                 vs.some(v => new RegExp(x).test(v));
         } catch (e) {
             return false;
