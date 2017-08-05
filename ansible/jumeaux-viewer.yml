@@ -11,6 +11,7 @@
         name: tadashi-aikawa/jumeaux-viewer
         path: /tmp/jumeaux-viewer
         dockerfile: Dockerfile.localstack
+        force: yes
     - name: Run container
       docker_container:
         name: jumeaux-viewer
@@ -19,4 +20,3 @@
           - 8888:80
         restart: yes
         restart_policy: always
-
