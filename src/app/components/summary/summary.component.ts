@@ -5,7 +5,7 @@ import {
     DynamoRow,
     EditorConfig,
     IgnoreCase,
-    JudgementAddon,
+    JudgementAddon, PropertyDiffsByCognition,
     Report,
     Summary,
     Trial
@@ -389,19 +389,25 @@ export class SummaryComponent implements OnInit {
                 .then((r: Report) => {
                     this.loadingReportKey = undefined;
 
-                    r.trials = r.trials.map(t => Object.assign(new Trial(), t));
-                    this.activeReport = r;
                     this.checkedAlready = toCheckedAlready(this.settingsService.checkList);
                     const ignorePropertyAddOn: JudgementAddon = _.find(
-                        this.activeReport.addons.judgement,
+                        r.addons.judgement,
                         x => x.name.match(/ignore_properties/gi) !== null
                     );
                     this.ignores = ignorePropertyAddOn ? ignorePropertyAddOn.config.ignores : [];
 
+                    r.trials = _.map(
+                        r.trials,
+                        t => Object.assign(new Trial(), t, {
+                            propertyDiffsByCognition: analysis ? createPropertyDiffs(t, this.ignores, this.checkedAlready) : undefined
+                        })
+                    );
+                    this.activeReport = r;
+
                     this.updateColumnVisibility();
                     this.tableSource.load(
                         r.trials.map(t => {
-                            const c = analysis && createPropertyDiffs(t, this.ignores, this.checkedAlready);
+                            const c = t.propertyDiffsByCognition;
                             return <RowData>{
                                 trial: t,
                                 seq: t.seq,
@@ -528,7 +534,7 @@ export class SummaryComponent implements OnInit {
     }
 
     afterChangeTab(index: number): void {
-        if (index === 1) {
+        if (index === 1 || index === 2) {
             this.tableSource.getFilteredAndSorted()
                 .then((es: RowData[]) => this.filteredTrials = es.map(x => x.trial));
         }

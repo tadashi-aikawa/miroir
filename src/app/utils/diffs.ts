@@ -5,6 +5,11 @@ import {
     Trial
 } from '../models/models';
 
+const isDiffKeysEmpty = (diffKeys: DiffKeys): boolean =>
+    diffKeys.added.length === 0 &&
+    diffKeys.changed.length === 0 &&
+    diffKeys.removed.length === 0;
+
 function matchRegExp(pattern: string, target: string): boolean {
     return new RegExp(`^${pattern}$`).test(target);
 }
@@ -74,8 +79,8 @@ function createPropertyDiffs(trial: Trial, ignores: IgnoreCase[], checkedAlready
 
     return Object.assign(new PropertyDiffsByCognition(), {
         unknown: Object.assign(new PropertyDiffs(), unknownDiffs),
-        checkedAlready: checkedAlreadyDiffs,
-        ignored: ignoredDiffs
+        checkedAlready: checkedAlreadyDiffs.filter(x => !isDiffKeysEmpty(x)),
+        ignored: ignoredDiffs.filter(x => !isDiffKeysEmpty(x))
     });
 }
 

@@ -229,6 +229,13 @@
                             </app-response-time-chart>
                         </div>
                     </md-tab>
+                    <md-tab label="Analystic">
+                        <app-analystic
+                            [summary]="activeReport.summary"
+                            [trials]="filteredTrials"
+                        >
+                        </app-analystic>
+                    </md-tab>
                 </md-tab-group>
             </div>
             <p *ngFor="let message of errorMessages">

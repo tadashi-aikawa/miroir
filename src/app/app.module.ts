@@ -40,6 +40,7 @@ import {MarkdownInlineEditorComponent} from './components/markdown-inline-editor
 import {ConfirmDialogComponent} from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import {MonacoEditorLoader} from './services/monaco-editor-loader';
 import {LogoLoadingComponent} from './components/guard/logo-loading.component';
+import {AnalyticsComponent, ToCheckedAlreadyDiffSummaryPipe, ToIgnoredDiffSummaryPipe} from './components/analystic/analytics.component';
 
 const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -68,7 +69,10 @@ const appRoutes: Routes = [
         StatusCodeComponent,
         StatusComponent,
         ResponseTimeChartComponent,
-        LogoLoadingComponent
+        AnalyticsComponent,
+        LogoLoadingComponent,
+        ToCheckedAlreadyDiffSummaryPipe,
+        ToIgnoredDiffSummaryPipe
     ],
     imports: [
         BrowserModule,
