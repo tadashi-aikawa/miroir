@@ -18,3 +18,4 @@ RUN yarn install
 COPY . /usr/src/app
 
 ENTRYPOINT ["sh"]
+

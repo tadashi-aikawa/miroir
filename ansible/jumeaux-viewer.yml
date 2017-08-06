@@ -10,7 +10,7 @@
       docker_image:
         name: tadashi-aikawa/jumeaux-viewer
         path: /tmp/jumeaux-viewer
-        dockerfile: Dockerfile.localstack
+        dockerfile: Dockerfile.local.deploy
         force: yes
     - name: Run container
       docker_container:

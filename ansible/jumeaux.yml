@@ -1,0 +1,9 @@
+- hosts: all
+  connection: local
+  become: yes
+  tasks:
+    - name: Install
+      pip:
+        name: jumeaux
+        executable: '{{ pip3 }}'
+

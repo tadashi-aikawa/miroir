@@ -1,0 +1,5 @@
+python3_version: '3.6.2'
+pyenv: '~/.pyenv/bin/pyenv'
+python3: '~/.pyenv/versions/{{ python3_version }}/bin/python'
+pip3: '~/.pyenv/versions/{{ python3_version }}/bin/pip'
+

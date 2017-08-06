@@ -14,11 +14,13 @@ Vagrant.configure("2") do |config|
   # provider
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "2048"
+#    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
   end
 
   # provisioning
   config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "ansible/playbook.yml"
+    ansible.verbose = "-v"
   end
 end
 

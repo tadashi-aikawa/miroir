@@ -10,6 +10,46 @@
       get_url:
         url: https://bootstrap.pypa.io/get-pip.py
         dest: /tmp/get-pip.py
+
+    - name: Install dependencies for pyenv
+      become: yes
+      apt:
+        name: '{{ item }}'
+        state: latest
+      with_items:
+        - make
+        - build-essential
+        - libssl-dev
+        - zlib1g-dev
+        - libbz2-dev
+        - libreadline-dev
+        - libsqlite3-dev
+        - wget
+        - curl
+        - llvm
+        - libncurses5-dev
+        - libncursesw5-dev
+        - xz-utils
+        - tk-dev
+
+    - name: Check pyenv installed
+      stat:
+        path: ~/.pyenv
+      register: pyenv_is_installed
+
+    - name: Install pyenv
+      shell: git clone --depth 1 https://github.com/pyenv/pyenv.git ~/.pyenv
+      when: not pyenv_is_installed.stat.exists
+
+    - name: Check python3 is already installed
+      stat:
+        path: '{{ python3 }}'
+      register: python_is_installed
+
+    - name: Install python
+      shell: '{{ pyenv }} install {{ python3_version }}'
+      when: not python_is_installed.stat.exists
+
     - name: Install pip
       shell: python /tmp/get-pip.py
 
