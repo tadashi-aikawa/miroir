@@ -5,16 +5,13 @@
     - name: Install vim
       apt:
         name: vim
-
-    - name: Download install script for pip
-      get_url:
-        url: https://bootstrap.pypa.io/get-pip.py
-        dest: /tmp/get-pip.py
+        update_cache: yes
 
     - name: Install dependencies for pyenv
       become: yes
       apt:
         name: '{{ item }}'
+        update_cache: yes
         state: latest
       with_items:
         - make
@@ -32,23 +29,50 @@
         - xz-utils
         - tk-dev
 
-    - name: Check pyenv installed
-      stat:
-        path: ~/.pyenv
-      register: pyenv_is_installed
+    - name: Download python tar ball
+      get_url:
+        url: https://www.python.org/ftp/python/{{ version.python3 }}/Python-{{ version.python3 }}.tgz
+        dest: '{{ dir.src }}'
 
-    - name: Install pyenv
-      shell: git clone --depth 1 https://github.com/pyenv/pyenv.git ~/.pyenv
-      when: not pyenv_is_installed.stat.exists
+    - name: Unarchive tarball
+      command: tar zxf Python-{{ version.python3 }}.tgz
+      args:
+        chdir: '{{ dir.src }}'
 
-    - name: Check python3 is already installed
+    - name: Check python installed
       stat:
-        path: '{{ python3 }}'
+        path: '{{ dir.python3 }}/bin/python3'
       register: python_is_installed
 
     - name: Install python
-      shell: '{{ pyenv }} install {{ python3_version }}'
+      shell: >
+        ./configure
+        --prefix={{ dir.python3 }}
+        --enable-shared &&
+        make &&
+        make install
+      args:
+        chdir: '{{ dir.src }}/Python-{{ version.python3 }}'
       when: not python_is_installed.stat.exists
+
+    - name: Create symbolic link
+      file:
+        src: '{{ dir.python3 }}/bin/python3'
+        dest: '/usr/bin/python3'
+        state: link
+
+    - name: Path to ld.so.conf
+      lineinfile:
+        dest: /etc/ld.so.conf
+        line: '{{ dir.python3 }}/lib'
+
+    - name: To be ldconfig reloaded
+      command: ldconfig
+
+    - name: Download install script for pip
+      get_url:
+        url: https://bootstrap.pypa.io/get-pip.py
+        dest: /tmp/get-pip.py
 
     - name: Install pip
       shell: python /tmp/get-pip.py
@@ -59,4 +83,3 @@
       with_items:
         - docker-py
         - awscli
-

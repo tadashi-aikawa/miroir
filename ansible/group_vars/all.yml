@@ -1,5 +1,7 @@
-python3_version: '3.6.2'
-pyenv: '~/.pyenv/bin/pyenv'
-python3: '~/.pyenv/versions/{{ python3_version }}/bin/python'
-pip3: '~/.pyenv/versions/{{ python3_version }}/bin/pip'
-
+version:
+  python3: '3.6.2'
+dir:
+  src: /usr/local/src
+  python3: /usr/local/python3
+bin:
+  pip3: /usr/local/python3/bin/pip3
