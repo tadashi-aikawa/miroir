@@ -71,8 +71,12 @@ You can also use jumeaux with no preparation if you are login with ssh.
 
 ```
 $ ssh ${vagrant-machine}
-$ jumeaux --help
+
+# For one example...
+$ jumeaux --config simple/config.yml simple/request.log
 ```
+
+If you create files under `/home/vagrant`, you can access them by http request like `http://localhost/api/...`.
 
 ### Note
 

@@ -1,0 +1,62 @@
+title: Sample
+
+one:
+  name: One endpoint
+  host: http://localhost/api/simple/one
+
+other:
+  name: Other endpoint
+  host: http://localhost/api/simple/other
+
+
+output:
+  encoding: utf8
+  response_dir: response
+  logger:  # (See http://wingware.com/psupport/python-manual/3.4/library/logging.config.html#logging-config-dictschema)
+    version: 1
+    formatters:
+      simple:
+        format: '%(levelname)s %(message)s'
+    handlers:
+      console:
+        class : logging.StreamHandler
+        formatter: simple
+        level   : INFO
+        stream  : ext://sys.stderr
+    root:
+      level: INFO
+      handlers: [console]
+
+addons:
+  log2reqs:
+    name: jumeaux.addons.log2reqs.plain
+    config:
+      encoding: utf8
+
+  store_criterion:
+    - name: jumeaux.addons.store_criterion.general
+      config:
+        statuses:
+          - different
+
+  did_challenge:
+    - name: jumeaux.addons.did_challenge.sleep
+      config:
+        min: 0.5
+        max: 0.5
+
+  dump:
+    - name: jumeaux.addons.dump.json
+    - name: jumeaux.addons.dump.xml
+
+  final:
+    - name: jumeaux.addons.final.aws
+      config:
+        table: jumeaux-viewer
+        bucket: mamansoft-jumeaux-viewer
+        cache_max_age: 120
+        checklist: sample
+        local_stack:
+          use: true
+
+
