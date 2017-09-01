@@ -65,7 +65,18 @@ $ vagrant up --provision
 
 And you can access to http://localhost:8888.
 
-Note: I confirmed it with the following versions
+### Jumeaux
+
+You can also use jumeaux with no preparation if you are login with ssh.
+
+```
+$ ssh ${vagrant-machine}
+$ jumeaux --help
+```
+
+### Note
+
+I confirmed it with the following versions
 
 * Vagrant: 1.9.5
 * VirtualBox: 5.1.22 r115126

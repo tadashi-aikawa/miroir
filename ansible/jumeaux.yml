@@ -1,14 +1,36 @@
 - hosts: all
   connection: local
-  become: yes
   tasks:
-    - name: Install
-      pip:
-        name: jumeaux
-        executable: '{{ bin.pip3 }}'
+    - name: Check python installed
+      stat:
+        path: "~/.pyenv/versions/{{ version.python3 }}"
+      register: python_is_installed
 
-    - name: Create symbolic link
+    - name: Install python
+      shell: '. ~/.bash_profile && pyenv install {{ version.python3 }}'
+      when: not python_is_installed.stat.exists
+
+    - name: Install Jumeaux from pip
+      shell: '. ~/.bash_profile && pyenv global {{ version.python3 }} && pip install jumeaux'
+
+    - name: Create .aws directory
       file:
-        src: '/usr/bin/python3'
-        dest: '/usr/bin/python'
-        state: link
+        path: ~/.aws
+        state: directory
+
+    - name: Configure .aws/config
+      blockinfile:
+        path: ~/.aws/config
+        create: yes
+        block: |
+          [default]
+          region = ap-northeast-1
+
+    - name: Configure .aws/credentials (dummy)
+      blockinfile:
+        path: ~/.aws/credentials
+        create: yes
+        block: |
+          [default]
+          aws_access_key_id = hoge
+          aws_secret_access_key = hoge

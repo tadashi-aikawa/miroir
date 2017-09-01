@@ -1,7 +1,3 @@
 version:
   python3: '3.6.2'
-dir:
-  src: /usr/local/src
-  python3: /usr/local/python3
-bin:
-  pip3: /usr/local/python3/bin/pip3
+  localstack: '0.7.3'

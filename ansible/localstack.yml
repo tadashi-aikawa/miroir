@@ -9,7 +9,7 @@
     - name: LocalStack is running as container
       docker_container:
         name: localstack
-        image: localstack/localstack:0.7.3
+        image: localstack/localstack:{{ version.localstack }}
         ports:
           - 4567:4567
           - 4568:4568

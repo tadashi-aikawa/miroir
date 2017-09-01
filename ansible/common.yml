@@ -2,72 +2,15 @@
   connection: local
   become: yes
   tasks:
-    - name: Install vim
-      apt:
-        name: vim
-        update_cache: yes
 
-    - name: Install dependencies for pyenv
-      become: yes
+    - name: Install usual tools
       apt:
         name: '{{ item }}'
-        update_cache: yes
         state: latest
+        update_cache: yes
       with_items:
-        - make
-        - build-essential
-        - libssl-dev
-        - zlib1g-dev
-        - libbz2-dev
-        - libreadline-dev
-        - libsqlite3-dev
-        - wget
-        - curl
-        - llvm
-        - libncurses5-dev
-        - libncursesw5-dev
-        - xz-utils
-        - tk-dev
-
-    - name: Download python tar ball
-      get_url:
-        url: https://www.python.org/ftp/python/{{ version.python3 }}/Python-{{ version.python3 }}.tgz
-        dest: '{{ dir.src }}'
-
-    - name: Unarchive tarball
-      command: tar zxf Python-{{ version.python3 }}.tgz
-      args:
-        chdir: '{{ dir.src }}'
-
-    - name: Check python installed
-      stat:
-        path: '{{ dir.python3 }}/bin/python3'
-      register: python_is_installed
-
-    - name: Install python
-      shell: >
-        ./configure
-        --prefix={{ dir.python3 }}
-        --enable-shared &&
-        make &&
-        make install
-      args:
-        chdir: '{{ dir.src }}/Python-{{ version.python3 }}'
-      when: not python_is_installed.stat.exists
-
-    - name: Create symbolic link
-      file:
-        src: '{{ dir.python3 }}/bin/python3'
-        dest: '/usr/bin/python3'
-        state: link
-
-    - name: Path to ld.so.conf
-      lineinfile:
-        dest: /etc/ld.so.conf
-        line: '{{ dir.python3 }}/lib'
-
-    - name: To be ldconfig reloaded
-      command: ldconfig
+        - vim
+        - tree
 
     - name: Download install script for pip
       get_url:
