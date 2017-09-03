@@ -15,8 +15,7 @@ COPY yarn.lock /usr/src/app/
 COPY package.json /usr/src/app/
 RUN yarn install
 
-COPY .angular-cli.json /usr/src/app/
-COPY src /usr/src/app/
+COPY . /usr/src/app/
 
 RUN ng build --prod --base-href http://localhost:8888
 RUN mv /usr/src/app/dist/* /usr/share/nginx/html/
