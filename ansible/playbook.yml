@@ -1,6 +1,0 @@
-- include: common.yml
-- include: pyenv.yml
-- include: localstack.yml
-- include: jumeaux-viewer.yml
-- include: jumeaux.yml
-- include: server.yml

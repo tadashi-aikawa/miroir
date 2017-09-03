@@ -54,34 +54,3 @@ You have to deploy `dist/*` to web server you want.
 Migrate to `package.json` when following issue is closed.
 
 [Support for module\.js or commonjs? · Issue \#40 · Microsoft/monaco\-editor](https://github.com/Microsoft/monaco-editor/issues/40)
-
-## Jumeaux Viewer in your hands!
-
-Only you need to exec one command if you installed Vagrant and VirtualBox!
-
-```
-$ vagrant up --provision
-```
-
-And you can access to http://localhost:8888.
-
-### Jumeaux
-
-You can also use jumeaux with no preparation if you are login with ssh.
-
-```
-$ ssh ${vagrant-machine}
-
-# For one example...
-$ jumeaux --config simple/config.yml simple/request.log
-```
-
-If you create files under `/home/vagrant`, you can access them by http request like `http://localhost/api/...`.
-
-### Note
-
-I confirmed it with the following versions
-
-* Vagrant: 1.9.5
-* VirtualBox: 5.1.22 r115126
-
