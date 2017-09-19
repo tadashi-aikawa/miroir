@@ -4,6 +4,9 @@ export class DynamoResult {
     Count: number;
     ScannedCount: number;
     Items: DynamoRow[];
+    LastEvaluatedKey?: {
+        hashkey: string;
+    }
 }
 
 export class DynamoRow {

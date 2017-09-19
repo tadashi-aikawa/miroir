@@ -10,6 +10,8 @@ import {Router} from '@angular/router';
 import CheckStatus from '../constants/check-status';
 import {SettingsService} from './settings-service';
 import DocumentClient = DynamoDB.DocumentClient;
+import {ConditionExpression} from "aws-sdk/clients/dynamodb";
+import {ExpressionAttributeValueMap} from "aws-sdk/clients/dynamodb";
 
 const DURATION_SECONDS = 86400;
 const JUMEAUX_RESULTS_PREFIX = 'jumeaux-results';
@@ -360,14 +362,44 @@ export class AwsService {
             'check_status'
         ];
 
-        const params = {
-            TableName: this.table,
-            FilterExpression: `${not ? 'NOT ' : ''}(${keys.map(toFilterExpression).join(' OR ')})`,
-            ExpressionAttributeValues: _(keys).map(toExpressionAttributePair).fromPairs().value()
+        const recursiveFetchSummary = async (accumurator?: DynamoResult) =>  {
+            if (!accumurator) {
+                accumurator = {Count: 0, ScannedCount: 0, Items: []}
+            }
+
+            const toLastEvaluatedHashkey = (r: DynamoResult): string => r && r.LastEvaluatedKey && r.LastEvaluatedKey.hashkey;
+
+            const current = await this.fetchSummary(
+                `${not ? 'NOT ' : ''}(${keys.map(toFilterExpression).join(' OR ')})`,
+                _(keys).map(toExpressionAttributePair).fromPairs().value(),
+                toLastEvaluatedHashkey(accumurator),
+            );
+
+            const accumurated: DynamoResult = {
+                Count: accumurator.Count + current.Count,
+                ScannedCount: accumurator.ScannedCount + current.ScannedCount,
+                Items: [...accumurator.Items, ...current.Items],
+                LastEvaluatedKey: {
+                    hashkey: toLastEvaluatedHashkey(current)
+                }
+            };
+
+            return toLastEvaluatedHashkey(current) ? recursiveFetchSummary(accumurated) : accumurated;
         };
 
-        return new Promise<DynamoResult>((resolve, reject) => {
-            this.db.scan(params, (err, data: DocumentClient.ScanOutput) => {
+        return recursiveFetchSummary();
+    }
+
+    private fetchSummary(filterExpression: ConditionExpression,
+                         expressionAttributeValues: ExpressionAttributeValueMap,
+                         exclusiveStartHash: string): Promise<DynamoResult> {
+        return new Promise((resolve, reject) => {
+            this.db.scan(Object.assign({
+                    TableName: this.table,
+                    FilterExpression: filterExpression,
+                    ExpressionAttributeValues: expressionAttributeValues,
+                }, exclusiveStartHash ? {ExclusiveStartKey: {hashkey: exclusiveStartHash}} : {}
+            ), (err, data: DocumentClient.ScanOutput) => {
                 return err ? reject(err.message) : resolve(data as DynamoResult);
             });
         });
