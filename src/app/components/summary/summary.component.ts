@@ -5,7 +5,7 @@ import {
     DynamoRow,
     EditorConfig,
     IgnoreCase,
-    JudgementAddon, PropertyDiffsByCognition,
+    PropertyDiffsByCognition,
     Report,
     Summary,
     Trial
@@ -390,11 +390,7 @@ export class SummaryComponent implements OnInit {
                     this.loadingReportKey = undefined;
 
                     this.checkedAlready = toCheckedAlready(this.settingsService.checkList);
-                    const ignorePropertyAddOn: JudgementAddon = _.find(
-                        r.addons.judgement,
-                        x => x.name.match(/ignore_properties/gi) !== null
-                    );
-                    this.ignores = ignorePropertyAddOn ? ignorePropertyAddOn.config.ignores : [];
+                    this.ignores = r.ignores;
 
                     r.trials = _.map(
                         r.trials,
@@ -587,9 +583,11 @@ export class SummaryComponent implements OnInit {
             {
                 key: this.activeReport.key,
                 title: this.activeReport.title,
+                description: this.activeReport.description,
                 summary: this.activeReport.summary,
+                ignores: this.activeReport.ignores,
                 addons: this.activeReport.addons,
-                retry_hash: this.activeReport.retry_hash
+                retry_hash: this.activeReport.retry_hash,
             },
             null,
             4

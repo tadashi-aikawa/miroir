@@ -82,25 +82,15 @@ export class CheckPoint {
     cases: IgnoreCase[];
 }
 
-export class JudgementAddon {
-    config: {
-        ignores: IgnoreCase[];
-    };
-}
-
-// TODO define needed parameters
-export class Addons {
-    judgement: JudgementAddon[];
-}
-
 export class Report {
     key: string;
     title: string;
     description?: string;
     summary: Summary;
     trials: Trial[];
-    addons?: Addons;
+    addons?: Object;
     retry_hash?: string;
+    ignores: IgnoreCase[];
 }
 
 export class Summary {
