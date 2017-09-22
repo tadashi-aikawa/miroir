@@ -273,7 +273,9 @@
                 </div>
             </div>
             <div style="width: 50%">
-                <button md-button (click)="updateEditorConfig()">Save</button>
+                <button md-raised-button color="primary" (click)="updateEditorConfig()" style="margin: 10px;">
+                    Save following settings on your browser (Local storage)
+                </button>
                 <app-editor #editor
                             [config]="editorConfig"
                 >
