@@ -146,7 +146,7 @@ const TABLE_SETTINGS = {
             filterFunction,
             width: '100px'
         },
-        unknown: {title: 'Unknown', width: '50px'},
+        attention: {title: 'Attention', width: '200px'},
         checkedAlready: {
             title: 'CheckedAlready',
             type: 'custom',
@@ -198,7 +198,7 @@ interface RowData {
     oneStatus: number;
     otherStatus: number;
     requestTime: string;
-    unknown: string;
+    attention: string;
     checkedAlready: string[];
     ignored: string[];
 }
@@ -404,6 +404,22 @@ export class SummaryComponent implements OnInit {
                     this.tableSource.load(
                         r.trials.map(t => {
                             const c = t.propertyDiffsByCognition;
+                            const toAttention = (): string => {
+                                if (!analysis) {
+                                    return '(・ω・)';
+                                }
+                                if ((!t.diff_keys) && t.status === 'different') {
+                                    return 'No diff keys!!';
+                                }
+                                if (c && !c.unknown.isEmpty()) {
+                                    return 'Appears unknown!!';
+                                }
+                                if (t.one.status_code >= 400 && t.other.status_code >= 400) {
+                                    return 'Both failure!!';
+                                }
+                                return '';
+                            };
+
                             return <RowData>{
                                 trial: t,
                                 seq: t.seq,
@@ -419,9 +435,7 @@ export class SummaryComponent implements OnInit {
                                 oneStatus: t.one.status_code,
                                 otherStatus: t.other.status_code,
                                 requestTime: t.request_time,
-                                unknown: analysis ?
-                                    (c ? (c.unknown.isEmpty() ? '' : '!!!!') : '') :
-                                    '(・ω・)',
+                                attention: toAttention(),
                                 checkedAlready: analysis ?
                                     (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
                                     ['(・ω・)'],
