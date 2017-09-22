@@ -28,6 +28,14 @@ import * as _ from 'lodash';
                     <md-chip color="primary" selected="true">{{c.trials.length}}</md-chip>
                 </md-list-item>
             </md-list>
+
+            <h2>Path</h2>
+            <md-list>
+                <md-list-item *ngFor="let c of (this.trials | toPath)">
+                    {{c.title}}
+                    <md-chip color="primary" selected="true">{{c.trials.length}}</md-chip>
+                </md-list-item>
+            </md-list>
         </div>
     `
 })
@@ -36,7 +44,7 @@ export class AnalyticsComponent {
     @Input() trials: Trial[];
 }
 
-interface AttentionSummary {
+interface AnalysisSummary {
     title: string,
     trials: Trial[]
 }
@@ -49,7 +57,7 @@ interface DiffSummary {
 
 @Pipe({name: 'toAttention'})
 export class ToAttentionPipe implements PipeTransform {
-    transform(trials: Trial[]): AttentionSummary[] {
+    transform(trials: Trial[]): AnalysisSummary[] {
         return _(trials)
             .filter((t: Trial) => t.attention)
             .groupBy((t: Trial) => t.attention)
@@ -109,6 +117,19 @@ export class ToIgnoredDiffSummaryPipe implements PipeTransform {
             .map(xs => ({
                 title: xs[0].title,
                 image: xs[0].image,
+                trials: xs.map(x => x.trial)
+            }))
+            .value();
+    }
+}
+
+@Pipe({name: 'toPath'})
+export class ToPathPipe implements PipeTransform {
+    transform(trials: Trial[]): AnalysisSummary[] {
+        return _(trials)
+            .groupBy((t: Trial) => t.path)
+            .map(xs => ({
+                title: xs[0].path,
                 trials: xs.map(x => x.trial)
             }))
             .value();

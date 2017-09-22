@@ -42,7 +42,7 @@ import {MonacoEditorLoader} from './services/monaco-editor-loader';
 import {LogoLoadingComponent} from './components/guard/logo-loading.component';
 import {
     AnalyticsComponent, ToAttentionPipe, ToCheckedAlreadyDiffSummaryPipe,
-    ToIgnoredDiffSummaryPipe
+    ToIgnoredDiffSummaryPipe, ToPathPipe
 } from './components/analystic/analytics.component';
 
 const appRoutes: Routes = [
@@ -77,6 +77,7 @@ const appRoutes: Routes = [
         ToCheckedAlreadyDiffSummaryPipe,
         ToIgnoredDiffSummaryPipe,
         ToAttentionPipe,
+        ToPathPipe,
     ],
     imports: [
         BrowserModule,
