@@ -392,33 +392,36 @@ export class SummaryComponent implements OnInit {
                     this.checkedAlready = toCheckedAlready(this.settingsService.checkList);
                     this.ignores = r.ignores;
 
-                    r.trials = _.map(
-                        r.trials,
-                        t => Object.assign(new Trial(), t, {
+                    const toAttention = (t: Trial): string => {
+                        if (!analysis) {
+                            return '(・ω・)';
+                        }
+                        if ((!t.diff_keys) && t.status === 'different') {
+                            return 'No diff keys!!';
+                        }
+                        if (t.propertyDiffsByCognition && !t.propertyDiffsByCognition.unknown.isEmpty()) {
+                            return 'Appears unknown!!';
+                        }
+                        if (t.one.status_code >= 400 && t.other.status_code >= 400) {
+                            return 'Both failure!!';
+                        }
+                        return '';
+                    };
+
+                    r.trials = _(r.trials)
+                        .map(t => Object.assign(new Trial(), t, {
                             propertyDiffsByCognition: analysis ? createPropertyDiffs(t, this.ignores, this.checkedAlready) : undefined
-                        })
-                    );
+                        }))
+                        .map(t => Object.assign(new Trial(), t, {
+                            attention: toAttention(t)
+                        }))
+                        .value();
                     this.activeReport = r;
 
                     this.updateColumnVisibility();
                     this.tableSource.load(
                         r.trials.map(t => {
                             const c = t.propertyDiffsByCognition;
-                            const toAttention = (): string => {
-                                if (!analysis) {
-                                    return '(・ω・)';
-                                }
-                                if ((!t.diff_keys) && t.status === 'different') {
-                                    return 'No diff keys!!';
-                                }
-                                if (c && !c.unknown.isEmpty()) {
-                                    return 'Appears unknown!!';
-                                }
-                                if (t.one.status_code >= 400 && t.other.status_code >= 400) {
-                                    return 'Both failure!!';
-                                }
-                                return '';
-                            };
 
                             return <RowData>{
                                 trial: t,
@@ -435,7 +438,7 @@ export class SummaryComponent implements OnInit {
                                 oneStatus: t.one.status_code,
                                 otherStatus: t.other.status_code,
                                 requestTime: t.request_time,
-                                attention: toAttention(),
+                                attention: t.attention,
                                 checkedAlready: analysis ?
                                     (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
                                     ['(・ω・)'],

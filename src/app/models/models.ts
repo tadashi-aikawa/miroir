@@ -134,6 +134,7 @@ export class Trial {
     diff_keys?: DiffKeys;
 
     propertyDiffsByCognition?: PropertyDiffsByCognition;
+    attention?: string;
 
     hasResponse(): boolean {
         return this.one.file !== undefined && this.other.file !== undefined;

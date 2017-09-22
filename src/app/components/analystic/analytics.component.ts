@@ -6,6 +6,14 @@ import * as _ from 'lodash';
     selector: 'app-analystic',
     template: `
         <div>
+            <h2>Attentions</h2>
+            <md-list>
+                <md-list-item *ngFor="let c of (this.trials | toAttention)">
+                    {{c.title}}
+                    <md-chip color="primary" selected="true">{{c.trials.length}}</md-chip>
+                </md-list-item>
+            </md-list>
+            
             <h2>Checked Already</h2>
             <md-list>
                 <md-list-item *ngFor="let c of (this.trials | toCheckedAlreadyDiffSummary)">
@@ -28,11 +36,29 @@ export class AnalyticsComponent {
     @Input() trials: Trial[];
 }
 
+interface AttentionSummary {
+    title: string,
+    trials: Trial[]
+}
 
 interface DiffSummary {
     title: string,
     image: string,
     trials: Trial[]
+}
+
+@Pipe({name: 'toAttention'})
+export class ToAttentionPipe implements PipeTransform {
+    transform(trials: Trial[]): AttentionSummary[] {
+        return _(trials)
+            .filter((t: Trial) => t.attention)
+            .groupBy((t: Trial) => t.attention)
+            .map(xs => ({
+                title: xs[0].attention,
+                trials: xs.map(x => x.trial)
+            }))
+            .value();
+    }
 }
 
 @Pipe({name: 'toCheckedAlreadyDiffSummary'})
