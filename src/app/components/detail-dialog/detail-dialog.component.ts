@@ -262,32 +262,42 @@ export class DetailDialogComponent implements OnInit {
         // Diff viewer
         this.isLoading = true;
         if (trial.hasResponse()) {
-            const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
-            Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
-                .then((rs: { encoding: string, body: string }[]) => {
+            if (trial.one.content_type.match(/octet-stream/) || trial.other.content_type.match(/octet-stream/)) {
+                this.errorMessage = undefined;
+                // We must initialize diffView after set config.
+                // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
+                setTimeout(() => {
                     this.isLoading = false;
-                    this.errorMessage = undefined;
+                    this.diffViewConfig = createConfig('Binary is not supported to show', 'Binary is not supported to show', 'text', 'text', !this.unifiedDiff);
+                }, 100);
+            } else {
+                const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
+                Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
+                    .then((rs: { encoding: string, body: string }[]) => {
+                        this.isLoading = false;
+                        this.errorMessage = undefined;
 
-                    const languagePair: Pair<string> = {
-                        one: toLanguage(trial.one.content_type),
-                        other: toLanguage(trial.other.content_type)
-                    };
-                    const bodyPair = this.maskIgnores({one: rs[0].body, other: rs[1].body}, languagePair);
+                        const languagePair: Pair<string> = {
+                            one: toLanguage(trial.one.content_type),
+                            other: toLanguage(trial.other.content_type)
+                        };
+                        const bodyPair = this.maskIgnores({one: rs[0].body, other: rs[1].body}, languagePair);
 
-                    this.diffViewConfig = createConfig(
-                        bodyPair.one,
-                        bodyPair.other,
-                        languagePair.one,
-                        languagePair.other,
-                        !this.unifiedDiff
-                    );
-                    this.oneExpectedEncoding = rs[0].encoding;
-                    this.otherExpectedEncoding = rs[1].encoding;
-                })
-                .catch(err => {
-                    this.isLoading = false;
-                    this.errorMessage = err;
-                });
+                        this.diffViewConfig = createConfig(
+                            bodyPair.one,
+                            bodyPair.other,
+                            languagePair.one,
+                            languagePair.other,
+                            !this.unifiedDiff
+                        );
+                        this.oneExpectedEncoding = rs[0].encoding;
+                        this.otherExpectedEncoding = rs[1].encoding;
+                    })
+                    .catch(err => {
+                        this.isLoading = false;
+                        this.errorMessage = err;
+                    });
+            }
         } else {
             this.errorMessage = undefined;
             // We must initialize diffView after set config.
