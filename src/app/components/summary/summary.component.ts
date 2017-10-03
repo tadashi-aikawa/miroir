@@ -464,16 +464,25 @@ export class SummaryComponent implements OnInit {
         });
     }
 
-    downloadReport(key: string, event) {
+    downloadReport(key: string, filtered: boolean, event) {
         const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
 
         row.downloading = true;
         this.errorMessages = undefined;
         this.service.fetchReport(key)
-            .then(x => {
+            .then((x: Report) => {
                 row.downloading = false;
                 const reportName = `${row.title}-${key.substring(0, 7)}.json`;
-                fileSaver.saveAs(new Blob([JSON.stringify(x)]), reportName);
+
+                return this.tableSource.getFilteredAndSorted().then((es: RowData[]) => {
+                    const filteredSeqs: number[] = es.map(e => e.trial.seq);
+                    const obj: object = !filtered ? x :
+                        Object.assign({}, x, {
+                            trials: x.trials.filter(t => _.includes(filteredSeqs, t.seq))
+                        });
+
+                    fileSaver.saveAs(new Blob([JSON.stringify(obj)]), reportName);
+                });
             })
             .catch(err => {
                 row.downloading = false;

@@ -113,7 +113,7 @@
                                  title="Remove from S3 storage (never restore)">
                             delete_forever
                         </md-icon>
-                        <md-icon (click)="downloadReport(row.hashkey, $event)"
+                        <md-icon (click)="downloadReport(row.hashkey, false, $event)"
                                  class="action-icon hvr-buzz-out"
                                  title="Download report.json"
                         >
@@ -159,6 +159,10 @@
                         <button md-menu-item (click)="showSummaryAsJson()">
                             <md-icon>open_in_new</md-icon>
                             <span>Show summary</span>
+                        </button>
+                        <button md-menu-item (click)="downloadReport(activeReport.key, true, $event)">
+                            <md-icon>file_download</md-icon>
+                            <span>Download filtered report</span>
                         </button>
                         <button md-menu-item (click)="showReport(activeReport.key, true)">
                             <md-icon>youtube_searched_for</md-icon>
