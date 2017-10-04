@@ -83,6 +83,7 @@ export class CheckPoint {
 }
 
 export class Report {
+    version: string;
     key: string;
     title: string;
     description?: string;

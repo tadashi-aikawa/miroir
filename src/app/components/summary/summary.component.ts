@@ -607,6 +607,7 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.title = 'Summary';
         dialogRef.componentInstance.value = JSON.stringify(
             {
+                version: this.activeReport.version,
                 key: this.activeReport.key,
                 title: this.activeReport.title,
                 description: this.activeReport.description,
