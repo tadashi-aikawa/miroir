@@ -549,7 +549,7 @@ export class SummaryComponent implements OnInit {
         }
     }
 
-    showDetail(index: number) {
+    showDetail(index: number, trials?: Trial[]) {
         const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '80vw',
             height: '97%',
@@ -560,7 +560,7 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.oneAccessPoint = this.activeReport.summary.one;
         dialogRef.componentInstance.otherAccessPoint = this.activeReport.summary.other;
         dialogRef.componentInstance.activeIndex = String(index);
-        dialogRef.componentInstance.trials = this.filteredTrials;
+        dialogRef.componentInstance.trials = trials || this.filteredTrials;
         dialogRef.componentInstance.ignores = this.ignores;
     }
 

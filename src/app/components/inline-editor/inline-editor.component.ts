@@ -29,7 +29,7 @@ export class InlineEditorComponent {
     @Input() value: string;
     @Output() onUpdate = new EventEmitter<Change<string>>();
 
-    editing: boolean = false;
+    editing = false;
     previousValue: string;
 
     @ViewChild(MdInputDirective) input;
@@ -46,7 +46,7 @@ export class InlineEditorComponent {
         }
     }
 
-    private onTextClick() {
+    onTextClick() {
         this.previousValue = this.value;
         this.editing = true;
         setTimeout(() => {

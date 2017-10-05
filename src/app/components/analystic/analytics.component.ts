@@ -1,70 +1,60 @@
 import {PropertyDiffs, Summary, Trial} from '../../models/models';
-import {Component, Input, Pipe, PipeTransform} from '@angular/core';
+import {Component, Input, Pipe, PipeTransform, Output, EventEmitter} from '@angular/core';
 import * as _ from 'lodash';
 
 @Component({
     selector: 'app-analystic',
-    template: `
-        <div>
-            <h2>Attentions</h2>
-            <md-list>
-                <md-list-item *ngFor="let c of (this.trials | toAttention)">
-                    {{c.title}}
-                    <md-chip color="primary" selected="true">{{c.trials.length}}</md-chip>
-                </md-list-item>
-            </md-list>
-            
-            <h2>Checked Already</h2>
-            <md-list>
-                <md-list-item *ngFor="let c of (this.trials | toCheckedAlreadyDiffSummary)">
-                    {{c.title}}
-                    <md-chip color="primary" selected="true">{{c.trials.length}}</md-chip>
-                </md-list-item>
-            </md-list>
-            <h2>Ignored</h2>
-            <md-list>
-                <md-list-item *ngFor="let c of (this.trials | toIgnoredDiffSummary)">
-                    {{c.title}}
-                    <md-chip color="primary" selected="true">{{c.trials.length}}</md-chip>
-                </md-list-item>
-            </md-list>
-
-            <h2>Path</h2>
-            <md-list>
-                <md-list-item *ngFor="let c of (this.trials | toPath)">
-                    {{c.title}}
-                    <md-chip color="primary" selected="true">{{c.trials.length}}</md-chip>
-                </md-list-item>
-            </md-list>
-        </div>
-    `
+    templateUrl: './analytics.component.html',
+    styleUrls: [
+        './analytics.css',
+    ],
 })
 export class AnalyticsComponent {
     @Input() summary: Summary;
     @Input() trials: Trial[];
+
+    @Output() onClickTrials = new EventEmitter<Trial[]>();
+
+    onClickRow(trials: Trial[]) {
+        this.onClickTrials.emit(trials);
+    }
+
+    stopPropagation(event) {
+        event.stopPropagation();
+    }
 }
 
-interface AnalysisSummary {
+interface AttentionSummary {
     title: string,
+    count: number,
+    trials: Trial[]
+}
+
+interface PathSummary {
+    title: string,
+    count: number,
     trials: Trial[]
 }
 
 interface DiffSummary {
     title: string,
     image: string,
+    link: string,
+    count: number,
     trials: Trial[]
 }
 
 @Pipe({name: 'toAttention'})
 export class ToAttentionPipe implements PipeTransform {
-    transform(trials: Trial[]): AnalysisSummary[] {
+    transform(trials: Trial[]): AttentionSummary[] {
         return _(trials)
             .filter((t: Trial) => t.attention)
             .groupBy((t: Trial) => t.attention)
             .map(xs => ({
                 title: xs[0].attention,
-                trials: xs.map(x => x.trial)
-            }))
+                count: xs.length,
+                trials: xs,
+            } as AttentionSummary))
             .value();
     }
 }
@@ -90,8 +80,10 @@ export class ToCheckedAlreadyDiffSummaryPipe implements PipeTransform {
             .map(xs => ({
                 title: xs[0].title,
                 image: xs[0].image,
+                link: xs[0].link,
+                count: xs.length,
                 trials: xs.map(x => x.trial)
-            }))
+            } as DiffSummary))
             .value();
     }
 }
@@ -117,21 +109,24 @@ export class ToIgnoredDiffSummaryPipe implements PipeTransform {
             .map(xs => ({
                 title: xs[0].title,
                 image: xs[0].image,
+                link: xs[0].link,
+                count: xs.length,
                 trials: xs.map(x => x.trial)
-            }))
+            } as DiffSummary))
             .value();
     }
 }
 
 @Pipe({name: 'toPath'})
 export class ToPathPipe implements PipeTransform {
-    transform(trials: Trial[]): AnalysisSummary[] {
+    transform(trials: Trial[]): PathSummary[] {
         return _(trials)
             .groupBy((t: Trial) => t.path)
             .map(xs => ({
                 title: xs[0].path,
-                trials: xs.map(x => x.trial)
-            }))
+                count: xs.length,
+                trials: xs,
+            } as PathSummary))
             .value();
     }
 }

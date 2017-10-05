@@ -88,6 +88,9 @@ div.ellipsis-text {
 
 ng2-smart-table table tbody tr:hover,
 div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.selected:hover {
+    -webkit-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
     background: rgba(27, 27, 202, 0.15);
 }
 

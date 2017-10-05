@@ -240,6 +240,7 @@
                         <app-analystic
                             [summary]="activeReport.summary"
                             [trials]="filteredTrials"
+                            (onClickTrials)="showDetail(0, $event)"
                         >
                         </app-analystic>
                     </md-tab>
