@@ -183,33 +183,6 @@ export class AwsService {
         return await putObject(this.s3, this.bucket, target, JSON.stringify(after));
     }
 
-    // TODO: Remove this function if jumeaux( < 0.9.0) become not be used
-    async convertReport(key: string): Promise<void> {
-        if (!await this.checkCredentialsExpiredAndTreat()) {
-            return Promise.reject('Temporary credentials is expired!!');
-        }
-
-        const oldPath = `${JUMEAUX_RESULTS_PREFIX}/${key}/report.json`;
-        const old: Report = await fetchObject<Report>(this.s3, this.bucket, oldPath);
-
-        await putObject(
-            this.s3,
-            this.bucket,
-            `${JUMEAUX_RESULTS_PREFIX}/${key}/trials.json`,
-            JSON.stringify(old.trials)
-        );
-
-        delete old.trials;
-        await putObject(
-            this.s3,
-            this.bucket,
-            `${JUMEAUX_RESULTS_PREFIX}/${key}/report-without-trials.json`,
-            JSON.stringify(old)
-        );
-
-        await deleteObjects(this.s3, this.bucket, [oldPath]);
-    }
-
     async fetchArchive(key: string): Promise<{name: string, body: Blob}> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
