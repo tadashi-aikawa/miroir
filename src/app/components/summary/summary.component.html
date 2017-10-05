@@ -107,7 +107,7 @@
                             </md-chip-list>
                         </span>
                     </md-card-content>
-                    <md-card-actions>
+                    <md-card-actions style="padding: 0;">
                         <md-icon (click)="removeDetail(row.hashkey, $event)"
                                  class="action-icon hvr-buzz-out"
                                  title="Remove from S3 storage (never restore)">
@@ -134,6 +134,9 @@
                             </span>
                         </div>
                     </md-card-actions>
+                    <md-card-footer class="smart-padding-xsmall" *ngIf="row.tags">
+                        <span class="summary-card-tag" *ngFor="let tag of row.tags.values">{{tag}}</span>
+                    </md-card-footer>
                 </md-card>
             </div>
         </md-sidenav>

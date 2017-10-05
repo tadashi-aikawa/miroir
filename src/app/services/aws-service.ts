@@ -10,8 +10,8 @@ import {Router} from '@angular/router';
 import CheckStatus from '../constants/check-status';
 import {SettingsService} from './settings-service';
 import DocumentClient = DynamoDB.DocumentClient;
-import {ConditionExpression} from "aws-sdk/clients/dynamodb";
-import {ExpressionAttributeValueMap} from "aws-sdk/clients/dynamodb";
+import {ConditionExpression} from 'aws-sdk/clients/dynamodb';
+import {ExpressionAttributeValueMap} from 'aws-sdk/clients/dynamodb';
 
 const DURATION_SECONDS = 86400;
 const JUMEAUX_RESULTS_PREFIX = 'jumeaux-results';
@@ -359,7 +359,8 @@ export class AwsService {
             'other_host',
             'begin_time',
             'paths',
-            'check_status'
+            'check_status',
+            'tags',
         ];
 
         const recursiveFetchSummary = async (accumurator?: DynamoResult) =>  {

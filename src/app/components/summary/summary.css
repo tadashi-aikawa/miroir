@@ -33,6 +33,16 @@ md-sidenav-container {
     background-color: rgba(27, 27, 202, 0.3);
 }
 
+.summary-card-tag {
+    font-size: 65%;
+    border-radius: 5px;
+    padding: 1px 5px 1px 5px;
+    margin-right: 3px;
+    color: antiquewhite;
+    border: 1px outset;
+    background-color: cornflowerblue;
+}
+
 .card-hashkey-text {
     color: gray;
     font-size: 80%;

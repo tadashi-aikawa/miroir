@@ -27,7 +27,7 @@ $ yarn install
 ## Development server
 
 ```
-$ yarn start
+$ yarn dev
 ```
 
 Then access to `http://localhost:4200/`

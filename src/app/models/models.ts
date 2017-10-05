@@ -24,6 +24,7 @@ export class DynamoRow {
     retry_hash?: string;
     checklist?: string;
     check_status: CheckStatus;
+    tags: Set<string>;
 
     deleting?: boolean;
     deleteErrorMessage?: string;
@@ -98,6 +99,7 @@ export class Summary {
     one: AccessPoint;
     other: AccessPoint;
     time: Time;
+    tags: string[];
     status: {
         same: number;
         different: number;
