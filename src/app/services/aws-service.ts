@@ -331,7 +331,6 @@ export class AwsService {
             'one_host',
             'other_host',
             'begin_time',
-            'paths',
             'check_status',
             'tags',
         ];
