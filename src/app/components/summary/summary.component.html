@@ -236,13 +236,13 @@
                             </app-response-time-chart>
                         </div>
                     </md-tab>
-                    <md-tab label="Analystic">
-                        <app-analystic
+                    <md-tab label="Analytics">
+                        <app-analytics
                             [summary]="activeReport.summary"
                             [trials]="filteredTrials"
                             (onClickTrials)="showDetail(0, $event)"
                         >
-                        </app-analystic>
+                        </app-analytics>
                     </md-tab>
                 </md-tab-group>
             </div>

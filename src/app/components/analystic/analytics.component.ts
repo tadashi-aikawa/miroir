@@ -3,7 +3,7 @@ import {Component, Input, Pipe, PipeTransform, Output, EventEmitter} from '@angu
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'app-analystic',
+    selector: 'app-analytics',
     templateUrl: './analytics.component.html',
     styleUrls: [
         './analytics.css',
