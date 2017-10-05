@@ -128,3 +128,15 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
 .multi-line {
     white-space: pre-line;
 }
+
+.same-color {
+    color: rgb(27, 27, 202);
+}
+
+.different-color {
+    color: rgb(202, 27, 202);
+}
+
+.failure-color {
+    color: rgb(202, 27, 27);
+}

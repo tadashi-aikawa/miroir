@@ -57,12 +57,18 @@
             <tr>
                 <th>Path</th>
                 <th>Count</th>
+                <th>Same</th>
+                <th>Different</th>
+                <th>Failure</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let c of (this.trials | toPath)" (click)="onClickRow(c.trials)">
                 <td>{{c.title}}</td>
-                <td>{{c.count}}</td>
+                <td><b>{{c.count}}</b></td>
+                <td class="same-color">{{c.status.same}}</td>
+                <td class="different-color">{{c.status.different}}</td>
+                <td class="failure-color">{{c.status.failure}}</td>
             </tr>
         </tbody>
     </table>

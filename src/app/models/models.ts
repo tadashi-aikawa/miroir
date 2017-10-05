@@ -103,6 +103,7 @@ export class Summary {
     status: {
         same: number;
         different: number;
+        failure: number;
     };
 }
 

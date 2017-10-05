@@ -33,6 +33,11 @@ interface AttentionSummary {
 interface PathSummary {
     title: string,
     count: number,
+    status: {
+        same: number,
+        different: number,
+        failure: number,
+    }
     trials: Trial[]
 }
 
@@ -122,9 +127,10 @@ export class ToPathPipe implements PipeTransform {
     transform(trials: Trial[]): PathSummary[] {
         return _(trials)
             .groupBy((t: Trial) => t.path)
-            .map(xs => ({
+            .map((xs: Trial[]) => ({
                 title: xs[0].path,
                 count: xs.length,
+                status: _(xs).groupBy(x => x.status).mapValues(x => x.length).value(),
                 trials: xs,
             } as PathSummary))
             .value();
