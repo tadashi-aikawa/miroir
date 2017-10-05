@@ -318,19 +318,6 @@ export class SummaryComponent implements OnInit {
             });
     }
 
-    // TODO: Remove this function if jumeaux( < 0.9.0) become not be used
-    onClickConvertReport() {
-        this.loadingReportKey = this.failureKey;
-        this.errorMessages = undefined;
-        this.service.convertReport(this.failureKey)
-            .then(_ => {
-                this.showReport(this.failureKey);
-            })
-            .catch(err => {
-                this.snackBar.open(err, '[FAILURE] Convert');
-            });
-    }
-
     onSelectColumns(event) {
         this.updateColumnVisibility();
     }
