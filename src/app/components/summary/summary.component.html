@@ -145,6 +145,9 @@
             <div *ngIf="loadingReportKey">
                 <app-logo-loading></app-logo-loading>
             </div>
+            <p *ngFor="let message of errorMessages" class="error-message" style="font-size: 150%; font-weight: bold;">
+                <md-icon>report_problem</md-icon> {{message}}
+            </p>
             <div *ngIf="activeReport">
                 <div class="center-vertical" style="flex-direction: row-reverse;">
                     <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}</small>
@@ -246,9 +249,6 @@
                     </md-tab>
                 </md-tab-group>
             </div>
-            <p *ngFor="let message of errorMessages">
-                {{message}}
-            </p>
         </div>
 
     </md-sidenav-container>

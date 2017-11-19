@@ -237,9 +237,6 @@ export class SummaryComponent implements OnInit {
     // TODO: Update after `onFilterChanged` if implemented by ng2-smart-table
     filteredTrials: Trial[];
 
-    // TODO: Remove this if jumeaux( < 0.9.0) become not be used
-    failureKey: string;
-
     statuses: CheckStatus[] = CheckStatuses.values;
     toDisplay: (key: CheckStatus) => string = CheckStatuses.toDisplay;
 
@@ -441,9 +438,6 @@ export class SummaryComponent implements OnInit {
                     });
                 })
                 .catch(err => {
-                    // TODO: Remove this function if jumeaux( < 0.9.0) become not be used
-                    this.failureKey = key;
-
                     this.loadingReportKey = undefined;
                     this.errorMessages = [err];
                     reject(err);
