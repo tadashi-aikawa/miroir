@@ -66,7 +66,7 @@ export class AwsService {
     }
 
     private get dataPrefix(): string {
-        return this.prefix ? `${this.prefix}/jumeaux-results` : 'jumeaux-results';
+        return this.prefix ? `${this.prefix}/results` : 'results';
     }
 
     private assignClients(): void {
