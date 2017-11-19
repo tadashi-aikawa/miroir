@@ -54,6 +54,14 @@ export class SettingsService {
         this.localStorageService.set('bucket', value);
     }
 
+    get prefix(): string {
+        return this.localStorageService.get<string>('prefix');
+    }
+
+    set prefix(value: string) {
+        this.localStorageService.set('prefix', value);
+    }
+
     get tmpAccessKeyId(): string {
         return this.localStorageService.get<string>('tmpAccessKeyId');
     }

@@ -14,7 +14,6 @@ import {ConditionExpression} from 'aws-sdk/clients/dynamodb';
 import {ExpressionAttributeValueMap} from 'aws-sdk/clients/dynamodb';
 
 const DURATION_SECONDS = 86400;
-const JUMEAUX_RESULTS_PREFIX = 'jumeaux-results';
 
 
 function fetchObject<T>(s3: S3, bucket: string, objectKey: string): Promise<T> {
@@ -49,6 +48,7 @@ export class AwsService {
     region = this.settingsService.region || 'ap-northeast-1';
     table: string = this.settingsService.table;
     bucket: string = this.settingsService.bucket;
+    prefix: string = this.settingsService.prefix;
     tmpCredentials: TemporaryCredentials;
     tmpAccessKeyId: string = this.settingsService.tmpAccessKeyId;
     tmpSecretAccessKey: string = this.settingsService.tmpSecretAccessKey;
@@ -63,6 +63,10 @@ export class AwsService {
     constructor(private settingsService: SettingsService,
                 private router: Router) {
         this.assignClients();
+    }
+
+    private get dataPrefix(): string {
+        return this.prefix ? `${this.prefix}/jumeaux-results` : 'jumeaux-results';
     }
 
     private assignClients(): void {
@@ -101,6 +105,11 @@ export class AwsService {
         this.settingsService.bucket = bucket;
     }
 
+    updatePrefix(prefix: string) {
+        this.prefix = prefix;
+        this.settingsService.prefix = prefix;
+    }
+
     login(accessKeyId: string, secretAccessKey: string,
           useLocalStack: boolean = false, localStackEndpoint?: string): Promise<any> {
         this.tmpCredentials = new TemporaryCredentials({DurationSeconds: DURATION_SECONDS}, <Credentials>{
@@ -130,7 +139,7 @@ export class AwsService {
 
         return new Promise<{ encoding: string, body: string }>((resolve, reject) => {
             this.s3.getObject(
-                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/${name}`, Bucket: this.bucket},
+                {Key: `${this.dataPrefix}/${key}/${name}`, Bucket: this.bucket},
                 (err, data) => {
                     if (err) {
                         return reject(err.message);
@@ -152,8 +161,8 @@ export class AwsService {
         }
 
         const [report, trials]: [Report, Trial[]] = await Promise.all<Report, Trial[]>([
-            fetchObject<Report>(this.s3, this.bucket, `${JUMEAUX_RESULTS_PREFIX}/${key}/report-without-trials.json`),
-            fetchObject<Trial[]>(this.s3, this.bucket, `${JUMEAUX_RESULTS_PREFIX}/${key}/trials.json`)
+            fetchObject<Report>(this.s3, this.bucket, `${this.dataPrefix}/${key}/report-without-trials.json`),
+            fetchObject<Trial[]>(this.s3, this.bucket, `${this.dataPrefix}/${key}/trials.json`)
         ]);
 
         return Object.assign(report, {trials});
@@ -164,7 +173,7 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        const target = `${JUMEAUX_RESULTS_PREFIX}/${key}/report-without-trials.json`;
+        const target = `${this.dataPrefix}/${key}/report-without-trials.json`;
         const withoutTrials: Report = await fetchObject<Report>(this.s3, this.bucket, target);
         const after = Object.assign(withoutTrials, {title});
 
@@ -176,7 +185,7 @@ export class AwsService {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        const target = `${JUMEAUX_RESULTS_PREFIX}/${key}/report-without-trials.json`;
+        const target = `${this.dataPrefix}/${key}/report-without-trials.json`;
         const withoutTrials: Report = await fetchObject<Report>(this.s3, this.bucket, target);
         const after = Object.assign(withoutTrials, {description});
 
@@ -191,7 +200,7 @@ export class AwsService {
         const zipName = `${key.substring(0, 7)}.zip`;
         return new Promise<{name: string, body: Blob}>((resolve, reject) => {
             this.s3.getObject(
-                {Key: `${JUMEAUX_RESULTS_PREFIX}/${key}/${zipName}`, Bucket: this.bucket},
+                {Key: `${this.dataPrefix}/${key}/${zipName}`, Bucket: this.bucket},
                 (err, data) => err ? reject(err.message) : resolve({
                     name: zipName,
                     body: new Blob([data.Body])
@@ -220,7 +229,7 @@ export class AwsService {
 
         return new Promise<ObjectList>((resolve, reject) => {
             this.s3.listObjectsV2(
-                {Bucket: this.bucket, Prefix: `${JUMEAUX_RESULTS_PREFIX}/${key}`},
+                {Bucket: this.bucket, Prefix: `${this.dataPrefix}/${key}`},
                 (err, data) => err ? reject(err.message) : resolve(data.Contents)
             );
         });

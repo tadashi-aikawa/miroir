@@ -10,6 +10,7 @@ export class RootComponent {
     region: string = this.awsService.region;
     table: string = this.awsService.table;
     bucket: string = this.awsService.bucket;
+    prefix: string = this.awsService.prefix;
     useLocalStack: boolean = this.awsService.useLocalStack;
     localStackEndpoint: string = this.awsService.localStackEndpoint;
 
@@ -21,5 +22,6 @@ export class RootComponent {
         this.awsService.updateRegion(this.region);
         this.awsService.updateTable(this.table);
         this.awsService.updateBucket(this.bucket);
+        this.awsService.updatePrefix(this.prefix);
     }
 }
