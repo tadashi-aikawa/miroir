@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {animate, style, transition, trigger} from '@angular/animations';
-import {MdDialog, MdInputDirective, MdTextareaAutosize} from '@angular/material';
+import {MatDialog, MatTextareaAutosize, MatFormField} from '@angular/material';
 import {Change} from 'app/models/models';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/confirm-dialog.component';
@@ -36,32 +36,32 @@ import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/conf
                 </ng-template>
 
                 <ng-template #emptyView>
-                    <md-icon class="icon-small">edit</md-icon>
+                    <mat-icon class="icon-small">edit</mat-icon>
                 </ng-template>
             </div>
 
             <markdown *ngIf="value && editing" [data]="value"></markdown>
 
-            <md-input-container *ngIf="editing" [@feed] class="balloon-right" style="flex: 1">
+            <mat-form-field *ngIf="editing" [@feed] class="balloon-right" style="flex: 1">
                 <div class="smart-padding-xsmall">
-                    <textarea mdInput mdTextareaAutosize [(ngModel)]="value"></textarea>
+                    <textarea mdInput matTextareaAutosize [(ngModel)]="value"></textarea>
                 </div>
                 <hr/>
                 <div class="smart-padding-left-small">
-                    <md-icon class="action-icon-large hvr-buzz-out"
+                    <mat-icon class="action-icon-large hvr-buzz-out"
                              style="font-size: 22px; margin-left: 10px;"
                              title="Save (Ctrl+Enter)"
                              (click)="update()">
                         check
-                    </md-icon>
-                    <md-icon class="action-icon-large hvr-buzz-out"
+                    </mat-icon>
+                    <mat-icon class="action-icon-large hvr-buzz-out"
                              style="font-size: 22px; margin-left: 10px;"
                              title="Cancel (ESC)"
                              (click)="cancel()">
                         cancel
-                    </md-icon>
+                    </mat-icon>
                 </div>
-            </md-input-container>
+            </mat-form-field>
         </div>
     `
 })
@@ -73,11 +73,11 @@ export class MarkdownInlineEditorComponent {
     editing = false;
     previousValue: string;
 
-    @ViewChild(MdInputDirective) input;
-    @ViewChild(MdTextareaAutosize) autosize;
+    @ViewChild(MatFormField) input;
+    @ViewChild(MatTextareaAutosize) autosize;
 
     constructor(private _hotkeysService: HotkeysService,
-                private _dialog: MdDialog) {
+                private _dialog: MatDialog) {
         // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 

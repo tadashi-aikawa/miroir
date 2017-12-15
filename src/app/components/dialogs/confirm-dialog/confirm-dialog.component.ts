@@ -1,23 +1,23 @@
 import {Component, Input, Optional} from '@angular/core';
-import {MdDialogRef} from '@angular/material';
+import {MatDialogRef} from '@angular/material';
 
 @Component({
     template: `
-        <h2 md-dialog-title>{{title}}</h2>
-        <md-dialog-content>{{message}}</md-dialog-content>
-        <md-dialog-actions>
+        <h2 mat-dialog-title>{{title}}</h2>
+        <mat-dialog-content>{{message}}</mat-dialog-content>
+        <mat-dialog-actions>
             <div class="smart-padding-without-bottom">
-                <button md-raised-button (click)="onClickOk()">OK</button>
-                <button md-raised-button md-dialog-close>Cancel</button>
+                <button mat-raised-button (click)="onClickOk()">OK</button>
+                <button mat-raised-button mat-dialog-close>Cancel</button>
             </div>
-        </md-dialog-actions>
+        </mat-dialog-actions>
     `,
 })
 export class ConfirmDialogComponent {
-    @Input() title: string = 'Confirm';
+    @Input() title = 'Confirm';
     @Input() message: string;
 
-    constructor(@Optional() public dialogRef: MdDialogRef<ConfirmDialogComponent>) {
+    constructor(@Optional() public dialogRef: MatDialogRef<ConfirmDialogComponent>) {
     }
 
     onClickOk() {

@@ -1,32 +1,32 @@
-<md-sidenav-container fullscreen>
-    <md-toolbar color="primary">
+<mat-sidenav-container fullscreen>
+    <mat-toolbar color="primary">
         <img src="assets/jumeaux-white.png" width="40px" />
         <div class="navbar-title">Jumeaux Viewer</div>
-        <md-chip-list *ngIf="useLocalStack">
-            <md-chip color="accent" selected="true" [title]="localStackEndpoint">LocalStack</md-chip>
-        </md-chip-list>
+        <mat-chip-list *ngIf="useLocalStack">
+            <mat-chip color="accent" selected="true" [title]="localStackEndpoint">LocalStack</mat-chip>
+        </mat-chip-list>
         <span class="remaining-space"></span>
-        <span routerLink='/login'><button md-button>Log-out</button></span>
-        <button md-icon-button (click)="sidenav.open()">
-            <md-icon class="md-24">menu</md-icon>
+        <span routerLink='/login'><button mat-button>Log-out</button></span>
+        <button mat-icon-button (click)="sidenav.open()">
+            <mat-icon class="mat-24">menu</mat-icon>
         </button>
-    </md-toolbar>
+    </mat-toolbar>
 
-    <md-sidenav #sidenav align="end" mode="over" (close)="update()">
-        <md-input-container>
-            <input mdInput [(ngModel)]="region" placeholder="Region">
-        </md-input-container>
-        <md-input-container>
-            <input mdInput [(ngModel)]="table" placeholder="DynamoDB table name">
-        </md-input-container>
-        <md-input-container>
-            <input mdInput [(ngModel)]="bucket" placeholder="Bucket name">
-        </md-input-container>
-        <md-input-container>
-            <input mdInput [(ngModel)]="prefix" placeholder="Prefix">
-        </md-input-container>
-    </md-sidenav>
+    <mat-sidenav #sidenav align="end" mode="over" (close)="update()">
+        <mat-form-field>
+            <input matInput [(ngModel)]="region" placeholder="Region">
+        </mat-form-field>
+        <mat-form-field>
+            <input matInput [(ngModel)]="table" placeholder="DynamoDB table name">
+        </mat-form-field>
+        <mat-form-field>
+            <input matInput [(ngModel)]="bucket" placeholder="Bucket name">
+        </mat-form-field>
+        <mat-form-field>
+            <input matInput [(ngModel)]="prefix" placeholder="Prefix">
+        </mat-form-field>
+    </mat-sidenav>
 
     <app-summary></app-summary>
 
-</md-sidenav-container>
+</mat-sidenav-container>

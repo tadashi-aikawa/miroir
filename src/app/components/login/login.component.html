@@ -4,40 +4,40 @@
 
     <div *ngIf="useLocalStack; then endpoint else credentials"></div>
     <ng-template #credentials>
-        <md-input-container>
-            <input mdInput
+        <mat-form-field>
+            <input matInput
                    [(ngModel)]="accessKeyId"
                    placeholder="Access key ID"
                    (keyup.enter)="login()"
             >
-        </md-input-container>
-        <md-input-container>
-            <input mdInput
+        </mat-form-field>
+        <mat-form-field>
+            <input matInput
                    type="password"
                    placeholder="Secret access key"
                    [(ngModel)]="secretAccessKey"
                    (keyup.enter)="login()"
             >
-        </md-input-container>
+        </mat-form-field>
     </ng-template>
     <ng-template #endpoint>
-        <md-input-container>
-            <input mdInput [(ngModel)]="localStackEndpoint" placeholder="Host (ex. http://localhost)"
+        <mat-form-field>
+            <input matInput [(ngModel)]="localStackEndpoint" placeholder="Host (ex. http://localhost)"
                    (keyup.enter)="login()">
-        </md-input-container>
+        </mat-form-field>
     </ng-template>
 
     <div class="center-vertical">
         <a href="https://github.com/localstack/localstack">
             <img src="https://www.yextstatic.com/cms/spark/localstack_small.png" height="45px"/>
         </a>
-        <md-slide-toggle [(ngModel)]="useLocalStack" class="smart-padding-left-small">
-        </md-slide-toggle>
+        <mat-slide-toggle [(ngModel)]="useLocalStack" class="smart-padding-left-small">
+        </mat-slide-toggle>
     </div>
 
     <div *ngIf="authenticating">
         Login...
-        <md-progress-bar mode="indeterminate"></md-progress-bar>
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
 
     <span *ngIf="errorMessage" class="error-message">{{errorMessage}}</span>

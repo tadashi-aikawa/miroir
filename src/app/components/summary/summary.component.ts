@@ -14,7 +14,7 @@ import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
-import {MdDialog, MdDialogRef, MdSidenav, MdSnackBar} from '@angular/material';
+import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
@@ -66,9 +66,9 @@ export class HoverComponent implements ViewCell, OnInit {
 
 @Component({
     template: `
-        <md-chip-list *ngFor="let v of this.value">
-            <md-chip>{{this.v}}</md-chip>
-        </md-chip-list>
+        <mat-chip-list *ngFor="let v of this.value">
+            <mat-chip>{{this.v}}</mat-chip>
+        </mat-chip-list>
     `
 })
 export class LabelsComponent {
@@ -77,9 +77,9 @@ export class LabelsComponent {
 
 @Component({
     template: `
-        <md-chip-list>
-            <md-chip [color]="kind" selected="true">{{renderValue}}</md-chip>
-        </md-chip-list>
+        <mat-chip-list>
+            <mat-chip [color]="kind" selected="true">{{renderValue}}</mat-chip>
+        </mat-chip-list>
     `
 })
 export class StatusComponent implements ViewCell, OnInit {
@@ -212,7 +212,7 @@ interface RowData {
     ]
 })
 export class SummaryComponent implements OnInit {
-    @ViewChild('sidenav') sideNav: MdSidenav;
+    @ViewChild('sidenav') sideNav: MatSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
     word = '';
 
@@ -241,10 +241,10 @@ export class SummaryComponent implements OnInit {
     toDisplay: (key: CheckStatus) => string = CheckStatuses.toDisplay;
 
     constructor(private service: AwsService,
-                private _dialog: MdDialog,
+                private _dialog: MatDialog,
                 private route: ActivatedRoute,
                 private settingsService: SettingsService,
-                private snackBar: MdSnackBar) {
+                private snackBar: MatSnackBar) {
     }
 
     ngOnInit(): void {
@@ -618,40 +618,40 @@ export class SummaryComponent implements OnInit {
 
 @Component({
     template: `
-        <h2 md-dialog-title>Remove following items... is it really O.K.?</h2>
+        <h2 mat-dialog-title>Remove following items... is it really O.K.?</h2>
 
-        <md-dialog-content>
+        <mat-dialog-content>
             <div *ngIf="isLoading" class="center">
-                <md-spinner></md-spinner>
+                <mat-spinner></mat-spinner>
             </div>
             <div *ngIf="!isLoading">
                 <ul>
                     <li *ngFor="let key of keys">{{key}}</li>
                 </ul>
             </div>
-        </md-dialog-content>
+        </mat-dialog-content>
 
-        <md-dialog-actions>
+        <mat-dialog-actions>
             <div class="smart-padding-without-bottom">
-                <button md-raised-button
+                <button mat-raised-button
                         color="primary"
                         (click)="onClickRemove()">
                     Remove
                 </button>
-                <button md-raised-button
+                <button mat-raised-button
                         color="secondary"
-                        md-dialog-close>
+                        mat-dialog-close>
                     Cancel
                 </button>
             </div>
-        </md-dialog-actions>
+        </mat-dialog-actions>
     `,
 })
 export class DeleteConfirmDialogComponent {
     @Input() keys: string[];
     @Input() isLoading: boolean;
 
-    constructor(@Optional() public dialogRef: MdDialogRef<DeleteConfirmDialogComponent>) {
+    constructor(@Optional() public dialogRef: MatDialogRef<DeleteConfirmDialogComponent>) {
     }
 
     onClickRemove() {
@@ -661,7 +661,7 @@ export class DeleteConfirmDialogComponent {
 
 @Component({
     template: `
-        <h2 md-dialog-title>{{title}}</h2>
+        <h2 mat-dialog-title>{{title}}</h2>
         <app-editor #editor
                     [config]="editorConfig"
         >
