@@ -268,7 +268,13 @@ export class DetailDialogComponent implements OnInit {
                 // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
                 setTimeout(() => {
                     this.isLoading = false;
-                    this.diffViewConfig = createConfig('Binary is not supported to show', 'Binary is not supported to show', 'text', 'text', !this.unifiedDiff);
+                    this.diffViewConfig = createConfig(
+                        'Binary is not supported to show',
+                        'Binary is not supported to show',
+                        'text',
+                        'text',
+                        !this.unifiedDiff
+                    );
                 }, 100);
             } else {
                 const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);

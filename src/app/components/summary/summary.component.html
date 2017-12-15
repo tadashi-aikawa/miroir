@@ -1,6 +1,6 @@
 <div style="display: flex;">
     <div class="sidebar">
-        <div *ngIf="sidenav._isOpened; then collapseButton else expandButton"></div>
+        <div *ngIf="sidenav.opened; then collapseButton else expandButton"></div>
         <ng-template #collapseButton>
             <mat-icon class="action-icon action-icon-large" (click)="sidenav.close()">
                 chevron_left
@@ -13,8 +13,8 @@
         </ng-template>
     </div>
     <mat-sidenav-container style="flex: 1">
-        <mat-sidenav #sidenav mode="side" class="app-sidenav" align="start">
-            <mat-form-field>
+        <mat-sidenav #sidenav mode="side" align="start">
+            <mat-form-field class="search-word-form">
                 <input matInput #keyWord title="Free word search"
                        [(ngModel)]="word" (keyup.enter)="onSearchReports(word)">
                 <mat-placeholder>

@@ -20,7 +20,7 @@ import {Change} from 'app/models/models';
             </ng-template>
         </div>
         <mat-form-field *ngIf="editing" style="flex-grow: 1;">
-            <input mdInput [(ngModel)]="value">
+            <input matInput [(ngModel)]="value">
         </mat-form-field>
     `
 })

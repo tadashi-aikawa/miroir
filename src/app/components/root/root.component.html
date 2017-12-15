@@ -12,7 +12,7 @@
         </button>
     </mat-toolbar>
 
-    <mat-sidenav #sidenav align="end" mode="over" (close)="update()">
+    <mat-sidenav #sidenav position="end" mode="over" (closedStart)="update()">
         <mat-form-field>
             <input matInput [(ngModel)]="region" placeholder="Region">
         </mat-form-field>

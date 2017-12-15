@@ -44,7 +44,7 @@ import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/conf
 
             <mat-form-field *ngIf="editing" [@feed] class="balloon-right" style="flex: 1">
                 <div class="smart-padding-xsmall">
-                    <textarea mdInput matTextareaAutosize [(ngModel)]="value"></textarea>
+                    <textarea matInput matTextareaAutosize [(ngModel)]="value"></textarea>
                 </div>
                 <hr/>
                 <div class="smart-padding-left-small">
