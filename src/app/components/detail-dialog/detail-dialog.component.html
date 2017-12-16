@@ -1,18 +1,18 @@
 <div class="center-vertical">
     <a href={{createActiveTrialLink()}} class="smart-padding-xsmall-right" tabindex="-1">
-        <md-icon class="action-icon hvr-buzz-out" title="Open this trial">link</md-icon>
+        <mat-icon class="action-icon hvr-buzz-out" title="Open this trial">link</mat-icon>
     </a>
     <div class="count-word">
         <span>{{activeIndexNum + 1}} / {{options.length}}</span>
         <span> ... </span>
         <span>{{reportTitle}}</span>
     </div>
-    <md-icon class="action-icon hvr-buzz-out"
+    <mat-icon class="action-icon hvr-buzz-out"
              style="margin-left: auto;"
              title="[w] Close dialog"
              (click)="closeDialog()">
         close
-    </md-icon>
+    </mat-icon>
 </div>
 <div style="display: flex;">
     <ng-select #selector
@@ -29,7 +29,7 @@
 </div>
 <div style="display: flex; justify-content: space-around">
     <div>
-        <md-chip>{{oneAccessPoint.name}}</md-chip>
+        <mat-chip>{{oneAccessPoint.name}}</mat-chip>
         <small>
             <a [href]="trial.one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
                 {{oneAccessPoint.host}}.....
@@ -37,7 +37,7 @@
         </small>
     </div>
     <div>
-        <md-chip>{{otherAccessPoint.name}}</md-chip>
+        <mat-chip>{{otherAccessPoint.name}}</mat-chip>
         <small>
             <a [href]="trial.other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
                 {{otherAccessPoint.host}}.....
@@ -62,11 +62,11 @@
 <hr/>
 <div class="origin-queries" *ngIf="!isLoading">{{trial.queryString}}</div>
 <div *ngIf="isLoading" style="width: 90%; padding-left: 10px;">
-    <md-progress-bar mode="indeterminate"></md-progress-bar>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
 <hr/>
-<md-tab-group  [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
-    <md-tab label="Diff viewer">
+<mat-tab-group  [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
+    <mat-tab label="Diff viewer">
         <div style="display: flex;">
             <div style="flex: 1;">
                 <div *ngIf="errorMessage">
@@ -79,59 +79,59 @@
             </div>
             <div style="padding-top: 40px; padding-left: 10px;">
                 <div>
-                    <md-button-toggle [checked]="unifiedDiff" (change)="changeDiffType($event.source.checked)">
-                        <md-icon title="Toggl diff kind">view_agenda</md-icon>
-                    </md-button-toggle>
+                    <mat-button-toggle [checked]="unifiedDiff" (change)="changeDiffType($event.source.checked)">
+                        <mat-icon title="Toggl diff kind">view_agenda</mat-icon>
+                    </mat-button-toggle>
                 </div>
                 <div>
-                    <md-button-toggle [checked]="hideIgnoredDiff"
+                    <mat-button-toggle [checked]="hideIgnoredDiff"
                                       (change)="changeHideIgnoredDiff($event.source.checked)">
-                        <md-icon style="color: green;"
+                        <mat-icon style="color: green;"
                                  title="Toggl ignored properties visibility">
                             visibility_off
-                        </md-icon>
-                    </md-button-toggle>
+                        </mat-icon>
+                    </mat-button-toggle>
                 </div>
                 <div>
-                    <md-button-toggle [checked]="hideCheckedAlreadyDiff"
+                    <mat-button-toggle [checked]="hideCheckedAlreadyDiff"
                                       (change)="changeHideCheckedAlreadyDiff($event.source.checked)">
-                        <md-icon style="color: red;"
+                        <mat-icon style="color: red;"
                                  title="Toggl checked already properties visibility">
                             visibility_off
-                        </md-icon>
-                    </md-button-toggle>
+                        </mat-icon>
+                    </mat-button-toggle>
                 </div>
             </div>
         </div>
-    </md-tab>
-    <md-tab label="Query parameters">
+    </mat-tab>
+    <mat-tab label="Query parameters">
         <div class="shape-margin">
             <ng2-smart-table [settings]="queryTableSettings"
                              [source]="queryTableSource"
             >
             </ng2-smart-table>
         </div>
-    </md-tab>
-    <md-tab label="Property diffs">
+    </mat-tab>
+    <mat-tab label="Property diffs">
         <div style="display: flex; justify-content: space-between;">
             <div *ngIf="trial.diff_keys" style="flex: 1;">
                 <h2 class="center-vertical">
-                    <md-icon>report_problem</md-icon>&nbsp;Unknown!!
+                    <mat-icon>report_problem</mat-icon>&nbsp;Unknown!!
                 </h2>
 
                 <expansion-panels-container *ngIf="!propertyDiffsByCognition.unknown.isEmpty()">
                     <expansion-panel>
                         <expansion-panel-title style="display: flex;">
                             <div class="center-horizontal little-horizontal-padding">
-                                <md-icon class="added">add</md-icon>
+                                <mat-icon class="added">add</mat-icon>
                                 <span class="diff-type-number">{{propertyDiffsByCognition.unknown.added.length}}</span>
                             </div>
                             <div class="center-horizontal little-horizontal-padding">
-                                <md-icon class="changed">autorenew</md-icon>
+                                <mat-icon class="changed">autorenew</mat-icon>
                                 <span class="diff-type-number">{{propertyDiffsByCognition.unknown.changed.length}}</span>
                             </div>
                             <div class="center-horizontal little-horizontal-padding">
-                                <md-icon class="removed">removed</md-icon>
+                                <mat-icon class="removed">removed</mat-icon>
                                 <span class="diff-type-number">{{propertyDiffsByCognition.unknown.removed.length}}</span>
                             </div>
                         </expansion-panel-title>
@@ -140,15 +140,15 @@
 
                         <expansion-panel-content>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.added" class="center-vertical">
-                                <md-icon class="added">add</md-icon>
+                                <mat-icon class="added">add</mat-icon>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.changed" class="center-vertical">
-                                <md-icon class="changed">autorenew</md-icon>
+                                <mat-icon class="changed">autorenew</mat-icon>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.removed" class="center-vertical">
-                                <md-icon class="removed">remove</md-icon>
+                                <mat-icon class="removed">remove</mat-icon>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                         </expansion-panel-content>
@@ -157,51 +157,51 @@
 
 
                 <h2 class="center-vertical">
-                    <md-icon>thumb_up</md-icon>&nbsp;Checked already
+                    <mat-icon>thumb_up</mat-icon>&nbsp;Checked already
                 </h2>
 
                 <expansion-panels-container>
                     <expansion-panel *ngFor="let pd of propertyDiffsByCognition.getNonEmptyCheckedAlready()">
                         <expansion-panel-title style="display: flex;">
                             <div class="center-horizontal little-horizontal-padding">
-                                <md-icon class="added">add</md-icon>
+                                <mat-icon class="added">add</mat-icon>
                                 <span class="diff-type-number">{{pd.added.length}}</span>
                             </div>
                             <div class="center-horizontal little-horizontal-padding">
-                                <md-icon class="changed">autorenew</md-icon>
+                                <mat-icon class="changed">autorenew</mat-icon>
                                 <span class="diff-type-number">{{pd.changed.length}}</span>
                             </div>
                             <div class="center-horizontal little-horizontal-padding">
-                                <md-icon class="removed">removed</md-icon>
+                                <mat-icon class="removed">removed</mat-icon>
                                 <span class="diff-type-number">{{pd.removed.length}}</span>
                             </div>
                         </expansion-panel-title>
                         <expansion-panel-description-hidden>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><md-icon class="icon-large hvr-buzz-out">open_in_browser</md-icon></a>
+                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon></a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
                             </div>
                         </expansion-panel-description-hidden>
                         <expansion-panel-description-toggled>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><md-icon class="icon-large hvr-buzz-out">open_in_browser</md-icon></a>
+                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon></a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
                             </div>
                         </expansion-panel-description-toggled>
 
                         <expansion-panel-content>
                             <div *ngFor="let p of pd.added" class="center-vertical">
-                                <md-icon class="added">add</md-icon>
+                                <mat-icon class="added">add</mat-icon>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of pd.changed" class="center-vertical">
-                                <md-icon class="changed">autorenew</md-icon>
+                                <mat-icon class="changed">autorenew</mat-icon>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of pd.removed" class="center-vertical">
-                                <md-icon class="removed">remove</md-icon>
+                                <mat-icon class="removed">remove</mat-icon>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                         </expansion-panel-content>
@@ -209,51 +209,51 @@
                 </expansion-panels-container>
 
                 <h2 class="center-vertical">
-                    <md-icon>visibility_off</md-icon>&nbsp;Ignored
+                    <mat-icon>visibility_off</mat-icon>&nbsp;Ignored
                 </h2>
 
                 <expansion-panels-container>
                     <expansion-panel *ngFor="let pd of propertyDiffsByCognition.getNonEmptyIgnored()">
                         <expansion-panel-title style="display: flex;">
                             <div class="center-horizontal little-horizontal-padding">
-                                <md-icon class="added">add</md-icon>
+                                <mat-icon class="added">add</mat-icon>
                                 <span class="diff-type-number">{{pd.added.length}}</span>
                             </div>
                             <div class="center-horizontal little-horizontal-padding">
-                                <md-icon class="changed">autorenew</md-icon>
+                                <mat-icon class="changed">autorenew</mat-icon>
                                 <span class="diff-type-number">{{pd.changed.length}}</span>
                             </div>
                             <div class="center-horizontal little-horizontal-padding">
-                                <md-icon class="removed">removed</md-icon>
+                                <mat-icon class="removed">removed</mat-icon>
                                 <span class="diff-type-number">{{pd.removed.length}}</span>
                             </div>
                         </expansion-panel-title>
                         <expansion-panel-description-hidden>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><md-icon class="icon-large hvr-buzz-out">open_in_browser</md-icon></a>
+                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon></a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
                             </div>
                         </expansion-panel-description-hidden>
                         <expansion-panel-description-toggled>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><md-icon class="icon-large hvr-buzz-out">open_in_browser</md-icon></a>
+                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon></a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
                             </div>
                         </expansion-panel-description-toggled>
 
                         <expansion-panel-content>
                             <div *ngFor="let p of pd.added" class="center-vertical">
-                                <md-icon class="added">add</md-icon>
+                                <mat-icon class="added">add</mat-icon>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of pd.changed" class="center-vertical">
-                                <md-icon class="changed">autorenew</md-icon>
+                                <mat-icon class="changed">autorenew</mat-icon>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of pd.removed" class="center-vertical">
-                                <md-icon class="removed">remove</md-icon>
+                                <mat-icon class="removed">remove</mat-icon>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                         </expansion-panel-content>
@@ -268,12 +268,12 @@
                         └──────────────v─────-┘
                     </div>
                     <div style="padding-top: 5px;">
-                        <md-icon class="icon-very-large error-message">hot_tub</md-icon>
+                        <mat-icon class="icon-very-large error-message">hot_tub</mat-icon>
                     </div>
                 </div>
             </div>
             <div style="width: 50%">
-                <button md-raised-button color="primary" (click)="updateEditorConfig()" style="margin: 10px;">
+                <button mat-raised-button color="primary" (click)="updateEditorConfig()" style="margin: 10px;">
                     Save following settings on your browser (Local storage)
                 </button>
                 <app-editor #editor
@@ -282,6 +282,6 @@
                 </app-editor>
             </div>
         </div>
-    </md-tab>
-</md-tab-group>
+    </mat-tab>
+</mat-tab-group>
 <hotkeys-cheatsheet></hotkeys-cheatsheet>

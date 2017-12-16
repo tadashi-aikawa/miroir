@@ -1,14 +1,20 @@
-md-sidenav {
-    padding: 10px;
-    min-width: 250px;
+mat-sidenav {
+    padding: 5px;
+    width: 310px;
 }
 
-md-sidenav-container {
+.search-word-form {
+    width: 250px;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+mat-sidenav-container {
     min-height: calc(100vh - 64px)
 }
 
 .summary-card-title {
-    width: 220px;
+    width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -21,7 +27,7 @@ md-sidenav-container {
     box-shadow:2px 2px 5px;
     border:0 solid #000;
     display: block;
-    width: 250px;
+    width: 230px;
 }
 
 .summary-card:hover {
@@ -83,7 +89,7 @@ md-sidenav-container {
     text-align: center;
 }
 
-md-select {
+mat-select {
     position: absolute;
     z-index: 2;
     opacity: 0;

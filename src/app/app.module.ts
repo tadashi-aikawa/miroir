@@ -4,7 +4,27 @@ import {RouterModule, Routes} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
-import {MaterialModule} from '@angular/material';
+import {
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatMenuModule,
+    MatOptionModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatSidenavModule,
+    MatSlideToggleModule,
+    MatSnackBarModule,
+    MatTabsModule,
+    MatToolbarModule,
+} from '@angular/material';
 import {Ng2SmartTableModule} from 'ng2-smart-table';
 import {LocalStorageModule} from 'angular-2-local-storage';
 import {SelectModule} from 'ng-select';
@@ -41,8 +61,11 @@ import {ConfirmDialogComponent} from './components/dialogs/confirm-dialog/confir
 import {MonacoEditorLoader} from './services/monaco-editor-loader';
 import {LogoLoadingComponent} from './components/guard/logo-loading.component';
 import {
-    AnalyticsComponent, ToAttentionPipe, ToCheckedAlreadyDiffSummaryPipe,
-    ToIgnoredDiffSummaryPipe, ToPathPipe
+    AnalyticsComponent,
+    ToAttentionPipe,
+    ToCheckedAlreadyDiffSummaryPipe,
+    ToIgnoredDiffSummaryPipe,
+    ToPathPipe
 } from './components/analystic/analytics.component';
 
 const appRoutes: Routes = [
@@ -85,7 +108,6 @@ const appRoutes: Routes = [
         RouterModule.forRoot(appRoutes),
         FormsModule,
         HttpModule,
-        MaterialModule,
         Ng2SmartTableModule,
         SelectModule,
         CommonModule,
@@ -96,7 +118,47 @@ const appRoutes: Routes = [
             prefix: 'jumeaux-viewer',
             storageType: 'localStorage'
         }),
-        MarkdownModule.forRoot()
+        MarkdownModule.forRoot(),
+        MatButtonModule,
+        MatCheckboxModule,
+        MatFormFieldModule,
+        MatSlideToggleModule,
+        MatProgressBarModule,
+        MatChipsModule,
+        MatIconModule,
+        MatToolbarModule,
+        MatSidenavModule,
+        MatProgressSpinnerModule,
+        MatOptionModule,
+        MatCardModule,
+        MatSelectModule,
+        MatMenuModule,
+        MatTabsModule,
+        MatButtonToggleModule,
+        MatDialogModule,
+        MatInputModule,
+        MatSnackBarModule,
+    ],
+    exports: [
+        MatButtonModule,
+        MatCheckboxModule,
+        MatFormFieldModule,
+        MatSlideToggleModule,
+        MatProgressBarModule,
+        MatChipsModule,
+        MatIconModule,
+        MatToolbarModule,
+        MatSidenavModule,
+        MatProgressSpinnerModule,
+        MatOptionModule,
+        MatCardModule,
+        MatSelectModule,
+        MatMenuModule,
+        MatTabsModule,
+        MatButtonToggleModule,
+        MatDialogModule,
+        MatInputModule,
+        MatSnackBarModule,
     ],
     entryComponents: [
         DetailDialogComponent,

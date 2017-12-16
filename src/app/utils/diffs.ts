@@ -16,13 +16,11 @@ function matchRegExp(pattern: string, target: string): boolean {
 
 function toCheckedAlready(yamlStr: string): IgnoreCase[] {
     const checkPoint: CheckPoint = yaml.safeLoad(yamlStr);
-    const assignVars = (ignoreCase: IgnoreCase): IgnoreCase => _.omitBy(
+    const assignVars = (ignoreCase: IgnoreCase): IgnoreCase =>
         _.reduce(checkPoint.vars, (result, v, k) => Object.assign({}, result, {
             image: result.image ? result.image.replace(new RegExp(`{{ ${k} }}`, 'g'), v) : undefined,
             link: result.link ? result.link.replace(new RegExp(`{{ ${k} }}`, 'g'), v) : undefined
-        }), ignoreCase),
-        v => v === undefined
-    );
+        }), ignoreCase);
 
     return checkPoint.cases.map(assignVars);
 }

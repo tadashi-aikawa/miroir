@@ -1,5 +1,5 @@
 import {Component, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
-import {MdInputDirective} from '@angular/material';
+import {MatFormField} from '@angular/material';
 import {Change} from 'app/models/models';
 
 @Component({
@@ -16,12 +16,12 @@ import {Change} from 'app/models/models';
             </ng-template>
 
             <ng-template #emptyView>
-                <md-icon class="icon-small">edit</md-icon>
+                <mat-icon class="icon-small">edit</mat-icon>
             </ng-template>
         </div>
-        <md-input-container *ngIf="editing" style="flex-grow: 1;">
-            <input mdInput [(ngModel)]="value">
-        </md-input-container>
+        <mat-form-field *ngIf="editing" style="flex-grow: 1;">
+            <input matInput [(ngModel)]="value">
+        </mat-form-field>
     `
 })
 export class InlineEditorComponent {
@@ -32,7 +32,7 @@ export class InlineEditorComponent {
     editing = false;
     previousValue: string;
 
-    @ViewChild(MdInputDirective) input;
+    @ViewChild(MatFormField) input;
 
     //noinspection JSUnusedLocalSymbols
     @HostListener('focusout')

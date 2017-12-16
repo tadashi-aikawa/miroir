@@ -1,36 +1,25 @@
-# jumeaux-viewer
+jumeaux-viewer
+==============
 
-<img src="./src/assets/jumeaux.png" width="500" height="500">
+<img src="./src/assets/jumeaux.png" width="240" height="240">
 
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
-Demo: https://tadashi-aikawa.github.io/jumeaux-viewer/
 
 ## Preparation for development
 
-1. Install `yarn` globally if you are not installed
-
-See https://yarnpkg.com/en/docs/install
-
-2. Install `angular-cli` if you are not installed
-
 ```
-$ yarn global add @angular/cli
-```
-
-3. Install dependencies
-
-```
-$ yarn install
+$ npm install
 ```
 
 ## Development server
 
 ```
-$ yarn dev
+$ npm run dev
 ```
 
 Then access to `http://localhost:4200/`
+
 
 ## Production build
 

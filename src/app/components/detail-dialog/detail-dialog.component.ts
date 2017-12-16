@@ -10,7 +10,7 @@ import {
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {MdDialogRef} from '@angular/material';
+import {MatDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
@@ -151,7 +151,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     constructor(private service: AwsService,
-                @Optional() public dialogRef: MdDialogRef<DetailDialogComponent>,
+                @Optional() public dialogRef: MatDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService,
                 private settingsService: SettingsService) {
         // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
@@ -268,7 +268,13 @@ export class DetailDialogComponent implements OnInit {
                 // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
                 setTimeout(() => {
                     this.isLoading = false;
-                    this.diffViewConfig = createConfig('Binary is not supported to show', 'Binary is not supported to show', 'text', 'text', !this.unifiedDiff);
+                    this.diffViewConfig = createConfig(
+                        'Binary is not supported to show',
+                        'Binary is not supported to show',
+                        'text',
+                        'text',
+                        !this.unifiedDiff
+                    );
                 }, 100);
             } else {
                 const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);

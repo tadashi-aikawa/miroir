@@ -4,7 +4,7 @@ h1 {
     font-size: 250%;
 }
 
-md-sidenav {
+mat-sidenav {
     display: flex;
     flex-direction: column;
     padding: 20px;
