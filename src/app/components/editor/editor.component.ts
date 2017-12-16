@@ -41,7 +41,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     }
 
     updateView() {
-        this.editor.layout();
+        setTimeout(() => this.editor.layout(), 0);
     }
 
     getValue(): string {
