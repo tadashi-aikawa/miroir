@@ -1,7 +1,7 @@
 Miroir
 ======
 
-<img src="./src/assets/miroir=png" width="240" height="240">
+<img src="./src/assets/miroir.png" width="240" height="240">
 
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
