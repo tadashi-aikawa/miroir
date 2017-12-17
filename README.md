@@ -6,13 +6,26 @@ Miroir
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
 
-## Preparation for development
+Setup
+-----
+
+```
+$ ./setup-aws.sh <bucket_name> <table_name>
+```
+
+`./setup-aws.sh -h` shows usages and a example.
+
+
+Developer
+---------
+
+### Preparation for development
 
 ```
 $ npm install
 ```
 
-## Development server
+### Development server
 
 ```
 $ npm run dev
@@ -21,7 +34,7 @@ $ npm run dev
 Then access to `http://localhost:4200/`
 
 
-## Production build
+### Production build
 
 ```
 $ ng build --prod --base-href ${BASE_URL}
@@ -30,11 +43,11 @@ $ ng build --prod --base-href ${BASE_URL}
 You have to specify BASE_URL as your own.
 Ex. https://xxxxx/miroir/
 
-## Deploy
+### Deploy
 
 You have to deploy `dist/*` to web server you want.
 
-## Dependencies without package.json
+### Dependencies without package.json
 
 ```
 "monaco-editor": "^0.8.3",
