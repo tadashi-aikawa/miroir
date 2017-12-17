@@ -1,15 +1,5 @@
 import {ActivatedRoute} from '@angular/router';
-import {
-    Change,
-    DynamoResult,
-    DynamoRow,
-    EditorConfig,
-    IgnoreCase,
-    PropertyDiffsByCognition,
-    Report,
-    Summary,
-    Trial
-} from '../../models/models';
+import {Change, DynamoResult, DynamoRow, EditorConfig, IgnoreCase, Report, Summary, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {ObjectList} from 'aws-sdk/clients/s3';
@@ -378,7 +368,7 @@ export class SummaryComponent implements OnInit {
 
                     const toAttention = (t: Trial): string => {
                         if (!analysis) {
-                            return '(・ω・)';
+                            return '???';
                         }
                         if ((!t.diff_keys) && t.status === 'different') {
                             return 'No diff keys!!';
@@ -425,10 +415,10 @@ export class SummaryComponent implements OnInit {
                                 attention: t.attention,
                                 checkedAlready: analysis ?
                                     (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
-                                    ['(・ω・)'],
+                                    ['???'],
                                 ignored: analysis ?
                                     (c ? _(c.ignored).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
-                                    ['(・ω・)'],
+                                    ['???'],
                             };
                         })
                     ).then(() => {
