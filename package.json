@@ -8,7 +8,8 @@
     "dev": "ng serve --host 0.0.0.0",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "package": "ng build --prod --base-href ${BASE_URL}"
   },
   "private": true,
   "dependencies": {

@@ -6,8 +6,8 @@ Miroir
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
 
-Setup
------
+AWS Setup
+---------
 
 ```
 $ ./setup-aws.sh <bucket_name> <table_name>
@@ -16,8 +16,8 @@ $ ./setup-aws.sh <bucket_name> <table_name>
 `./setup-aws.sh -h` shows usages and a example.
 
 
-Developer
----------
+Develop
+-------
 
 ### Preparation for development
 
@@ -34,18 +34,39 @@ $ npm run dev
 Then access to `http://localhost:4200/`
 
 
-### Production build
+Release
+-------
+
+TODO: make measure-release
+TODO: make minor-release
+TODO: make patch-release
+
+
+Deploy
+------
+
+### Packaging
 
 ```
-$ ng build --prod --base-href ${BASE_URL}
+$ make init package
 ```
 
-You have to specify BASE_URL as your own.
-Ex. https://xxxxx/miroir/
+### Deploy by docker
 
-### Deploy
+```
+$ make deploy-container
+```
 
-You have to deploy `dist/*` to web server you want.
+Then access to `http://localhost:8888/miroir`
+
+
+### Deploy to S3
+
+TODO: make deploy-s3
+
+
+Other
+-----
 
 ### Dependencies without package.json
 
