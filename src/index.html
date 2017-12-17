@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Jumeaux Viewer</title>
+    <title>Miroir</title>
     <base href="/">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,34 +10,36 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <style>
-        @-webkit-keyframes blink {
-            from {
-                opacity: 1;
-            }
-            to {
-                opacity: 0.1;
-            }
+        .shake {
+            animation: shake .6s  infinite;
         }
-        .blink {
-            -webkit-animation-name: blink;
-            -webkit-animation-duration: 0.65s;
-            -webkit-animation-iteration-count:infinite;
-            -webkit-animation-timing-function:ease-in-out;
-            -webkit-animation-direction: alternate;
-            -webkit-animation-delay: 0s;
+        @keyframes shake {
+            0% {transform: translate(0px, 0px) rotateZ(0deg)}
+            25% {transform: translate(3px, 3px) rotateZ(2deg)}
+            50% {transform: translate(0px, 3px) rotateZ(0deg)}
+            75% {transform: translate(3px, 0px) rotateZ(-2deg)}
+            100% {transform: translate(0px, 0px) rotateZ(0deg)}
+        }
+        .loading-message {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-size: 300%;
+            font-weight: bold;
+            color: #3f51b5;
         }
         .loading-image {
             width: auto;
             height: 75vh;
-            max-height: 768px;
+            max-height: 512px;
         }
     </style>
 </head>
 <body>
 <app-root>
     <div style="width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center;">
-        <div class="center-horizontal blink">
-            <img src="assets/jumeaux-loading.png" class="loading-image"/>
+        <div class="center-horizontal">
+            <img src="assets/miroir.png" class="loading-image shake"/>
+            <div class="loading-message shake">NOW LOADING</div>
         </div>
     </div>
 </app-root>

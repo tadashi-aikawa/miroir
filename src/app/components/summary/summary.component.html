@@ -13,7 +13,7 @@
         </ng-template>
     </div>
     <mat-sidenav-container style="flex: 1">
-        <mat-sidenav #sidenav mode="side" align="start">
+        <mat-sidenav #sidenav mode="side" align="start" class="scrollable-y">
             <mat-form-field class="search-word-form">
                 <input matInput #keyWord title="Free word search"
                        [(ngModel)]="word" (keyup.enter)="onSearchReports(word)">
@@ -141,7 +141,7 @@
             </div>
         </mat-sidenav>
 
-        <div class="smart-padding">
+        <div class="smart-padding scrollable-y">
             <div *ngIf="loadingReportKey">
                 <app-logo-loading></app-logo-loading>
             </div>

@@ -1,11 +1,11 @@
 {
-  "name": "jumeaux-viewer",
+  "name": "miroir",
   "version": "0.0.0",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
-    "dev": "ng serve",
+    "dev": "ng serve --host 0.0.0.0",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
