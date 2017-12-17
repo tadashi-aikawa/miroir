@@ -115,7 +115,7 @@ const appRoutes: Routes = [
         ExpansionPanelsModule,
         HotkeyModule.forRoot({disableCheatSheet: true}),
         LocalStorageModule.withConfig({
-            prefix: 'jumeaux-viewer',
+            prefix: 'miroir',
             storageType: 'localStorage'
         }),
         MarkdownModule.forRoot(),
