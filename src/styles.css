@@ -140,3 +140,8 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
 .failure-color {
     color: rgb(202, 27, 27);
 }
+
+.scrollable-y {
+    overflow-y: scroll;
+    height: calc(100vh - 64px - 20*2px);
+}

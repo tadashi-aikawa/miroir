@@ -6,23 +6,41 @@ import {animate, style, transition, trigger} from '@angular/animations';
     template: `
         <style>
             .frame {
-                width: 100%;
-                height: 100%;
+                width: calc(100% - 370px);
+                height: 100vh;
                 z-index: 100;
                 position: fixed;
                 background-color: rgba(255, 255, 255, 0.85);
             }
             .loading-image {
-                width: auto;
-                height: 75vh;
-                max-height: 768px;
-                top: 10vh;
-                z-index: 200;
-                position: fixed;
+                max-height: 256px;
+                padding-top: 20vh;
+            }
+            .loading-message {
+                margin-top: 15px;
+                margin-bottom: 15px;
+                font-size: 200%;
+                font-weight: bold;
+                color: #3f51b5;
+            }
+            .loading-bar {
+                max-width: 256px;
+            }
+            .shake {
+                animation: shake .4s  infinite;
+            }
+            @keyframes shake {
+                0% {transform: translate(0px, 0px) rotateZ(0deg)}
+                25% {transform: translate(2px, 2px) rotateZ(1deg)}
+                50% {transform: translate(0px, 2px) rotateZ(0deg)}
+                75% {transform: translate(2px, 0px) rotateZ(-1deg)}
+                100% {transform: translate(0px, 0px) rotateZ(0deg)}
             }
         </style>
         <div class="frame center-horizontal">
-            <img src="assets/jumeaux-loading.gif" class="loading-image"/>
+            <img src="assets/miroir.png" class="loading-image shake"/>
+            <div class="loading-message shake">NOW LOADING</div>
+            <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
         </div>
     `
 })
