@@ -1,7 +1,7 @@
-jumeaux-viewer
-==============
+Miroir
+======
 
-<img src="./src/assets/jumeaux.png" width="240" height="240">
+<img src="./src/assets/miroir=png" width="240" height="240">
 
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
@@ -28,7 +28,7 @@ $ ng build --prod --base-href ${BASE_URL}
 ```
 
 You have to specify BASE_URL as your own.
-Ex. https://xxxxx/jumeaux-viewer/
+Ex. https://xxxxx/miroir/
 
 ## Deploy
 
