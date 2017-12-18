@@ -1,6 +1,6 @@
 mat-sidenav {
     padding: 5px;
-    width: 310px;
+    width: 355px;
 }
 
 .search-word-form {
@@ -15,7 +15,7 @@ mat-sidenav-container {
 }
 
 .summary-card-title {
-    width: 200px;
+    width: 230px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -28,7 +28,7 @@ mat-sidenav-container {
     box-shadow:2px 2px 5px;
     border:0 solid #000;
     display: block;
-    width: 230px;
+    width: 260px;
 }
 
 .summary-card:hover {
