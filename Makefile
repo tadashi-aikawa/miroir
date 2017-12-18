@@ -7,6 +7,7 @@ SHELL := /bin/bash
 
 #----
 
+PORT := 8888
 BASE_URL := http://localhost:8888/miroir/
 
 help: ## Print this help
@@ -26,7 +27,7 @@ _clean-package:
 	@docker rm -f tmp-miroir || echo "No need to clean"
 	@echo 'End $@'
 
-package: _clean-package ## Package to dist (set BASE_URL)
+package: _clean-package ## Package to dist (Set BASE_URL[def: http://localhost:8888/miroir/])
 	@echo 'Start $@'
 	@docker run -i -e BASE_URL=$(BASE_URL) --name tmp-miroir tadashi-aikawa/miroir npm run package
 	@rm -rf dist
@@ -39,8 +40,18 @@ _clean-deploy-container:
 	@docker rm -f miroir || echo "No need to clean"
 	@echo 'End $@'
 
-deploy-container: _clean-deploy-container ## Deploy by docker (Requirements dist)
+deploy-container: _clean-deploy-container ## Deploy by docker (Set: PORT[def: 8888] and Requirements: dist)
 	@echo 'Start $@'
-	@docker run --name miroir -v `pwd`/dist:/usr/share/nginx/html/miroir:ro -p 8888:80 -d nginx
+	@docker run --name miroir -v `pwd`/dist:/usr/share/nginx/html/miroir:ro -p $(PORT):80 -d nginx
+	@echo 'End $@'
+
+_clean-deploy-s3:
+	@echo 'Start $@'
+	@aws s3 rm s3://$(BUCKET) || echo "No need to clean"
+	@echo 'End $@'
+
+deploy-s3: _clean-deploy-s3 ## Deploy by docker (Set: BUCKET and Requirements dist, aws-cli)
+	@echo 'Start $@'
+	@aws s3 cp --acl public-read `pwd`/dist/ s3://$(BUCKET)/ --recursive
 	@echo 'End $@'
 
