@@ -6,7 +6,7 @@ import {animate, style, transition, trigger} from '@angular/animations';
     template: `
         <style>
             .frame {
-                width: calc(100% - 370px);
+                width: 100vw;
                 height: 100vh;
                 z-index: 100;
                 position: fixed;

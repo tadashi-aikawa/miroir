@@ -12,6 +12,9 @@
             </mat-icon>
         </ng-template>
     </div>
+    <div *ngIf="loadingReportKey">
+        <app-logo-loading></app-logo-loading>
+    </div>
     <mat-sidenav-container style="flex: 1">
         <mat-sidenav #sidenav mode="side" align="start" class="scrollable-y">
             <mat-form-field class="search-word-form">
@@ -142,9 +145,6 @@
         </mat-sidenav>
 
         <div class="smart-padding scrollable-y">
-            <div *ngIf="loadingReportKey">
-                <app-logo-loading></app-logo-loading>
-            </div>
             <p *ngFor="let message of errorMessages" class="error-message" style="font-size: 150%; font-weight: bold;">
                 <mat-icon>report_problem</mat-icon> {{message}}
             </p>
