@@ -52,6 +52,6 @@ _clean-deploy-s3:
 
 deploy-s3: _clean-deploy-s3 ## Deploy by docker (Set: BUCKET and Requirements dist, aws-cli)
 	@echo 'Start $@'
-	@aws s3 cp --acl public-read `pwd`/dist/ s3://$(BUCKET)/ --recursive
+	@aws s3 cp --acl private `pwd`/dist/ s3://$(BUCKET)/ --recursive
 	@echo 'End $@'
 
