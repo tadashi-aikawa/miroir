@@ -1,0 +1,3 @@
+- [Getting started](index.md)
+- Releases
+  - [v0.1.0](releases/v0.1.0.md)
