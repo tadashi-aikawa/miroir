@@ -6,6 +6,12 @@ Miroir
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
 
+Documentation
+-------------
+
+https://tadashi-aikawa.github.io/miroir
+
+
 AWS Setup
 ---------
 
@@ -62,7 +68,9 @@ Then access to `http://localhost:8888/miroir`
 
 ### Deploy to S3
 
-TODO: make deploy-s3
+```
+$ make deploy-s3 BUCKET=your-miroir-bucket
+```
 
 
 Other
