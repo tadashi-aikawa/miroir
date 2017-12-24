@@ -43,9 +43,10 @@ Then access to `http://localhost:4200/`
 Release
 -------
 
-TODO: make measure-release
-TODO: make minor-release
-TODO: make patch-release
+1. Create `releases/*.md` and `git add`
+2. `npm version [major|minor|patch]`
+3. Check Miroir and documentation
+4. `git push`
 
 
 Deploy
