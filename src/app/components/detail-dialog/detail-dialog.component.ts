@@ -192,7 +192,7 @@ export class DetailDialogComponent implements OnInit {
             new Hotkey('C', () => {
                 this.copyActiveTrialLink();
                 return false;
-            }, null, 'Copy one url.'),
+            }, null, 'Copy trial url.'),
             new Hotkey('J', () => {
                 Clipboard.copy(this.trial.one.url);
                 this.toasterService.pop('success', `Copied ${this.oneAccessPoint.name} url`, this.trial.one.url);
