@@ -55,7 +55,7 @@ Deploy
 ### Packaging
 
 ```
-$ make init package
+$ make package
 ```
 
 ### Deploy by docker
