@@ -1,3 +1,9 @@
+:host >>> #toast-container > div {
+    max-width: 600px;
+    width: auto;
+    min-width: 300px;
+}
+
 :host >>> th.ng2-smart-th.key {
     width: 200px;
 }

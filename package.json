@@ -33,6 +33,7 @@
     "angular-2-local-storage": "^1.0.1",
     "angular2-hotkeys": "^2.0.3",
     "angular2-markdown": "^2.2.0",
+    "angular2-toaster": "^4.0.1",
     "aws-sdk": "^2.168.0",
     "aws-sdk-webpack": "2.18.0",
     "core-js": "^2.5.3",

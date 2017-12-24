@@ -67,6 +67,7 @@ import {
     ToIgnoredDiffSummaryPipe,
     ToPathPipe
 } from './components/analystic/analytics.component';
+import {ToasterModule} from "angular2-toaster";
 
 const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -105,6 +106,7 @@ const appRoutes: Routes = [
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
+        ToasterModule,
         RouterModule.forRoot(appRoutes),
         FormsModule,
         HttpModule,

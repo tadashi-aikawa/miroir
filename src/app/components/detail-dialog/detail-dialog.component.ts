@@ -18,6 +18,7 @@ import * as _ from 'lodash';
 import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
+import {ToasterConfig, ToasterService} from "angular2-toaster";
 
 
 interface RowData {
@@ -129,6 +130,12 @@ export class DetailDialogComponent implements OnInit {
     @ViewChild('diffView') diffView;
     @ViewChild('editor') editor;
 
+    public toasterConfig : ToasterConfig = new ToasterConfig({
+        animation: 'flyRight',
+        newestOnTop: false,
+        mouseoverTimerStop: true,
+    });
+
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
     propertyDiffsByCognition: PropertyDiffsByCognition;
@@ -154,7 +161,8 @@ export class DetailDialogComponent implements OnInit {
     constructor(private service: AwsService,
                 @Optional() public dialogRef: MatDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService,
-                private settingsService: SettingsService) {
+                private settingsService: SettingsService,
+                private toasterService: ToasterService) {
         // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
@@ -189,10 +197,12 @@ export class DetailDialogComponent implements OnInit {
             }, null, 'Show next trial.'),
             new Hotkey('J', () => {
                 Clipboard.copy(this.trial.one.url);
+                this.toasterService.pop('success', `Copied ${this.oneAccessPoint.name} url`, this.trial.one.url);
                 return false;
             }, null, 'Copy one url.'),
             new Hotkey('L', () => {
                 Clipboard.copy(this.trial.other.url);
+                this.toasterService.pop('success', `Copied ${this.otherAccessPoint.name} url`, this.trial.other.url);
                 return false;
             }, null, 'Copy other url.'),
             new Hotkey('w', () => {
