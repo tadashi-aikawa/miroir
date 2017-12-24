@@ -1,5 +1,4 @@
-import {Component, EventEmitter, HostListener, Input, Output, ViewChild} from '@angular/core';
-import {MatFormField} from '@angular/material';
+import {Component, EventEmitter, HostListener, Input, Output} from '@angular/core';
 import {Change} from 'app/models/models';
 
 @Component({
@@ -19,8 +18,8 @@ import {Change} from 'app/models/models';
                 <mat-icon class="icon-small">edit</mat-icon>
             </ng-template>
         </div>
-        <mat-form-field *ngIf="editing" style="flex-grow: 1;">
-            <input matInput [(ngModel)]="value">
+        <mat-form-field *ngIf="editing">
+            <input id="edit-field" matInput [(ngModel)]="value">
         </mat-form-field>
     `
 })
@@ -31,8 +30,6 @@ export class InlineEditorComponent {
 
     editing = false;
     previousValue: string;
-
-    @ViewChild(MatFormField) input;
 
     //noinspection JSUnusedLocalSymbols
     @HostListener('focusout')
@@ -50,7 +47,7 @@ export class InlineEditorComponent {
         this.previousValue = this.value;
         this.editing = true;
         setTimeout(() => {
-            this.input.focus();
+            document.getElementById('edit-field').focus();
         }, 1);
     }
 }

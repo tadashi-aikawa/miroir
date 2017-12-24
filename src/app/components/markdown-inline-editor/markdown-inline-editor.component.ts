@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {animate, style, transition, trigger} from '@angular/animations';
-import {MatDialog, MatTextareaAutosize, MatFormField} from '@angular/material';
+import {MatDialog, MatTextareaAutosize} from '@angular/material';
 import {Change} from 'app/models/models';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/confirm-dialog.component';
@@ -44,7 +44,7 @@ import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/conf
 
             <mat-form-field *ngIf="editing" [@feed] class="balloon-right" style="flex: 1">
                 <div class="smart-padding-xsmall">
-                    <textarea matInput matTextareaAutosize [(ngModel)]="value"></textarea>
+                    <textarea id="edit-area" matInput matTextareaAutosize [(ngModel)]="value"></textarea>
                 </div>
                 <hr/>
                 <div class="smart-padding-left-small">
@@ -73,7 +73,6 @@ export class MarkdownInlineEditorComponent {
     editing = false;
     previousValue: string;
 
-    @ViewChild(MatFormField) input;
     @ViewChild(MatTextareaAutosize) autosize;
 
     constructor(private _hotkeysService: HotkeysService,
@@ -124,7 +123,7 @@ export class MarkdownInlineEditorComponent {
         this.editing = true;
         setTimeout(() => {
             this.autosize.resizeToFitContent();
-            this.input.focus();
+            document.getElementById('edit-area').focus();
         }, 1);
     }
 }
