@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {AwsService} from '../../services/aws-service';
+const {version} = require('../../../../package.json');
 
 @Component({
     selector: 'app-root',
@@ -7,6 +8,7 @@ import {AwsService} from '../../services/aws-service';
     styleUrls: ['./root.component.css']
 })
 export class RootComponent {
+    version: string = version;
     region: string = this.awsService.region;
     table: string = this.awsService.table;
     bucket: string = this.awsService.bucket;
