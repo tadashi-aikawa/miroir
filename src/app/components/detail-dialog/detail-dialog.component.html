@@ -1,7 +1,10 @@
 <div class="center-vertical">
-    <a href={{createActiveTrialLink()}} class="smart-padding-xsmall-right" tabindex="-1">
-        <mat-icon class="action-icon hvr-buzz-out" title="Open this trial">link</mat-icon>
-    </a>
+    <mat-icon class="action-icon hvr-buzz-out smart-padding-xsmall-right"
+              title="Copy this trial url"
+              (click)="copyActiveTrialLink()"
+    >
+        link
+    </mat-icon>
     <div class="count-word">
         <span>{{activeIndexNum + 1}} / {{options.length}}</span>
         <span> ... </span>

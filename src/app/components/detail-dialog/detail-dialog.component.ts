@@ -195,6 +195,10 @@ export class DetailDialogComponent implements OnInit {
                 this.showNextTrial();
                 return false;
             }, null, 'Show next trial.'),
+            new Hotkey('C', () => {
+                this.copyActiveTrialLink();
+                return false;
+            }, null, 'Copy one url.'),
             new Hotkey('J', () => {
                 Clipboard.copy(this.trial.one.url);
                 this.toasterService.pop('success', `Copied ${this.oneAccessPoint.name} url`, this.trial.one.url);
@@ -399,8 +403,9 @@ export class DetailDialogComponent implements OnInit {
         );
     }
 
-    createActiveTrialLink() {
-        return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`;
+    copyActiveTrialLink() {
+        const url = `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`;
+        Clipboard.copy(url);
+        this.toasterService.pop('success', `Copied this trial url`, url);
     }
-
 }
