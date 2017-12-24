@@ -15,7 +15,7 @@ mat-sidenav-container {
 }
 
 .summary-card-title {
-    width: 230px;
+    width: 220px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
