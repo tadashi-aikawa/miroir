@@ -15,6 +15,7 @@ import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
 import * as _ from 'lodash';
+import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 
@@ -186,6 +187,14 @@ export class DetailDialogComponent implements OnInit {
                 this.showNextTrial();
                 return false;
             }, null, 'Show next trial.'),
+            new Hotkey('J', () => {
+                Clipboard.copy(this.trial.one.url);
+                return false;
+            }, null, 'Copy one url.'),
+            new Hotkey('L', () => {
+                Clipboard.copy(this.trial.other.url);
+                return false;
+            }, null, 'Copy other url.'),
             new Hotkey('w', () => {
                 this.closeDialog();
                 return false;
