@@ -43,10 +43,11 @@ Then access to `http://localhost:4200/`
 Release
 -------
 
-1. Create `releases/*.md` and `git add`
-2. `npm version [major|minor|patch]`
-3. Check Miroir and documentation
-4. `git push`
+1. Create `docs/releases/*.md` and Update `docs/_sidebar.md`
+2. `git commit` above
+3. `npm version [major|minor|patch]`
+4. Check Miroir and documentation
+5. `git push`
 
 
 Deploy
