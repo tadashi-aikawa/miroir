@@ -1,3 +1,9 @@
+:host >>> #toast-container > div {
+    max-width: 600px;
+    width: auto;
+    min-width: 300px;
+}
+
 h1 {
     color: #369;
     font-family: Arial, Helvetica, sans-serif;

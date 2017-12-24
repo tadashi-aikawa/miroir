@@ -15,8 +15,10 @@ import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
 import * as _ from 'lodash';
+import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
+import {ToasterConfig, ToasterService} from "angular2-toaster";
 
 
 interface RowData {
@@ -153,7 +155,8 @@ export class DetailDialogComponent implements OnInit {
     constructor(private service: AwsService,
                 @Optional() public dialogRef: MatDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService,
-                private settingsService: SettingsService) {
+                private settingsService: SettingsService,
+                private toasterService: ToasterService) {
         // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
@@ -186,6 +189,20 @@ export class DetailDialogComponent implements OnInit {
                 this.showNextTrial();
                 return false;
             }, null, 'Show next trial.'),
+            new Hotkey('C', () => {
+                this.copyActiveTrialLink();
+                return false;
+            }, null, 'Copy trial url.'),
+            new Hotkey('J', () => {
+                Clipboard.copy(this.trial.one.url);
+                this.toasterService.pop('success', `Copied ${this.oneAccessPoint.name} url`, this.trial.one.url);
+                return false;
+            }, null, 'Copy one url.'),
+            new Hotkey('L', () => {
+                Clipboard.copy(this.trial.other.url);
+                this.toasterService.pop('success', `Copied ${this.otherAccessPoint.name} url`, this.trial.other.url);
+                return false;
+            }, null, 'Copy other url.'),
             new Hotkey('w', () => {
                 this.closeDialog();
                 return false;
@@ -380,8 +397,9 @@ export class DetailDialogComponent implements OnInit {
         );
     }
 
-    createActiveTrialLink() {
-        return `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`;
+    copyActiveTrialLink() {
+        const url = `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`;
+        Clipboard.copy(url);
+        this.toasterService.pop('success', `Copied this trial url`, url);
     }
-
 }

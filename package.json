@@ -1,6 +1,6 @@
 {
   "name": "miroir",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
@@ -33,6 +33,7 @@
     "angular-2-local-storage": "^1.0.1",
     "angular2-hotkeys": "^2.0.3",
     "angular2-markdown": "^2.2.0",
+    "angular2-toaster": "^4.0.1",
     "aws-sdk": "^2.168.0",
     "aws-sdk-webpack": "2.18.0",
     "core-js": "^2.5.3",
@@ -49,6 +50,7 @@
     "ng2-highcharts": "^1.1.2",
     "ng2-smart-table": "^1.2.2",
     "rxjs": "^5.5.5",
+    "ts-clipboard": "^1.0.15",
     "zone.js": "^0.8.18"
   },
   "devDependencies": {

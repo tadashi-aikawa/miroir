@@ -180,10 +180,11 @@
                         <app-inline-editor [value]="activeReport.title"
                                            (onUpdate)="onUpdateTitle($event)">
                         </app-inline-editor>
-                        <a href={{createActiveReportLink()}}><span
-                            class="hashkey-text hvr-underline-from-center action-text">
+                        <span class="hashkey-text hvr-underline-from-center action-text"
+                              (click)="copyActiveReportLink()"
+                        >
                                     ({{activeReport.key.substring(0, 7)}})
-                            </span></a>
+                        </span>
                         <span *ngIf="activeReport.retry_hash" class="retry-text">
                                 retried from
                                 <span class="hvr-underline-from-center action-text"

@@ -27,7 +27,7 @@ _clean-package:
 	@docker rm -f tmp-miroir || echo "No need to clean"
 	@echo 'End $@'
 
-package: _clean-package ## Package to dist (Set BASE_URL[def: http://localhost:8888/miroir/])
+package: init _clean-package ## Package to dist (Set BASE_URL[def: http://localhost:8888/miroir/])
 	@echo 'Start $@'
 	@docker run -i -e BASE_URL=$(BASE_URL) --name tmp-miroir tadashi-aikawa/miroir npm run package
 	@rm -rf dist
