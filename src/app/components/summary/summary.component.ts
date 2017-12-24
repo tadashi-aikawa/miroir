@@ -207,12 +207,6 @@ export class SummaryComponent implements OnInit {
     @ViewChild('sidenav') sideNav: MatSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
 
-    public toasterConfig : ToasterConfig = new ToasterConfig({
-        animation: 'flyRight',
-        newestOnTop: false,
-        mouseoverTimerStop: true,
-    });
-
     word = '';
 
     searchingSummary: boolean;

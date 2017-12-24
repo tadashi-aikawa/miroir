@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {AwsService} from '../../services/aws-service';
+import {ToasterConfig, ToasterService} from "angular2-toaster";
 const {version} = require('../../../../package.json');
 
 @Component({
@@ -15,6 +16,12 @@ export class RootComponent {
     prefix: string = this.awsService.prefix;
     useLocalStack: boolean = this.awsService.useLocalStack;
     localStackEndpoint: string = this.awsService.localStackEndpoint;
+
+    public toasterConfig : ToasterConfig = new ToasterConfig({
+        animation: 'flyRight',
+        newestOnTop: false,
+        mouseoverTimerStop: true,
+    });
 
     constructor(private awsService: AwsService) {
         // DO NOTHING

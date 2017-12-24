@@ -130,12 +130,6 @@ export class DetailDialogComponent implements OnInit {
     @ViewChild('diffView') diffView;
     @ViewChild('editor') editor;
 
-    public toasterConfig : ToasterConfig = new ToasterConfig({
-        animation: 'flyRight',
-        newestOnTop: false,
-        mouseoverTimerStop: true,
-    });
-
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
     propertyDiffsByCognition: PropertyDiffsByCognition;
