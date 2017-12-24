@@ -11,6 +11,8 @@ import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
+import {Clipboard} from "ts-clipboard";
+import {ToasterConfig, ToasterService} from "angular2-toaster";
 
 @Component({
     template: `
@@ -204,6 +206,13 @@ interface RowData {
 export class SummaryComponent implements OnInit {
     @ViewChild('sidenav') sideNav: MatSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
+
+    public toasterConfig : ToasterConfig = new ToasterConfig({
+        animation: 'flyRight',
+        newestOnTop: false,
+        mouseoverTimerStop: true,
+    });
+
     word = '';
 
     searchingSummary: boolean;
@@ -234,7 +243,8 @@ export class SummaryComponent implements OnInit {
                 private _dialog: MatDialog,
                 private route: ActivatedRoute,
                 private settingsService: SettingsService,
-                private snackBar: MatSnackBar) {
+                private snackBar: MatSnackBar,
+                private toasterService: ToasterService) {
     }
 
     ngOnInit(): void {
@@ -592,8 +602,10 @@ export class SummaryComponent implements OnInit {
         );
     }
 
-    createActiveReportLink() {
-        return `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}`;
+    copyActiveReportLink() {
+        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}`;
+        Clipboard.copy(url);
+        this.toasterService.pop('success', `Copied this report url`, url);
     }
 
     private updateColumnVisibility() {
