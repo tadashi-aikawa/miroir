@@ -4,11 +4,13 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
 .PHONY: $(shell egrep -oh ^[a-zA-Z0-9][a-zA-Z0-9_-]+: $(MAKEFILE_LIST) | sed 's/://')
-
 #----
 
 PORT := 8888
 BASE_URL := http://localhost:8888/miroir/
+
+-include .env
+
 
 help: ## Print this help
 	@echo 'Usage: make [target]'
