@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {AwsService} from '../../services/aws-service';
 import {ToasterConfig, ToasterService} from "angular2-toaster";
+import {SettingsService} from "../../services/settings-service";
 const {version} = require('../../../../package.json');
 
 @Component({
@@ -16,6 +17,7 @@ export class RootComponent {
     prefix: string = this.awsService.prefix;
     useLocalStack: boolean = this.awsService.useLocalStack;
     localStackEndpoint: string = this.awsService.localStackEndpoint;
+    alwaysIntelligentAnalytics: boolean = this.settingsService.alwaysIntelligentAnalytics;
 
     public toasterConfig : ToasterConfig = new ToasterConfig({
         animation: 'flyRight',
@@ -23,7 +25,7 @@ export class RootComponent {
         mouseoverTimerStop: true,
     });
 
-    constructor(private awsService: AwsService) {
+    constructor(private awsService: AwsService, private settingsService: SettingsService) {
         // DO NOTHING
     }
 
@@ -32,5 +34,7 @@ export class RootComponent {
         this.awsService.updateTable(this.table);
         this.awsService.updateBucket(this.bucket);
         this.awsService.updatePrefix(this.prefix);
+
+        this.settingsService.alwaysIntelligentAnalytics = this.alwaysIntelligentAnalytics;
     }
 }

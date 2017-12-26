@@ -118,6 +118,14 @@ export class SettingsService {
         this.localStorageService.set('useLocalStack', value);
     }
 
+    get alwaysIntelligentAnalytics(): boolean {
+        return this.localStorageService.get<boolean>('alwaysIntelligentAnalytics');
+    }
+
+    set alwaysIntelligentAnalytics(value: boolean) {
+        this.localStorageService.set('alwaysIntelligentAnalytics', value);
+    }
+
     get localStackEndpoint(): string {
         return this.localStorageService.get<string>('localStackEndpoint');
     }

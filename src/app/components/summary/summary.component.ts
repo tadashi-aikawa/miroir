@@ -253,7 +253,7 @@ export class SummaryComponent implements OnInit {
                 this.searchReport(ps.searchWord);
             }
             if (ps.hashKey) {
-                this.showReport(ps.hashKey)
+                this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
                     .then((r: Report) => {
                         this.filteredTrials = r.trials.map(x => Object.assign(new Trial(), x));
                         if (ps.seq) {
@@ -290,12 +290,12 @@ export class SummaryComponent implements OnInit {
     }
 
     onClickCard(row: DynamoRow, event) {
-        this.showReport(row.hashkey);
+        this.showReport(row.hashkey, this.settingsService.alwaysIntelligentAnalytics);
         event.stopPropagation();
     }
 
     onClickRetryHash(retryHash: string, event) {
-        this.showReport(retryHash);
+        this.showReport(retryHash, this.settingsService.alwaysIntelligentAnalytics);
         event.stopPropagation();
     }
 
@@ -506,7 +506,7 @@ export class SummaryComponent implements OnInit {
                                 this.rows = this.rows.filter((r: DynamoRow) => r.hashkey !== key);
                                 if (key === this.activeReport.key) {
                                     // TODO: abnormal
-                                    this.showReport(this.rows[0].hashkey);
+                                    this.showReport(this.rows[0].hashkey, this.settingsService.alwaysIntelligentAnalytics);
                                 }
                             })
                             .catch(err => {
