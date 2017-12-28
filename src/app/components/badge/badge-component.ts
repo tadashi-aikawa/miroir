@@ -6,7 +6,7 @@ type BadgeKind = "fine" | "warning" | "danger" | "disabled";
     selector: 'app-badge',
     styleUrls: ['badge-component.css'],
     template: `
-        <span [ngClass]="{'badge': true, 'badge-compact': compact}">
+        <span [ngClass]="calculateClasses()">
             <ng-content></ng-content>
         </span>
     `
@@ -14,6 +14,14 @@ type BadgeKind = "fine" | "warning" | "danger" | "disabled";
 export class BadgeComponent {
     @Input() kind: BadgeKind;
     @Input() compact: boolean = false;
+
+    calculateClasses() {
+        return [
+            "badge",
+            `badge-${this.kind || "disabled"}`,
+            `badge-${this.compact ? "compact" : "normal"}`
+        ]
+    }
 }
 
 @Component({

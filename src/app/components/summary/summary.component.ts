@@ -59,7 +59,7 @@ export class HoverComponent implements ViewCell, OnInit {
 @Component({
     template: `
         <app-badge-list *ngFor="let v of this.value">
-            <app-badge kind="disabled">{{this.v}}</app-badge>    
+            <app-badge kind="disabled" compact="true">{{this.v}}</app-badge>    
         </app-badge-list>
     `
 })
