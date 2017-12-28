@@ -15,11 +15,28 @@
     padding: 7px 13px;
 }
 
-.badge-compact {
+.badge-small {
+    border-radius: 16px;
+    font-size: 85%;
+    font-weight: bold;
+    padding: 3px 8px;
+}
+
+.badge-tiny {
+    border-radius:12px;
+    font-size: 75%;
+    padding: 3px 8px;
+}
+
+.badge-minimum {
     border-radius: 4px;
     font-size: 50%;
     padding: 0 5px;
     word-break: keep-all;
+}
+
+.badge-primary {
+    background-color: #3f51b5;
 }
 
 .badge-fine {
