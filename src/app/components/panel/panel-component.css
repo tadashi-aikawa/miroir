@@ -1,0 +1,30 @@
+.panel-center {
+    justify-content: center;
+    display: grid;
+}
+
+.panel-title-normal {
+    height: 24px;
+    line-height: 24px;
+    font-weight: bold;
+}
+
+.panel-title-small {
+    font-size: 85%;
+    height: 20px;
+    line-height: 20px;
+    font-weight: bold;
+}
+
+.panel-title-primary {
+    background-color: lavender;
+}
+
+.panel-body {
+    font-size: small;
+    padding: 5px;
+}
+
+.panel-body-primary {
+    border: solid 2px lavender;
+}

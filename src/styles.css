@@ -27,6 +27,11 @@
     justify-content: flex-end;
 }
 
+.pain2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
 div.ellipsis-text {
     display: inline-block;
     overflow: hidden;

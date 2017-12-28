@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 
-type BadgeKind = "fine" | "warning" | "danger" | "disabled";
-type BadgeSize = "normal" | "small" | "minimum";
+type BadgeKind = "fine" | "warning" | "danger" | "disabled" | "primary";
+type BadgeSize = "normal" | "small" | "tiny" | "minimum";
 
 @Component({
     selector: 'app-badge',

@@ -30,38 +30,29 @@
     >
     </ng-select>
 </div>
-<div style="display: flex; justify-content: space-around">
-    <div>
-        <app-badge size="tiny" kind="primary">{{oneAccessPoint.name}}</app-badge>
-        <small>
-            <a [href]="trial.one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                {{oneAccessPoint.host}}.....
-            </a>
-        </small>
+<div class="pain2" style="padding-right: calc(66px + 15px);">
+    <div class="smart-padding-xsmall">
+        <app-panel [url]="trial.one.url" [title]="oneAccessPoint.name" titleFont="small">
+            <div class="center">
+                <span class="label">{{oneExpectedEncoding}}</span>
+                <span class="label">{{trial.one.byte}} b</span>
+                <span class="label">{{trial.one.response_sec}} s</span>
+                <span class="label">{{trial.one.status_code}}</span>
+            </div>
+        </app-panel>
     </div>
-    <div>
-        <app-badge size="tiny" kind="primary">{{otherAccessPoint.name}}</app-badge>
-        <small>
-            <a [href]="trial.other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
-                {{otherAccessPoint.host}}.....
-            </a>
-        </small>
-    </div>
-</div>
-<div style="display: flex; justify-content: space-around">
-    <div>
-        <span class="label">{{oneExpectedEncoding}}</span>
-        <span class="label">{{trial.one.byte}} b</span>
-        <span class="label">{{trial.one.response_sec}} s</span>
-        <span class="label">{{trial.one.status_code}}</span>
-    </div>
-    <div>
-        <span class="label">{{otherExpectedEncoding}}</span>
-        <span class="label">{{trial.other.byte}} b</span>
-        <span class="label">{{trial.other.response_sec}} s</span>
-        <span class="label">{{trial.other.status_code}}</span>
+    <div class="smart-padding-xsmall">
+        <app-panel [url]="trial.other.url" [title]="otherAccessPoint.name" titleFont="small">
+            <div class="center">
+                <span class="label">{{otherExpectedEncoding}}</span>
+                <span class="label">{{trial.other.byte}} b</span>
+                <span class="label">{{trial.other.response_sec}} s</span>
+                <span class="label">{{trial.other.status_code}}</span>
+            </div>
+        </app-panel>
     </div>
 </div>
+
 <hr/>
 <div class="origin-queries" *ngIf="!isLoading">{{trial.queryString}}</div>
 <div *ngIf="isLoading" style="width: 90%; padding-left: 10px;">

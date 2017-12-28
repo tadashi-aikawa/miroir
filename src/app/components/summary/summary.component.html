@@ -201,15 +201,13 @@
                     </app-markdown-inline-editor>
                 </div>
                 <hr/>
-                <div class="smart-padding">
-                    <app-badge size="tiny" kind="primary">{{activeReport.summary.one.name}}</app-badge>
-                    <small>
-                        {{activeReport.summary.one.host}}
-                    </small>
-                    <app-badge size="tiny" kind="primary">{{activeReport.summary.other.name}}</app-badge>
-                    <small>
-                        {{activeReport.summary.other.host}}
-                    </small>
+                <div class="pain2 smart-padding">
+                    <app-panel [title]="activeReport.summary.one.name" class="smart-padding-small">
+                        <small><a [href]="activeReport.summary.one.host">{{activeReport.summary.one.host}}</a></small>
+                    </app-panel>
+                    <app-panel [title]="activeReport.summary.other.name" class="smart-padding-small">
+                        <small><a [href]="activeReport.summary.other.host">{{activeReport.summary.other.host}}</a></small>
+                    </app-panel>
                 </div>
                 <mat-tab-group (selectedIndexChange)="afterChangeTab($event)">
                     <mat-tab label="Table">
