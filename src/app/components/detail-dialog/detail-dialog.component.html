@@ -32,7 +32,7 @@
 </div>
 <div style="display: flex; justify-content: space-around">
     <div>
-        <mat-chip>{{oneAccessPoint.name}}</mat-chip>
+        <app-badge size="tiny" kind="primary">{{oneAccessPoint.name}}</app-badge>
         <small>
             <a [href]="trial.one.url" class="ellipsis-text" style="width: 30vw" target="_blank">
                 {{oneAccessPoint.host}}.....
@@ -40,7 +40,7 @@
         </small>
     </div>
     <div>
-        <mat-chip>{{otherAccessPoint.name}}</mat-chip>
+        <app-badge size="tiny" kind="primary">{{otherAccessPoint.name}}</app-badge>
         <small>
             <a [href]="trial.other.url" class="ellipsis-text" style="width: 30vw" target="_blank">
                 {{otherAccessPoint.host}}.....
