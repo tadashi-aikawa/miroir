@@ -65,11 +65,11 @@
                         </mat-card-subtitle>
                     </mat-card-header>
                     <mat-card-content>
-                        <mat-chip-list>
-                            <mat-chip color="primary" selected="true">{{row.same_count}}</mat-chip>
-                            <mat-chip color="accent" selected="true">{{row.different_count}}</mat-chip>
-                            <mat-chip color="warn" selected="true">{{row.failure_count}}</mat-chip>
-                        </mat-chip-list>
+                        <app-badge-list>
+                            <app-badge kind="fine">{{row.same_count}}</app-badge>
+                            <app-badge kind="warning">{{row.different_count}}</app-badge>
+                            <app-badge kind="danger">{{row.failure_count}}</app-badge>
+                        </app-badge-list>
                         <span *ngIf="loadingReportKey == row.hashkey">
                             Now Loading...
                             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
