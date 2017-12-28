@@ -57,6 +57,7 @@ import {AuthGuard} from './components/guard/auth.guard';
 import {LoginComponent} from './components/login/login.component';
 import {InlineEditorComponent} from './components/inline-editor/inline-editor.component';
 import {MarkdownInlineEditorComponent} from './components/markdown-inline-editor/markdown-inline-editor.component';
+import {BadgeComponent, BadgeListComponent} from "./components/badge/badge-component";
 import {ConfirmDialogComponent} from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import {MonacoEditorLoader} from './services/monaco-editor-loader';
 import {LogoLoadingComponent} from './components/guard/logo-loading.component';
@@ -93,6 +94,8 @@ const appRoutes: Routes = [
         LabelsComponent,
         InlineEditorComponent,
         MarkdownInlineEditorComponent,
+        BadgeComponent,
+        BadgeListComponent,
         StatusCodeComponent,
         StatusComponent,
         ResponseTimeChartComponent,

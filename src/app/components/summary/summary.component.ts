@@ -12,7 +12,7 @@ import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {Clipboard} from "ts-clipboard";
-import {ToasterConfig, ToasterService} from "angular2-toaster";
+import {ToasterService} from "angular2-toaster";
 
 @Component({
     template: `
@@ -58,9 +58,9 @@ export class HoverComponent implements ViewCell, OnInit {
 
 @Component({
     template: `
-        <mat-chip-list *ngFor="let v of this.value">
-            <mat-chip>{{this.v}}</mat-chip>
-        </mat-chip-list>
+        <app-badge-list *ngFor="let v of this.value">
+            <app-badge kind="disabled">{{this.v}}</app-badge>    
+        </app-badge-list>
     `
 })
 export class LabelsComponent {
@@ -68,11 +68,11 @@ export class LabelsComponent {
 }
 
 @Component({
+    selector: 'app-status',
     template: `
-        <mat-chip-list>
-            <mat-chip [color]="kind" selected="true">{{renderValue}}</mat-chip>
-        </mat-chip-list>
-    `
+        <app-badge [kind]="kind">{{renderValue}}</app-badge>
+    `,
+    styleUrls: ['summary.css']
 })
 export class StatusComponent implements ViewCell, OnInit {
     renderValue: string;
@@ -83,9 +83,9 @@ export class StatusComponent implements ViewCell, OnInit {
     ngOnInit(): void {
         const v = String(this.value);
         this.renderValue = v;
-        this.kind = v === 'same' ? 'primary' :
-            v === 'different' ? 'accent' :
-                v === 'failure' ? 'warn' : '';
+        this.kind = v === 'same' ? "fine" :
+            v === 'different' ? "warning" :
+                v === 'failure' ? "danger" : '';
     }
 }
 
