@@ -69,6 +69,7 @@ import {
     ToPathPipe
 } from './components/analystic/analytics.component';
 import {ToasterModule} from "angular2-toaster";
+import {PanelComponent} from "./components/panel/panel-component";
 
 const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -96,6 +97,7 @@ const appRoutes: Routes = [
         MarkdownInlineEditorComponent,
         BadgeComponent,
         BadgeListComponent,
+        PanelComponent,
         StatusCodeComponent,
         StatusComponent,
         ResponseTimeChartComponent,
