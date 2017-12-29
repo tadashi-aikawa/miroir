@@ -35,6 +35,7 @@
         <app-panel [url]="trial.one.url" [title]="oneAccessPoint.name" titleFont="small">
             <div class="center">
                 <span class="label">{{oneExpectedEncoding}}</span>
+                <span class="label">{{trial.one.content_type}}</span>
                 <span class="label">{{trial.one.byte}} b</span>
                 <span class="label">{{trial.one.response_sec}} s</span>
                 <span class="label">{{trial.one.status_code}}</span>
@@ -45,6 +46,7 @@
         <app-panel [url]="trial.other.url" [title]="otherAccessPoint.name" titleFont="small">
             <div class="center">
                 <span class="label">{{otherExpectedEncoding}}</span>
+                <span class="label">{{trial.other.content_type}}</span>
                 <span class="label">{{trial.other.byte}} b</span>
                 <span class="label">{{trial.other.response_sec}} s</span>
                 <span class="label">{{trial.other.status_code}}</span>
