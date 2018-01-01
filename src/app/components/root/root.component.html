@@ -15,13 +15,13 @@
 
     <mat-sidenav #sidenav position="end" mode="over" (closedStart)="update()">
         <mat-form-field>
-            <input matInput [(ngModel)]="region" placeholder="Region">
+            <input matInput [(ngModel)]="region" placeholder="Region" required>
         </mat-form-field>
         <mat-form-field>
-            <input matInput [(ngModel)]="table" placeholder="DynamoDB table name">
+            <input matInput [(ngModel)]="table" placeholder="DynamoDB table name" required>
         </mat-form-field>
         <mat-form-field>
-            <input matInput [(ngModel)]="bucket" placeholder="Bucket name">
+            <input matInput [(ngModel)]="bucket" placeholder="Bucket name" required>
         </mat-form-field>
         <mat-form-field>
             <input matInput [(ngModel)]="prefix" placeholder="Prefix">
