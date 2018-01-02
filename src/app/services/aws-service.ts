@@ -76,7 +76,8 @@ export class AwsService {
             accessKeyId: this.tmpAccessKeyId,
             secretAccessKey: this.tmpSecretAccessKey,
             sessionToken: this.tmpSessionToken,
-            endpoint: this.useLocalStack ? `${this.localStackEndpoint}:4572` : undefined
+            endpoint: this.useLocalStack ? `${this.localStackEndpoint}:4572` : undefined,
+            maxRetries: 1,
         });
         this.db = new DynamoDB.DocumentClient({
             service: new DynamoDB({
@@ -130,6 +131,55 @@ export class AwsService {
         this.settingsService.removeTmpSecretAccessKeyId();
         this.settingsService.removeTmpSessionToken();
         this.settingsService.removeTmpExpireTime();
+    }
+
+    async pingTable(): Promise<void | string> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        return new Promise<void | string>((resolve, reject) => {
+            this.db.query(Object.assign({
+                    TableName: this.table,
+                    Limit: 1,
+                    KeyConditionExpression: "hashkey = :hash",
+                    ExpressionAttributeValues: {":hash": "something"},
+                },{}
+            ), err => err ?
+                reject(err.code === 'ResourceNotFoundException' ? `Invalid bucket` : 'Unexpected error') :
+                resolve()
+            );
+        });
+    }
+
+    async pingBucket(): Promise<void | string> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        return new Promise<void | string>((resolve, reject) => {
+            this.s3.headBucket(
+                {Bucket: this.bucket},
+                err => err ?
+                    reject(err.code === 'NetworkingError' ? `Invalid bucket` : 'Unexpected error') :
+                    resolve()
+            );
+        });
+    }
+
+    async pingBucketWithPrefix(): Promise<void | string> {
+        if (!await this.checkCredentialsExpiredAndTreat()) {
+            return Promise.reject('Temporary credentials is expired!!');
+        }
+
+        return new Promise<void | string>((resolve, reject) => {
+            this.s3.listObjectsV2(
+                {Bucket: this.bucket, Prefix: this.prefix && `${this.prefix}/`, MaxKeys: 1},
+                (err, data) => err ?
+                    reject('Unexpected error') :
+                    data.KeyCount > 0 ? resolve() : reject(`${this.bucket}/${this.prefix} is not existed or empty`)
+            );
+        });
     }
 
     async fetchTrial(key: string, name: string): Promise<{ encoding: string, body: string }> {
@@ -192,13 +242,13 @@ export class AwsService {
         return await putObject(this.s3, this.bucket, target, JSON.stringify(after));
     }
 
-    async fetchArchive(key: string): Promise<{name: string, body: Blob}> {
+    async fetchArchive(key: string): Promise<{ name: string, body: Blob }> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
         const zipName = `${key.substring(0, 7)}.zip`;
-        return new Promise<{name: string, body: Blob}>((resolve, reject) => {
+        return new Promise<{ name: string, body: Blob }>((resolve, reject) => {
             this.s3.getObject(
                 {Key: `${this.dataPrefix}/${key}/${zipName}`, Bucket: this.bucket},
                 (err, data) => err ? reject(err.message) : resolve({
@@ -267,8 +317,8 @@ export class AwsService {
                 hashkey: key
             },
             UpdateExpression: 'set #a = :title',
-            ExpressionAttributeNames: {'#a' : 'title'},
-            ExpressionAttributeValues: {':title' : title}
+            ExpressionAttributeNames: {'#a': 'title'},
+            ExpressionAttributeValues: {':title': title}
         };
 
         return new Promise((resolve, reject) => {
@@ -290,8 +340,8 @@ export class AwsService {
                 hashkey: key
             },
             UpdateExpression: 'set #a = :description',
-            ExpressionAttributeNames: {'#a' : 'description'},
-            ExpressionAttributeValues: {':description' : description}
+            ExpressionAttributeNames: {'#a': 'description'},
+            ExpressionAttributeValues: {':description': description}
         };
 
         return new Promise((resolve, reject) => {
@@ -313,8 +363,8 @@ export class AwsService {
                 hashkey: key
             },
             UpdateExpression: 'set #a = :check_status',
-            ExpressionAttributeNames: {'#a' : 'check_status'},
-            ExpressionAttributeValues: {':check_status' : status}
+            ExpressionAttributeNames: {'#a': 'check_status'},
+            ExpressionAttributeValues: {':check_status': status}
         };
 
         return new Promise((resolve, reject) => {
@@ -344,7 +394,7 @@ export class AwsService {
             'tags',
         ];
 
-        const recursiveFetchSummary = async (accumurator?: DynamoResult) =>  {
+        const recursiveFetchSummary = async (accumurator?: DynamoResult) => {
             if (!accumurator) {
                 accumurator = {Count: 0, ScannedCount: 0, Items: []}
             }

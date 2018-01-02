@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterModule, Routes} from '@angular/router';
 import {NgModule} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {
     MatButtonModule,
@@ -114,6 +114,7 @@ const appRoutes: Routes = [
         ToasterModule,
         RouterModule.forRoot(appRoutes),
         FormsModule,
+        ReactiveFormsModule,
         HttpModule,
         Ng2SmartTableModule,
         SelectModule,
