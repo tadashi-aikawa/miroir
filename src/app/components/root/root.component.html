@@ -13,18 +13,42 @@
         </button>
     </mat-toolbar>
 
-    <mat-sidenav #sidenav position="end" mode="over" (closedStart)="update()">
+    <mat-sidenav #sidenav position="end" mode="over" (openedStart)="pingAll()" (closedStart)="update()">
         <mat-form-field>
             <input matInput [(ngModel)]="region" placeholder="Region" required>
         </mat-form-field>
+
         <mat-form-field>
-            <input matInput [(ngModel)]="table" placeholder="DynamoDB table name" required>
+            <input matInput required
+                   placeholder="DynamoDB table name"
+                   [(ngModel)]="table"
+                   (focusout)="pingTable()">
+            <mat-spinner *ngIf="connectingTable" diameter="20"></mat-spinner>
+            <span class="error-message-small" *ngIf="!connectingTable">{{tableError}}</span>
+            <mat-icon *ngIf="!tableError && !connectingTable" matSuffix class="icon-fine">check</mat-icon>
+            <mat-icon *ngIf="tableError && !connectingTable" matSuffix class="icon-danger">close</mat-icon>
         </mat-form-field>
+
         <mat-form-field>
-            <input matInput [(ngModel)]="bucket" placeholder="Bucket name" required>
+            <input matInput required
+                   placeholder="Bucket name"
+                   [(ngModel)]="bucket"
+                   (focusout)="pingBucket()">
+            <mat-spinner *ngIf="connectingBucket" diameter="20"></mat-spinner>
+            <span class="error-message-small" *ngIf="!connectingBucket">{{bucketError}}</span>
+            <mat-icon *ngIf="!bucketError && !connectingBucket" matSuffix class="icon-fine">check</mat-icon>
+            <mat-icon *ngIf="bucketError && !connectingBucket" matSuffix class="icon-danger">close</mat-icon>
         </mat-form-field>
+
         <mat-form-field>
-            <input matInput [(ngModel)]="prefix" placeholder="Prefix">
+            <input matInput
+                   placeholder="Prefix"
+                   [(ngModel)]="prefix"
+                   (focusout)="pingPrefix()">
+            <mat-spinner *ngIf="connectingPrefix" diameter="20"></mat-spinner>
+            <span class="error-message-small" *ngIf="!connectingPrefix">{{prefixError}}</span>
+            <mat-icon *ngIf="!prefixError && !connectingPrefix" matSuffix class="icon-fine">check</mat-icon>
+            <mat-icon *ngIf="prefixError && !connectingPrefix" matSuffix class="icon-danger">close</mat-icon>
         </mat-form-field>
 
         <div class="center-vertical">

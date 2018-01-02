@@ -117,6 +117,14 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
     font-size: 16px;
 }
 
+.icon-fine {
+    color: #00897b;
+}
+
+.icon-danger {
+    color: #f44336;
+}
+
 .icon-large {
     font-size: 28px;
 }
@@ -129,6 +137,11 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
 
 .error-message {
     color: red;
+}
+
+.error-message-small{
+    color: red;
+    font-size: 75%;
 }
 
 .multi-line {
