@@ -11,6 +11,23 @@ const {version} = require('../../../../package.json');
     styleUrls: ['./root.component.css']
 })
 export class RootComponent {
+    REGIONS = [
+        "ap-northeast-1",
+        "ap-northeast-2",
+        "ap-southeast-1",
+        "ap-southeast-2",
+        "ap-south-1",
+        "us-east-1",
+        "us-east-2",
+        "us-west-1",
+        "us-west-2",
+        "eu-central-1",
+        "eu-west-1",
+        "eu-west-2",
+        "sa-east-1",
+        "ca-central-1",
+    ];
+
     version: string = version;
     region: string = this.awsService.region;
 
@@ -42,7 +59,7 @@ export class RootComponent {
 
     pingTable() {
         this.connectingTable = true;
-        this.awsService.pingTable(this.table)
+        this.awsService.pingTable()
             .then(_ => {
                 this.tableError = undefined;
                 this.connectingTable = false;
@@ -55,7 +72,7 @@ export class RootComponent {
 
     pingBucket() {
         this.connectingBucket = true;
-        this.awsService.pingBucket(this.bucket)
+        this.awsService.pingBucket()
             .then(_ => {
                 this.bucketError = undefined;
                 this.connectingBucket = false;
@@ -68,7 +85,7 @@ export class RootComponent {
 
     pingPrefix() {
         this.connectingPrefix = true;
-        this.awsService.pingBucketWithPrefix(this.bucket, this.prefix)
+        this.awsService.pingBucketWithPrefix()
             .then(_ => {
                 this.prefixError = undefined;
                 this.connectingPrefix = false;

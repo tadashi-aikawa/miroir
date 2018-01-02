@@ -133,14 +133,14 @@ export class AwsService {
         this.settingsService.removeTmpExpireTime();
     }
 
-    async pingTable(tableName: string): Promise<void | string> {
+    async pingTable(): Promise<void | string> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
         return new Promise<void | string>((resolve, reject) => {
             this.db.query(Object.assign({
-                    TableName: tableName,
+                    TableName: this.table,
                     Limit: 1,
                     KeyConditionExpression: "hashkey = :hash",
                     ExpressionAttributeValues: {":hash": "something"},
@@ -152,14 +152,14 @@ export class AwsService {
         });
     }
 
-    async pingBucket(bucketName: string): Promise<void | string> {
+    async pingBucket(): Promise<void | string> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
         return new Promise<void | string>((resolve, reject) => {
             this.s3.headBucket(
-                {Bucket: bucketName},
+                {Bucket: this.bucket},
                 err => err ?
                     reject(err.code === 'NetworkingError' ? `Invalid bucket` : 'Unexpected error') :
                     resolve()
@@ -167,17 +167,17 @@ export class AwsService {
         });
     }
 
-    async pingBucketWithPrefix(bucketName: string, prefix: string): Promise<void | string> {
+    async pingBucketWithPrefix(): Promise<void | string> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
         return new Promise<void | string>((resolve, reject) => {
             this.s3.listObjectsV2(
-                {Bucket: bucketName, Prefix: prefix && `${prefix}/`, MaxKeys: 1},
+                {Bucket: this.bucket, Prefix: this.prefix && `${this.prefix}/`, MaxKeys: 1},
                 (err, data) => err ?
                     reject('Unexpected error') :
-                    data.KeyCount > 0 ? resolve() : reject(`${bucketName}/${prefix} is not existed or empty`)
+                    data.KeyCount > 0 ? resolve() : reject(`${this.bucket}/${this.prefix} is not existed or empty`)
             );
         });
     }
