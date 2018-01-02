@@ -30,3 +30,16 @@ mat-sidenav {
     font-size: 75%;
     margin-top: 17px;
 }
+
+.navbar-region {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.region-fine {
+    color: rgb(134, 255, 151);
+}
+
+.region-danger {
+    color: #ffa9ac;
+}

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {AfterViewInit, Component} from '@angular/core';
 import {AwsService} from '../../services/aws-service';
 import {ToasterConfig} from "angular2-toaster";
 import {SettingsService} from "../../services/settings-service";
@@ -10,7 +10,7 @@ const {version} = require('../../../../package.json');
     templateUrl: './root.component.html',
     styleUrls: ['./root.component.css']
 })
-export class RootComponent {
+export class RootComponent implements AfterViewInit {
     REGIONS = [
         "ap-northeast-1",
         "ap-northeast-2",
@@ -44,7 +44,6 @@ export class RootComponent {
     prefixError: string;
 
     useLocalStack: boolean = this.awsService.useLocalStack;
-    localStackEndpoint: string = this.awsService.localStackEndpoint;
     alwaysIntelligentAnalytics: boolean = this.settingsService.alwaysIntelligentAnalytics;
 
     public toasterConfig : ToasterConfig = new ToasterConfig({
@@ -55,6 +54,10 @@ export class RootComponent {
 
     constructor(private awsService: AwsService, private settingsService: SettingsService) {
         // DO NOTHING
+    }
+
+    ngAfterViewInit(): void {
+        this.pingAll();
     }
 
     pingTable() {
@@ -102,6 +105,10 @@ export class RootComponent {
         this.pingPrefix();
     }
 
+    hasErrorSettings() {
+        return this.tableError || this.bucketError || this.prefixError;
+    }
+
     update() {
         this.awsService.updateRegion(this.region);
         this.awsService.updateTable(this.table);
@@ -110,4 +117,5 @@ export class RootComponent {
 
         this.settingsService.alwaysIntelligentAnalytics = this.alwaysIntelligentAnalytics;
     }
+
 }

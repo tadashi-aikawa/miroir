@@ -1,15 +1,18 @@
 <mat-sidenav-container fullscreen>
     <mat-toolbar color="primary">
-        <img src="assets/miroir-inverse.png" width="30px" />
+        <img src="assets/miroir-inverse.png" width="30px"/>
         <div class="navbar-title">Miroir</div>
         <div class="navbar-version">{{version}}</div>
-        <mat-chip-list *ngIf="useLocalStack">
-            <mat-chip color="accent" selected="true" [title]="localStackEndpoint">LocalStack</mat-chip>
-        </mat-chip-list>
         <span class="remaining-space"></span>
-        <span routerLink='/login'><button mat-button>Log-out</button></span>
-        <button mat-icon-button (click)="sidenav.open()">
-            <mat-icon class="mat-24">menu</mat-icon>
+
+        <div class="navbar-region center-vertical {{ hasErrorSettings() ? 'region-danger' : 'region-fine' }}">
+            <mat-icon style="padding-right: 5px;">{{ hasErrorSettings() ? 'cloud_off' : 'cloud' }}</mat-icon>
+            <span>{{useLocalStack ? "LocalStack" : region}}</span>
+        </div>
+
+        <span style="width: 15px;"></span>
+        <button mat-mini-fab color="primary" (click)="sidenav.open()">
+            <mat-icon>settings</mat-icon>
         </button>
     </mat-toolbar>
 
@@ -29,6 +32,8 @@
                    (focusout)="update(); pingTable()">
             <mat-spinner *ngIf="connectingTable" diameter="20"></mat-spinner>
             <span class="error-message-small" *ngIf="!connectingTable">{{tableError}}</span>
+            <mat-icon *ngIf="connectingTable" matSuffix></mat-icon>
+            <!--Above is needed to show icons certainly. Is this a bug?-->
             <mat-icon *ngIf="!tableError && !connectingTable" matSuffix class="icon-fine">check</mat-icon>
             <mat-icon *ngIf="tableError && !connectingTable" matSuffix class="icon-danger">close</mat-icon>
         </mat-form-field>
@@ -40,6 +45,8 @@
                    (focusout)="update(); pingBucket(); pingPrefix()">
             <mat-spinner *ngIf="connectingBucket" diameter="20"></mat-spinner>
             <span class="error-message-small" *ngIf="!connectingBucket">{{bucketError}}</span>
+            <mat-icon *ngIf="connectingBucket" matSuffix></mat-icon>
+            <!--Above is needed to show icons certainly. Is this a bug?-->
             <mat-icon *ngIf="!bucketError && !connectingBucket" matSuffix class="icon-fine">check</mat-icon>
             <mat-icon *ngIf="bucketError && !connectingBucket" matSuffix class="icon-danger">close</mat-icon>
         </mat-form-field>
@@ -51,6 +58,8 @@
                    (focusout)="update(); pingPrefix()">
             <mat-spinner *ngIf="connectingPrefix" diameter="20"></mat-spinner>
             <span class="error-message-small" *ngIf="!connectingPrefix">{{prefixError}}</span>
+            <mat-icon *ngIf="connectingPrefix" matSuffix></mat-icon>
+            <!--Above is needed to show icons certainly. Is this a bug?-->
             <mat-icon *ngIf="!prefixError && !connectingPrefix" matSuffix class="icon-fine">check</mat-icon>
             <mat-icon *ngIf="prefixError && !connectingPrefix" matSuffix class="icon-danger">close</mat-icon>
         </mat-form-field>
@@ -60,6 +69,10 @@
             <mat-slide-toggle [(ngModel)]="alwaysIntelligentAnalytics" class="smart-padding-left-small">
             </mat-slide-toggle>
         </div>
+        <button mat-button routerLink="/login" style="margin-top: 20px;">
+            <mat-icon class="mat-24">exit_to_app</mat-icon>
+            <span>Log-out</span>
+        </button>
     </mat-sidenav>
 
     <app-summary></app-summary>
