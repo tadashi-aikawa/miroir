@@ -56,7 +56,9 @@ import {SettingsService} from './services/settings-service';
 import {AuthGuard} from './components/guard/auth.guard';
 import {LoginComponent} from './components/login/login.component';
 import {InlineEditorComponent} from './components/inline-editor/inline-editor.component';
-import {MarkdownInlineEditorComponent} from './components/markdown-inline-editor/markdown-inline-editor.component';
+import {
+    MarkdownInlineEditorComponent
+} from './components/markdown-inline-editor/markdown-inline-editor.component';
 import {BadgeComponent, BadgeListComponent} from "./components/badge/badge-component";
 import {ConfirmDialogComponent} from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import {MonacoEditorLoader} from './services/monaco-editor-loader';
@@ -70,6 +72,7 @@ import {
 } from './components/analystic/analytics.component';
 import {ToasterModule} from "angular2-toaster";
 import {PanelComponent} from "./components/panel/panel-component";
+import {HasContentsPipe, EmptyContentsPipe} from "./utils/regexp";
 
 const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -107,6 +110,8 @@ const appRoutes: Routes = [
         ToIgnoredDiffSummaryPipe,
         ToAttentionPipe,
         ToPathPipe,
+        HasContentsPipe,
+        EmptyContentsPipe,
     ],
     imports: [
         BrowserModule,

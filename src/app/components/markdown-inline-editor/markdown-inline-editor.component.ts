@@ -4,6 +4,7 @@ import {MatDialog, MatTextareaAutosize} from '@angular/material';
 import {Change} from 'app/models/models';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/confirm-dialog.component';
+import {hasContents} from 'app/utils/regexp';
 
 @Component({
     selector: 'app-markdown-inline-editor',
@@ -29,7 +30,7 @@ import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/conf
     template: `
         <div style="display: flex;">
             <div *ngIf="!editing" class="action-icon hvr-glow" (click)="onTextClick()">
-                <div *ngIf="value; then view else emptyView;"></div>
+                <div *ngIf="value | hasContents; then view else emptyView;"></div>
 
                 <ng-template #view>
                     <markdown [data]="value"></markdown>
@@ -46,6 +47,9 @@ import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/conf
                 <div class="smart-padding-xsmall">
                     <textarea id="edit-area" matInput matTextareaAutosize [(ngModel)]="value"></textarea>
                 </div>
+                <span class="error-message-small" *ngIf="value | emptyContents">
+                    <mat-icon>warning</mat-icon> Required!!
+                </span>
                 <hr/>
                 <div class="smart-padding-left-small">
                     <mat-icon class="action-icon-large hvr-buzz-out"
@@ -94,6 +98,11 @@ export class MarkdownInlineEditorComponent {
 
     update() {
         this.editing = false;
+        if (!hasContents(this.value)) {
+            this.value = this.previousValue;
+            return;
+        }
+
         if (this.onUpdate !== null && this.previousValue !== this.value) {
             this.onUpdate.emit({
                 previous: this.previousValue,
