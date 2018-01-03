@@ -329,10 +329,10 @@ export class SummaryComponent implements OnInit {
             })
             .then(_ => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).title = title.current;
-                this.snackBar.open('', '[SUCCESS] Title updated', {duration: 2000});
+                this.toasterService.pop('success', `Succeeded to update title`);
             })
             .catch(err => {
-                this.snackBar.open(err, '[FAILURE] Title updated');
+                this.toasterService.pop('error', 'Failed to update title');
             });
     }
 
@@ -352,10 +352,10 @@ export class SummaryComponent implements OnInit {
             })
             .then(_ => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).description = description.current;
-                this.snackBar.open('', '[SUCCESS] Description updated', {duration: 3000});
+                this.toasterService.pop('success', `Succeeded to update description`);
             })
             .catch(err => {
-                this.snackBar.open(err, '[FAILURE] Description updated');
+                this.toasterService.pop('error', 'Failed to update description');
             });
     }
 
