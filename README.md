@@ -81,7 +81,7 @@ Other
 ### Dependencies without package.json
 
 ```
-"monaco-editor": "^0.8.3",
+"monaco-editor": "^0.10.1",
 ```
 
 Migrate to `package.json` when following issue is closed.
