@@ -224,7 +224,10 @@ export class DetailDialogComponent implements OnInit {
             content: this.settingsService.checkList,
             contentType: 'yaml',
             readOnly: false,
-            theme: 'vs'
+            theme: 'vs',
+            minimap: {
+                enabled: false
+            }
         };
 
         this.checkedAlready = toCheckedAlready(this.editorConfig.content);

@@ -675,7 +675,10 @@ export class EditorDialogComponent implements OnInit {
             content: this.value,
             contentType: this.mode,
             readOnly: true,
-            theme: 'vs-dark'
+            theme: 'vs-dark',
+            minimap: {
+                enabled: true
+            },
         };
     }
 }

@@ -18,7 +18,7 @@ function updateFromConfig(diffEditor?: any, config?: DiffViewConfig) {
         readOnly: config.readOnly,
         originalEditable: !config.readOnly,
         renderSideBySide: config.sideBySide,
-        scrollBeyondLastLine: false
+        scrollBeyondLastLine: false,
     });
 
     diffEditor.setModel({

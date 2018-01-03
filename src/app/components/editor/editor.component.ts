@@ -26,7 +26,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
             this.editor = monaco.editor.create(this.view.nativeElement, {
                 readOnly: this.config.readOnly,
                 scrollBeyondLastLine: false,
-                theme: this.config.theme
+                theme: this.config.theme,
+                minimap: this.config.minimap,
             });
              (<any>window).addEventListener('resize', this._updateLayout);
 
