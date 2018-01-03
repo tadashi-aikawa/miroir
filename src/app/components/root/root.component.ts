@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AwsService} from '../../services/aws-service';
 import {ToasterConfig} from "angular2-toaster";
 import {SettingsService} from "../../services/settings-service";
@@ -10,7 +10,7 @@ const {version} = require('../../../../package.json');
     templateUrl: './root.component.html',
     styleUrls: ['./root.component.css']
 })
-export class RootComponent implements AfterViewInit {
+export class RootComponent implements OnInit {
     REGIONS = [
         "ap-northeast-1",
         "ap-northeast-2",
@@ -56,7 +56,7 @@ export class RootComponent implements AfterViewInit {
         // DO NOTHING
     }
 
-    ngAfterViewInit(): void {
+    ngOnInit(): void {
         this.pingAll();
     }
 
