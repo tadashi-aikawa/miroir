@@ -181,6 +181,9 @@ export class EditorConfig {
     contentType: string;
     readOnly: boolean;
     theme?: string;
+    minimap?: {
+        enabled: boolean
+    }
 }
 
 export class DiffViewConfig {

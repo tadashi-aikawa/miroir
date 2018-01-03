@@ -11,7 +11,7 @@ export class AuthGuard implements CanActivate {
     ) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-        if (this.awsService.tmpAccessKeyId) {
+        if (this.awsService.tmpAccessKeyId && this.awsService.tmpExpireTime > new Date()) {
             return true;
         }
 

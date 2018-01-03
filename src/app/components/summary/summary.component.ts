@@ -12,7 +12,7 @@ import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {Clipboard} from "ts-clipboard";
-import {ToasterService} from "angular2-toaster";
+import {BodyOutputType, ToasterService} from "angular2-toaster";
 
 @Component({
     template: `
@@ -329,10 +329,10 @@ export class SummaryComponent implements OnInit {
             })
             .then(_ => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).title = title.current;
-                this.snackBar.open('', '[SUCCESS] Title updated', {duration: 2000});
+                this.toasterService.pop('success', `Succeeded to update title`);
             })
             .catch(err => {
-                this.snackBar.open(err, '[FAILURE] Title updated');
+                this.toasterService.pop('error', 'Failed to update title');
             });
     }
 
@@ -340,7 +340,15 @@ export class SummaryComponent implements OnInit {
         this.service.fetchReport(this.activeReport.key)
             .then((r: Report) => {
                 if (r.description !== description.previous) {
-                    return Promise.reject('Conflict?? Please reload and update again.');
+                    return Promise.reject(`
+                    <h4>Maybe conflict ??</h4>
+                    <h4>You need to operate as following to resolve conflict.</h4>
+                    <ol>
+                        <li>Copy your description not to be discarded</li>
+                        <li>Reload this report to update description</li>
+                        <li>Merge 2 and your description(1)</li>
+                    </ol>
+                    `);
                 }
 
                 this.activeReport.description = description.current;
@@ -348,14 +356,20 @@ export class SummaryComponent implements OnInit {
                 return Promise.all([
                     this.service.updateSummaryDescription(this.activeReport.key, description.current),
                     this.service.updateReportDescription(this.activeReport.key, description.current)
-                ]);
+                ]).catch(err => Promise.reject('Unexpected error occured'));
             })
             .then(_ => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).description = description.current;
-                this.snackBar.open('', '[SUCCESS] Description updated', {duration: 3000});
+                this.toasterService.pop('success', `Succeeded to update description`);
             })
             .catch(err => {
-                this.snackBar.open(err, '[FAILURE] Description updated');
+                this.toasterService.pop({
+                    type: 'error',
+                    title: 'Failed to update description',
+                    body: err,
+                    bodyOutputType: BodyOutputType.TrustedHtml,
+                    timeout: 0,
+                });
             });
     }
 
@@ -675,7 +689,10 @@ export class EditorDialogComponent implements OnInit {
             content: this.value,
             contentType: this.mode,
             readOnly: true,
-            theme: 'vs-dark'
+            theme: 'vs-dark',
+            minimap: {
+                enabled: true
+            },
         };
     }
 }
