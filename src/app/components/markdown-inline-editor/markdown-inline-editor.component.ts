@@ -82,13 +82,13 @@ export class MarkdownInlineEditorComponent {
 
         _hotkeysService.add([
             new Hotkey('ctrl+enter', () => {
-                this.update();
+                this.editing && this.update();
                 return false;
             }, ['TEXTAREA'], 'Update.'),
             new Hotkey('esc', () => {
-                this.cancel();
+                this.editing && this.cancel();
                 return false;
-            }, ['TEXTAREA'], 'Update.')
+            }, ['TEXTAREA'], 'Cancel.')
         ]);
     }
 
