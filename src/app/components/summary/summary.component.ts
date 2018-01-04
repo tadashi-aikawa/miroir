@@ -2,7 +2,6 @@ import {ActivatedRoute} from '@angular/router';
 import {Change, DynamoResult, DynamoRow, EditorConfig, IgnoreCase, Report, Summary, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {ObjectList} from 'aws-sdk/clients/s3';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material';
 import * as fileSaver from 'file-saver';
@@ -59,7 +58,7 @@ export class HoverComponent implements ViewCell, OnInit {
 @Component({
     template: `
         <app-badge-list *ngFor="let v of this.value">
-            <app-badge kind="disabled" size="minimum">{{this.v}}</app-badge>    
+            <app-badge kind="disabled" size="minimum">{{this.v}}</app-badge>
         </app-badge-list>
     `
 })
@@ -507,9 +506,9 @@ export class SummaryComponent implements OnInit {
         const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
 
         this.service.fetchList(key)
-            .then((oList: ObjectList) => {
+            .then((keys: string[]) => {
                 dialogRef.componentInstance.isLoading = false;
-                dialogRef.componentInstance.keys = oList.map(x => x.Key);
+                dialogRef.componentInstance.keys = keys;
                 dialogRef.afterClosed().subscribe((s3KeysToRemove: string[]) => {
                     if (s3KeysToRemove) {
                         row.deleting = true;

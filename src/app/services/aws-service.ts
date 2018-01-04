@@ -2,18 +2,18 @@ import {Injectable} from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import {Credentials, DynamoDB, S3, TemporaryCredentials} from 'aws-sdk';
-import {ObjectList} from 'aws-sdk/clients/s3';
+import {ListObjectsV2Output} from 'aws-sdk/clients/s3';
 import {DynamoResult, Report, Trial} from '../models/models';
 import * as Encoding from 'encoding-japanese';
 import * as _ from 'lodash';
 import {Router} from '@angular/router';
 import CheckStatus from '../constants/check-status';
 import {SettingsService} from './settings-service';
+import {ConditionExpression, ExpressionAttributeValueMap} from 'aws-sdk/clients/dynamodb';
 import DocumentClient = DynamoDB.DocumentClient;
-import {ConditionExpression} from 'aws-sdk/clients/dynamodb';
-import {ExpressionAttributeValueMap} from 'aws-sdk/clients/dynamodb';
 
 const DURATION_SECONDS = 86400;
+const S3_MAX_PER_PAGE = 1000;
 
 
 function fetchObject<T>(s3: S3, bucket: string, objectKey: string): Promise<T> {
@@ -144,8 +144,8 @@ export class AwsService {
                     Limit: 1,
                     KeyConditionExpression: "hashkey = :hash",
                     ExpressionAttributeValues: {":hash": "something"},
-                },{}
-            ), err => err ?
+                }, {}
+                ), err => err ?
                 reject(err.code === 'ResourceNotFoundException' ? `Invalid bucket` : 'Unexpected error') :
                 resolve()
             );
@@ -269,20 +269,43 @@ export class AwsService {
             return;
         }
 
-        await deleteObjects(this.s3, this.bucket, s3Keys);
+        for (let ks of _.chunk(s3Keys, S3_MAX_PER_PAGE)) {
+            await deleteObjects(this.s3, this.bucket, ks);
+        }
     }
 
-    async fetchList(key: string): Promise<ObjectList> {
+    async fetchList(key: string): Promise<string[]> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }
 
-        return new Promise<ObjectList>((resolve, reject) => {
-            this.s3.listObjectsV2(
-                {Bucket: this.bucket, Prefix: `${this.dataPrefix}/${key}`},
-                (err, data) => err ? reject(err.message) : resolve(data.Contents)
-            );
-        });
+        const recursiveFetchList = async (accumulator?: ListObjectsV2Output): Promise<ListObjectsV2Output> => {
+            if (!accumulator) {
+                accumulator = {KeyCount: 0, Contents: []}
+            }
+
+            const current = await new Promise<ListObjectsV2Output>((resolve, reject) => {
+                this.s3.listObjectsV2(
+                    {
+                        Bucket: this.bucket,
+                        Prefix: `${this.dataPrefix}/${key}`,
+                        ContinuationToken: accumulator.NextContinuationToken,
+                        MaxKeys: S3_MAX_PER_PAGE,
+                    },
+                    (err, data) => err ? reject(err.message) : resolve(data)
+                );
+            });
+
+            const accumulated: ListObjectsV2Output = {
+                KeyCount: accumulator.KeyCount + current.KeyCount,
+                Contents: [...accumulator.Contents, ...current.Contents],
+                NextContinuationToken: current.NextContinuationToken,
+            };
+
+            return current.NextContinuationToken ? recursiveFetchList(accumulated) : accumulated;
+        };
+
+        return (await recursiveFetchList()).Contents.map(x => x.Key);
     }
 
     async removeSummary(key: string): Promise<any> {
