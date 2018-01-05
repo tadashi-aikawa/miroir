@@ -8,6 +8,7 @@ import {Dictionary} from 'lodash';
     templateUrl: './analytics.component.html',
     styleUrls: [
         './analytics.css',
+        '../../../../node_modules/hover.css/css/hover.css',
     ],
 })
 export class AnalyticsComponent {
