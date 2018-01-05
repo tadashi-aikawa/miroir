@@ -26,7 +26,14 @@
         </thead>
         <tbody>
         <tr *ngFor="let c of (this.trials | toCheckedAlreadyDiffSummary)" (click)="onClickRow(c.trials)">
-            <td><a href={{c.link}} (click)="stopPropagation($event)" target="_blank"><img src={{c.image}} /></a></td>
+            <td>
+                <div class="center-vertical">
+                    <img *ngIf="c.image" src={{c.image}}/>
+                    <a *ngIf="c.link" href={{c.link}} (click)="stopPropagation($event)" target=”_blank”>
+                        <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                    </a>
+                </div>
+            </td>
             <td>{{c.title}}</td>
             <td>{{c.count}}</td>
         </tr>
@@ -44,7 +51,14 @@
         </thead>
         <tbody>
         <tr *ngFor="let c of (this.trials | toIgnoredDiffSummary)" (click)="onClickRow(c.trials)">
-            <td><a href={{c.link}} (click)="stopPropagation($event)" target="_blank"><img src={{c.image}} /></a></td>
+            <td>
+                <div class="center-vertical">
+                    <img *ngIf="c.image" src={{c.image}}/>
+                    <a *ngIf="c.link" href={{c.link}} (click)="stopPropagation($event)" target=”_blank”>
+                        <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                    </a>
+                </div>
+            </td>
             <td>{{c.title}}</td>
             <td>{{c.count}}</td>
         </tr>
@@ -54,22 +68,22 @@
     <h2>Path</h2>
     <table class="table table-hover">
         <thead>
-            <tr>
-                <th>Path</th>
-                <th>Count</th>
-                <th>Same</th>
-                <th>Different</th>
-                <th>Failure</th>
-            </tr>
+        <tr>
+            <th>Path</th>
+            <th>Count</th>
+            <th>Same</th>
+            <th>Different</th>
+            <th>Failure</th>
+        </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let c of (this.trials | toPath)" (click)="onClickRow(c.trials)">
-                <td>{{c.title}}</td>
-                <td><b>{{c.count}}</b></td>
-                <td class="same-color">{{c.status.same}}</td>
-                <td class="different-color">{{c.status.different}}</td>
-                <td class="failure-color">{{c.status.failure}}</td>
-            </tr>
+        <tr *ngFor="let c of (this.trials | toPath)" (click)="onClickRow(c.trials)">
+            <td>{{c.title}}</td>
+            <td><b>{{c.count}}</b></td>
+            <td class="same-color">{{c.status.same}}</td>
+            <td class="different-color">{{c.status.different}}</td>
+            <td class="failure-color">{{c.status.failure}}</td>
+        </tr>
         </tbody>
     </table>
 </div>
