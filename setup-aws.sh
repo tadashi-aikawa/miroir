@@ -27,7 +27,7 @@ cat > cors.json << 'EOF'
     "CORSRules": [
         {
             "AllowedHeaders": ["*"],
-            "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
+            "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
             "AllowedOrigins": ["*"],
             "MaxAgeSeconds": 3000
         }
