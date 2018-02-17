@@ -64,11 +64,24 @@
             <mat-icon *ngIf="prefixError && !connectingPrefix" matSuffix class="icon-danger">close</mat-icon>
         </mat-form-field>
 
+        <mat-divider style="margin: 15px 0;"></mat-divider>
+
         <div class="center-vertical">
             Use intelligent analytics always.
             <mat-slide-toggle [(ngModel)]="alwaysIntelligentAnalytics" class="smart-padding-left-small">
             </mat-slide-toggle>
         </div>
+
+        <mat-divider style="margin: 15px 0;"></mat-divider>
+
+        <mat-form-field>
+          <mat-select placeholder="Key binding mode" [(ngModel)]="keyMode" (selectionChange)="update();">
+            <mat-option *ngFor="let keyMode of KEY_MODES" [value]="keyMode">
+              {{ keyMode }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
         <button mat-button routerLink="/login" style="margin-top: 20px;">
             <mat-icon class="mat-24">exit_to_app</mat-icon>
             <span>Log-out</span>

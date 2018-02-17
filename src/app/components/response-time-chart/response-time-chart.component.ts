@@ -15,6 +15,10 @@ const statusToMarker = (status: number): Marker => {
             ({enabled: false});
 };
 
+const trialToTitle = (x: Trial): string =>
+  `${x.seq}. ${x.name} (${x.path}) [${x.status}] <br/><span style="font-size: 75%">${x.request_time}</span>`
+
+
 @Component({
     selector: 'app-response-time-chart',
     template: `
@@ -114,7 +118,7 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
                     type: 'spline',
                     data: trials.map(x => ({
                         y: x.one.response_sec,
-                        name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                        name: trialToTitle(x),
                         marker: statusToMarker(x.one.status_code),
                         events: {
                             click: e => {
@@ -130,7 +134,7 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
                     type: 'spline',
                     data: trials.map(x => ({
                         y: x.other.response_sec,
-                        name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                        name: trialToTitle(x),
                         marker: statusToMarker(x.other.status_code),
                         events: {
                             click: e => {
@@ -146,7 +150,7 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
                     type: 'area',
                     data: trials.map(x => ({
                         y: x.responseSecDiff,
-                        name: `${x.seq}. ${x.name} (${x.path}) [${x.status}]`,
+                        name: trialToTitle(x),
                         events: {
                             click: e => {
                                 this.onPointClick.emit(e.point.index);
