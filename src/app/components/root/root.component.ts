@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AwsService} from '../../services/aws-service';
 import {ToasterConfig} from "angular2-toaster";
-import {SettingsService} from "../../services/settings-service";
+import {KeyMode, SettingsService} from "../../services/settings-service";
 
 const {version} = require('../../../../package.json');
 
@@ -28,6 +28,11 @@ export class RootComponent implements OnInit {
         "ca-central-1",
     ];
 
+    KEY_MODES: KeyMode[] = [
+        "default",
+        "vim"
+    ];
+
     version: string = version;
     region: string = this.awsService.region;
 
@@ -45,6 +50,7 @@ export class RootComponent implements OnInit {
 
     useLocalStack: boolean = this.awsService.useLocalStack;
     alwaysIntelligentAnalytics: boolean = this.settingsService.alwaysIntelligentAnalytics;
+    keyMode: KeyMode = this.settingsService.keyMode;
 
     public toasterConfig : ToasterConfig = new ToasterConfig({
         animation: 'flyRight',
@@ -116,6 +122,7 @@ export class RootComponent implements OnInit {
         this.awsService.updatePrefix(this.prefix);
 
         this.settingsService.alwaysIntelligentAnalytics = this.alwaysIntelligentAnalytics;
+        this.settingsService.keyMode = this.keyMode;
     }
 
 }

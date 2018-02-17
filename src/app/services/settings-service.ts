@@ -5,6 +5,8 @@ import {DynamoDB} from 'aws-sdk';
 import {LocalStorageService} from 'angular-2-local-storage';
 import DocumentClient = DynamoDB.DocumentClient;
 
+export type KeyMode = 'default' | 'vim';
+const KEY_MODE_DEFAULT: KeyMode = 'default';
 
 const CHECKLIST_DEFAULT = `
 vars:
@@ -116,6 +118,14 @@ export class SettingsService {
 
     set useLocalStack(value: boolean) {
         this.localStorageService.set('useLocalStack', value);
+    }
+
+    get keyMode(): KeyMode {
+        return this.localStorageService.get<KeyMode>('keyMode') || KEY_MODE_DEFAULT;
+    }
+
+    set keyMode(value: KeyMode) {
+        this.localStorageService.set('keyMode', value);
     }
 
     get alwaysIntelligentAnalytics(): boolean {

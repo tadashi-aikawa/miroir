@@ -15,10 +15,62 @@ import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {LocalDataSource} from 'ng2-smart-table';
 import * as _ from 'lodash';
+import {Dictionary} from 'lodash';
 import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {ToasterConfig, ToasterService} from "angular2-toaster";
+
+
+interface KeyBindings {
+    move_diff_viewer_tab: string;
+    move_query_parameters_tab: string;
+    move_property_diffs_tab: string;
+    move_to_next_diff: string;
+    move_to_previous_diff: string;
+    show_next_trail: string;
+    show_previous_trail: string;
+    copy_trial_url: string;
+    copy_one_url: string;
+    copy_other_url: string;
+    close_this_dialog: string;
+    open_trial_list: string;
+    toggle_cheat_sheet: string;
+}
+
+const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
+    default: {
+        move_diff_viewer_tab: 'd',
+        move_query_parameters_tab: 'q',
+        move_property_diffs_tab: 'p',
+        move_to_next_diff: 'k',
+        move_to_previous_diff: 'i',
+        show_next_trail: 'l',
+        show_previous_trail: 'j',
+        copy_trial_url: 'C',
+        copy_one_url: 'J',
+        copy_other_url: 'L',
+        close_this_dialog: 'w',
+        open_trial_list: '/',
+        toggle_cheat_sheet: '?',
+    },
+    vim: {
+        move_diff_viewer_tab: 'd',
+        move_query_parameters_tab: 'q',
+        move_property_diffs_tab: 'p',
+        move_to_next_diff: 'j',
+        move_to_previous_diff: 'k',
+        show_next_trail: 'l',
+        show_previous_trail: 'h',
+        copy_trial_url: 'Y',
+        copy_one_url: 'H',
+        copy_other_url: 'L',
+        close_this_dialog: 'x',
+        open_trial_list: 'i',
+        toggle_cheat_sheet: '?',
+    }
+};
+
 
 
 interface RowData {
@@ -157,61 +209,62 @@ export class DetailDialogComponent implements OnInit {
                 private _hotkeysService: HotkeysService,
                 private settingsService: SettingsService,
                 private toasterService: ToasterService) {
+      const keyMode: KeyBindings = KEY_BINDINGS_BY[settingsService.keyMode];
         // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
         _hotkeysService.add([
-            new Hotkey('d', () => {
+            new Hotkey(keyMode.move_diff_viewer_tab, () => {
                 this.changeTab(0);
                 return false;
             }, null, 'Move `Diff viewer` tab.'),
-            new Hotkey('q', () => {
+            new Hotkey(keyMode.move_query_parameters_tab, () => {
                 this.changeTab(1);
                 return false;
             }, null, 'Move `Query parameters` tab.'),
-            new Hotkey('p', () => {
+            new Hotkey(keyMode.move_property_diffs_tab, () => {
                 this.changeTab(2);
                 return false;
             }, null, 'Move `Property diffs` tab.'),
-            new Hotkey('i', () => {
+            new Hotkey(keyMode.move_to_previous_diff, () => {
                 this.diffView.moveToPreviousDiff(true);
                 return false;
             }, null, 'Move to next diff.'),
-            new Hotkey('j', () => {
+            new Hotkey(keyMode.show_previous_trail, () => {
                 this.showPreviousTrial();
                 return false;
             }, null, 'Show previous trial.'),
-            new Hotkey('k', () => {
+            new Hotkey(keyMode.move_to_next_diff, () => {
                 this.diffView.moveToNextDiff(true);
                 return false;
             }, null, 'Move to previous diff.'),
-            new Hotkey('l', () => {
+            new Hotkey(keyMode.show_next_trail, () => {
                 this.showNextTrial();
                 return false;
             }, null, 'Show next trial.'),
-            new Hotkey('C', () => {
+            new Hotkey(keyMode.copy_trial_url, () => {
                 this.copyActiveTrialLink();
                 return false;
             }, null, 'Copy trial url.'),
-            new Hotkey('J', () => {
+            new Hotkey(keyMode.copy_one_url, () => {
                 Clipboard.copy(this.trial.one.url);
                 this.toasterService.pop('success', `Copied ${this.oneAccessPoint.name} url`, this.trial.one.url);
                 return false;
             }, null, 'Copy one url.'),
-            new Hotkey('L', () => {
+            new Hotkey(keyMode.copy_other_url, () => {
                 Clipboard.copy(this.trial.other.url);
                 this.toasterService.pop('success', `Copied ${this.otherAccessPoint.name} url`, this.trial.other.url);
                 return false;
             }, null, 'Copy other url.'),
-            new Hotkey('w', () => {
+            new Hotkey(keyMode.close_this_dialog, () => {
                 this.closeDialog();
                 return false;
             }, null, 'Close this dialog'),
-            new Hotkey('/', () => {
+            new Hotkey(keyMode.open_trial_list, () => {
                 this.openSelector();
                 return false;
             }, null, 'Open trial list'),
-            new Hotkey('?', () => {
+            new Hotkey(keyMode.toggle_cheat_sheet, () => {
                 this.toggleCheatSheet();
                 return false;
             }, null, 'Open/Close cheat sheet')
