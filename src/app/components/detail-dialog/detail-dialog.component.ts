@@ -348,6 +348,8 @@ export class DetailDialogComponent implements OnInit {
                         'text',
                         !this.unifiedDiff
                     );
+                    this.oneExpectedEncoding = 'None';
+                    this.otherExpectedEncoding = 'None';
                 }, 100);
             } else {
                 const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
@@ -384,6 +386,8 @@ export class DetailDialogComponent implements OnInit {
             setTimeout(() => {
                 this.isLoading = false;
                 this.diffViewConfig = createConfig('No file', 'No file', 'text', 'text', !this.unifiedDiff);
+                this.oneExpectedEncoding = 'None';
+                this.otherExpectedEncoding = 'None';
             }, 100);
         }
 
