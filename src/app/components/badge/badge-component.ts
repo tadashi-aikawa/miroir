@@ -1,7 +1,8 @@
 import {Component, Input} from '@angular/core';
 
-type BadgeKind = "fine" | "warning" | "danger" | "disabled" | "primary";
-type BadgeSize = "normal" | "small" | "tiny" | "minimum";
+type BadgeKind = 'fine' | 'warning' | 'danger' | 'disabled' | 'primary';
+type BadgeSize = 'normal' | 'small' | 'tiny' | 'minimum';
+type BadgeCursor = 'default' | 'pointer';
 
 @Component({
     selector: 'app-badge',
@@ -13,14 +14,16 @@ type BadgeSize = "normal" | "small" | "tiny" | "minimum";
     `
 })
 export class BadgeComponent {
-    @Input() kind: BadgeKind = "disabled";
-    @Input() size: BadgeSize = "normal";
+    @Input() kind: BadgeKind = 'disabled';
+    @Input() size: BadgeSize = 'normal';
+    @Input() cursor: BadgeCursor = 'default';
 
     calculateClasses() {
         return [
-            "badge",
+            'badge',
             `badge-${this.kind}`,
-            `badge-${this.size}`
+            `badge-${this.size}`,
+            `badge-cursor-${this.cursor}`
         ]
     }
 }
