@@ -10,6 +10,7 @@ PORT := 8888
 BASE_URL := http://localhost:8888/miroir/
 
 -include .env
+version := $(shell git rev-parse --abbrev-ref HEAD)
 
 
 help: ## Print this help
@@ -37,14 +38,20 @@ package: init _clean-package ## Package to dist (Set BASE_URL[def: http://localh
 	@docker rm -f tmp-miroir
 	@echo 'End $@'
 
-add-release:  ## Add releases to documentation (Set: VERSION)
+add-release:  ## Add releases to documentation
 	@echo 'Start $@'
-	@cat docs/releases/template.md | sed -r 's/x.y.z/$(VERSION)/g' | sed -r s@yyyy/MM/dd@`date '+%Y/%m/%d'`@g > docs/releases/$(VERSION).md
+	@cat docs/releases/template.md | sed -r 's/x.y.z/$(version)/g' | sed -r s@yyyy/MM/dd@`date '+%Y/%m/%d'`@g > docs/releases/$(version).md
 	@echo 'End $@'
 
 _clean-deploy-container:
 	@echo 'Start $@'
 	@docker rm -f miroir || echo "No need to clean"
+	@echo 'End $@'
+
+release:  ## Release
+	@echo 'Start $@'
+	npm version $(version)
+	git push
 	@echo 'End $@'
 
 deploy-container: _clean-deploy-container ## Deploy by docker (Set: PORT[def: 8888] and Requirements: dist)
