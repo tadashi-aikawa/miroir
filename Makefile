@@ -50,6 +50,7 @@ _clean-deploy-container:
 
 release:  ## Release
 	@echo 'Start $@'
+	git add docs
 	npm version $(version)
 	git push
 	@echo 'End $@'
