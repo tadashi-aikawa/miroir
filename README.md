@@ -43,11 +43,14 @@ Then access to `http://localhost:4200/`
 Release
 -------
 
-1. Create `docs/releases/*.md` and Update `docs/_sidebar.md`
-2. `git commit` above
-3. `npm version [major|minor|patch]`
-4. Check Miroir and documentation
-5. `git push`
+Before release, you need to `Confirm that your branch name equals release version`
+
+1. `make add-release` for createing `docs/releases/*.md`
+2. Update `docs/_sidebar.md`
+3. Check Miroir and documentation
+4. `make release`
+
+Finally, create pull request and merge to master!!
 
 
 Deploy
