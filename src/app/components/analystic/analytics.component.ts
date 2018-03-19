@@ -1,3 +1,4 @@
+import {Memoize} from 'lodash-decorators';
 import {PropertyDiffs, Summary, Trial} from '../../models/models';
 import {Component, Input, Pipe, PipeTransform, Output, EventEmitter} from '@angular/core';
 import * as _ from 'lodash';
@@ -16,6 +17,20 @@ export class AnalyticsComponent {
     @Input() trials: Trial[];
 
     @Output() onClickTrials = new EventEmitter<Trial[]>();
+
+    get checkedAlreadyTrials(): Trial[] {
+        return this.filterCheckedAlreadyTrials(this.trials);
+    }
+
+    @Memoize
+    private filterCheckedAlreadyTrials(trials: Trial[]): Trial[] {
+        return _(trials)
+            .filter((t: Trial) =>
+                t.propertyDiffsByCognition &&
+                t.propertyDiffsByCognition.getNonEmptyCheckedAlready().length > 0
+            )
+            .value();
+    }
 
     onClickRow(trials: Trial[]) {
         this.onClickTrials.emit(trials);
@@ -51,7 +66,7 @@ interface DiffSummary {
     trials: Trial[]
 }
 
-type DiffSummaryWip = Partial<DiffSummary> & {trial: Trial}
+type DiffSummaryWip = Partial<DiffSummary> & { trial: Trial }
 
 @Pipe({name: 'toAttention'})
 export class ToAttentionPipe implements PipeTransform {
@@ -137,7 +152,7 @@ export class ToPathPipe implements PipeTransform {
                 status: _(xs)
                     .groupBy<Trial>((x: Trial) => x.status)
                     .mapValues<Dictionary<Trial[]>, number>((x: Trial[]) => x.length)
-                    .value() as {same: number, different: number, failure: number},
+                    .value() as { same: number, different: number, failure: number },
                 trials: xs,
             }))
             .value();

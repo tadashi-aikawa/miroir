@@ -14,8 +14,16 @@
         </tr>
         </tbody>
     </table>
-
-    <h2>Checked Already</h2>
+    <div class="center-vertical">
+        <h2>Checked Already</h2>
+        <app-badge
+            (click)="onClickRow(this.checkedAlreadyTrials)"
+            size="small"
+            cursor="pointer"
+            kind="warning">
+            {{this.checkedAlreadyTrials.length}}
+        </app-badge>
+    </div>
     <table class="table table-hover">
         <thead>
         <tr>

@@ -56,3 +56,10 @@
     background-color: #e1e1e1;
 }
 
+.badge-cursor-default {
+    cursor: default;
+}
+
+.badge-cursor-pointer {
+    cursor: pointer;
+}
