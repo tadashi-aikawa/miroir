@@ -50,9 +50,17 @@ _clean-deploy-container:
 
 release:  ## Release
 	@echo 'Start $@'
+
+	@echo '1. Staging and commit'
 	git add docs
+	git commit -m ':pencil: Add release note'
+
+	@echo '2. Version up'
 	npm version $(version)
+
+	@echo '3. Push'
 	git push
+
 	@echo 'End $@'
 
 deploy-container: _clean-deploy-container ## Deploy by docker (Set: PORT[def: 8888] and Requirements: dist)
