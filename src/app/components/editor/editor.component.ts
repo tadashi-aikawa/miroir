@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild, OnChanges, SimpleChanges} from '@angular/core';
 import {EditorConfig} from '../../models/models';
 import {MonacoEditorLoader} from '../../services/monaco-editor-loader';
 
@@ -7,10 +7,11 @@ declare const require: any;
 
 @Component({
     selector: 'app-editor',
-    template: `<div #view class="monaco-editor" style="height: 85vh;"></div>`
+    template: `<div #view class="monaco-editor" [style.height]="height"></div>`,
 })
-export class EditorComponent implements AfterViewInit, OnDestroy {
+export class EditorComponent implements AfterViewInit, OnDestroy, OnChanges {
     @Input() config: EditorConfig;
+    @Input() height: string;
     editor: any;
 
     @ViewChild('view') view: ElementRef;
@@ -20,6 +21,13 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     constructor(private _monacoLoader: MonacoEditorLoader) {
         this._updateLayout = this.updateView.bind(this);
     }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes.height) {
+            setTimeout(() => this.updateView(), 0);
+        }
+    }
+
 
     ngAfterViewInit() {
         this._monacoLoader.waitForMonaco().then(() => {

@@ -19,7 +19,7 @@ import {Dictionary} from 'lodash';
 import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
-import {ToasterConfig, ToasterService} from "angular2-toaster";
+import {ToasterConfig, ToasterService} from 'angular2-toaster';
 
 
 interface KeyBindings {
@@ -35,6 +35,7 @@ interface KeyBindings {
     copy_other_url: string;
     close_this_dialog: string;
     open_trial_list: string;
+    toggle_fullscreen: string;
     toggle_cheat_sheet: string;
 }
 
@@ -52,6 +53,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         copy_other_url: 'L',
         close_this_dialog: 'w',
         open_trial_list: '/',
+        toggle_fullscreen: 'f',
         toggle_cheat_sheet: '?',
     },
     vim: {
@@ -67,6 +69,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         copy_other_url: 'L',
         close_this_dialog: 'x',
         open_trial_list: 'i',
+        toggle_fullscreen: 'f',
         toggle_cheat_sheet: '?',
     }
 };
@@ -131,7 +134,7 @@ const applyIgnores = (contents: Pair<string>, languages: Pair<string>,
     const sortStringify = (obj): string =>
         JSON.stringify(
             obj,
-            (_, v) => (!(v instanceof Array || v === null) && typeof v === 'object') ?
+            (none, v) => (!(v instanceof Array || v === null) && typeof v === 'object') ?
                 Object.keys(v).sort().reduce((r, k) => {
                     r[k] = v[k];
                     return r;
@@ -174,6 +177,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() ignores: IgnoreCase[] = [];
     @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
+    @Input() fullscreen = false;
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
     @Input() hideIgnoredDiff: boolean = this.settingsService.hideIgnoredDiff;
     @Input() hideCheckedAlreadyDiff: boolean = this.settingsService.hideCheckedAlreadyDiff;
@@ -264,6 +268,10 @@ export class DetailDialogComponent implements OnInit {
                 this.openSelector();
                 return false;
             }, null, 'Open trial list'),
+            new Hotkey(keyMode.toggle_fullscreen, () => {
+                this.changeFullscreen(!this.fullscreen);
+                return false;
+            }, null, 'Toggle fullscrean'),
             new Hotkey(keyMode.toggle_cheat_sheet, () => {
                 this.toggleCheatSheet();
                 return false;
@@ -417,6 +425,10 @@ export class DetailDialogComponent implements OnInit {
 
     changeTab(index: number): void {
         this.activeTabIndex = String(index);
+    }
+
+    changeFullscreen(fullscreen: boolean) {
+        this.fullscreen = fullscreen;
     }
 
     changeDiffType(unifiedDiff: boolean) {

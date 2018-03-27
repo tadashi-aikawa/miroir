@@ -10,8 +10,8 @@ import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
-import {Clipboard} from "ts-clipboard";
-import {BodyOutputType, ToasterService} from "angular2-toaster";
+import {Clipboard} from 'ts-clipboard';
+import {BodyOutputType, ToasterService} from 'angular2-toaster';
 
 @Component({
     template: `
@@ -82,9 +82,9 @@ export class StatusComponent implements ViewCell, OnInit {
     ngOnInit(): void {
         const v = String(this.value);
         this.renderValue = v;
-        this.kind = v === 'same' ? "fine" :
-            v === 'different' ? "warning" :
-                v === 'failure' ? "danger" : '';
+        this.kind = v === 'same' ? 'fine' :
+            v === 'different' ? 'warning' :
+                v === 'failure' ? 'danger' : '';
     }
 }
 
@@ -326,7 +326,7 @@ export class SummaryComponent implements OnInit {
                     this.service.updateReportTitle(this.activeReport.key, title.current)
                 ]);
             })
-            .then(_ => {
+            .then(none => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).title = title.current;
                 this.toasterService.pop('success', `Succeeded to update title`);
             })
@@ -357,7 +357,7 @@ export class SummaryComponent implements OnInit {
                     this.service.updateReportDescription(this.activeReport.key, description.current)
                 ]).catch(err => Promise.reject('Unexpected error occured'));
             })
-            .then(_ => {
+            .then(none => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).description = description.current;
                 this.toasterService.pop('success', `Succeeded to update description`);
             })
@@ -552,7 +552,8 @@ export class SummaryComponent implements OnInit {
 
     showDetail(index: number, trials?: Trial[]) {
         const dialogRef = this._dialog.open(DetailDialogComponent, {
-            width: '80vw',
+            width: '95vw',
+            maxWidth: '95vw',
             height: '97%',
             disableClose: true
         });

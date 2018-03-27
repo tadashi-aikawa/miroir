@@ -18,6 +18,9 @@
     "typeRoots": [
       "../node_modules/@types"
     ],
-    "noStrictGenericChecks": true
+    "noStrictGenericChecks": true,
+    "plugins": [
+      { "name": "@angular/language-service" }
+    ]
   }
 }
