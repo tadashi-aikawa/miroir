@@ -47,8 +47,9 @@ Before release, you need to `Confirm that your branch name equals release versio
 
 1. `make add-release` for createing `docs/releases/*.md`
 2. Update `docs/_sidebar.md`
-3. Check Miroir and documentation
-4. `make release`
+3. Update version in `docs/index.md`
+4. Check Miroir and documentation
+5. `make release`
 
 Finally, create pull request and merge to master!!
 
