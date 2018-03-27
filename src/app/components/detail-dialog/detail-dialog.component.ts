@@ -35,6 +35,7 @@ interface KeyBindings {
     copy_other_url: string;
     close_this_dialog: string;
     open_trial_list: string;
+    toggle_fullscreen: string;
     toggle_cheat_sheet: string;
 }
 
@@ -52,6 +53,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         copy_other_url: 'L',
         close_this_dialog: 'w',
         open_trial_list: '/',
+        toggle_fullscreen: 'f',
         toggle_cheat_sheet: '?',
     },
     vim: {
@@ -67,6 +69,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         copy_other_url: 'L',
         close_this_dialog: 'x',
         open_trial_list: 'i',
+        toggle_fullscreen: 'f',
         toggle_cheat_sheet: '?',
     }
 };
@@ -265,6 +268,10 @@ export class DetailDialogComponent implements OnInit {
                 this.openSelector();
                 return false;
             }, null, 'Open trial list'),
+            new Hotkey(keyMode.toggle_fullscreen, () => {
+                this.changeFullscreen(!this.fullscreen);
+                return false;
+            }, null, 'Toggle fullscrean'),
             new Hotkey(keyMode.toggle_cheat_sheet, () => {
                 this.toggleCheatSheet();
                 return false;

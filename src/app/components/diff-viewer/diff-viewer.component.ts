@@ -36,10 +36,11 @@ function updateFromConfig(diffEditor?: any, config?: DiffViewConfig) {
 
 @Component({
     selector: 'app-diff-viewer',
-    template: `<div #view class="monaco-editor" style="height: 65vh;"></div>`,
+    template: `<div #view class="monaco-editor" [style.height]="height"></div>`,
 })
 export class DiffViewerComponent implements AfterViewInit, OnDestroy, OnChanges {
     @Input() config: DiffViewConfig;
+    @Input() height: string;
     diffEditor: any;
     diffNavigator: any;
 
@@ -52,7 +53,12 @@ export class DiffViewerComponent implements AfterViewInit, OnDestroy, OnChanges 
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        updateFromConfig(this.diffEditor, changes.config.currentValue);
+        if (changes.config) {
+            updateFromConfig(this.diffEditor, changes.config.currentValue);
+        }
+        if (changes.height) {
+            setTimeout(() => this.updateLayout(), 0);
+        }
     }
 
     ngAfterViewInit() {
@@ -69,7 +75,9 @@ export class DiffViewerComponent implements AfterViewInit, OnDestroy, OnChanges 
     }
 
     private updateLayout() {
-        this.diffEditor.layout();
+        if (this.diffEditor) {
+            this.diffEditor.layout();
+        }
     }
 
     moveToNextDiff() {
@@ -83,6 +91,7 @@ export class DiffViewerComponent implements AfterViewInit, OnDestroy, OnChanges 
     updateView() {
         // XXX: More simple solutions?
         updateFromConfig(this.diffEditor, this.config);
+        setTimeout(() => this.updateLayout(), 0);
     }
 
 }
