@@ -19,7 +19,7 @@ import {Dictionary} from 'lodash';
 import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
-import {ToasterConfig, ToasterService} from "angular2-toaster";
+import {ToasterConfig, ToasterService} from 'angular2-toaster';
 
 
 interface KeyBindings {
@@ -131,7 +131,7 @@ const applyIgnores = (contents: Pair<string>, languages: Pair<string>,
     const sortStringify = (obj): string =>
         JSON.stringify(
             obj,
-            (_, v) => (!(v instanceof Array || v === null) && typeof v === 'object') ?
+            (none, v) => (!(v instanceof Array || v === null) && typeof v === 'object') ?
                 Object.keys(v).sort().reduce((r, k) => {
                     r[k] = v[k];
                     return r;
@@ -174,6 +174,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() ignores: IgnoreCase[] = [];
     @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
+    @Input() fullscreen = false;
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
     @Input() hideIgnoredDiff: boolean = this.settingsService.hideIgnoredDiff;
     @Input() hideCheckedAlreadyDiff: boolean = this.settingsService.hideCheckedAlreadyDiff;
@@ -417,6 +418,10 @@ export class DetailDialogComponent implements OnInit {
 
     changeTab(index: number): void {
         this.activeTabIndex = String(index);
+    }
+
+    changeFullscreen(fullscreen: boolean) {
+        this.fullscreen = fullscreen;
     }
 
     changeDiffType(unifiedDiff: boolean) {

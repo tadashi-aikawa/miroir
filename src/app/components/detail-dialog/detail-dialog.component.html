@@ -17,41 +17,44 @@
         close
     </mat-icon>
 </div>
-<div style="display: flex;">
-    <ng-select #selector
-               [options]="options"
-               [(ngModel)]="activeIndex"
-               [ngStyle]="{
-                'z-index': '99',
-                'font-size': '1.2rem'
-            }"
-               [className]="'smart-padding-without-left'"
-               (selected)="showTrial(trial)"
-    >
-    </ng-select>
-</div>
-<div class="pain2" style="padding-right: calc(66px + 15px);">
-    <div class="smart-padding-xsmall">
-        <app-panel [url]="trial.one.url" [title]="oneAccessPoint.name" titleFont="small">
-            <div class="center">
-                <span class="label">{{oneExpectedEncoding}}</span>
-                <span class="label">{{trial.one.content_type}}</span>
-                <span class="label">{{trial.one.byte}} b</span>
-                <span class="label">{{trial.one.response_sec}} s</span>
-                <span class="label">{{trial.one.status_code}}</span>
-            </div>
-        </app-panel>
+
+<div *ngIf="!fullscreen">
+    <div style="display: flex;">
+        <ng-select #selector
+                   [options]="options"
+                   [(ngModel)]="activeIndex"
+                   [ngStyle]="{
+                    'z-index': '99',
+                    'font-size': '1.2rem'
+                }"
+                   [className]="'smart-padding-without-left'"
+                   (selected)="showTrial(trial)"
+        >
+        </ng-select>
     </div>
-    <div class="smart-padding-xsmall">
-        <app-panel [url]="trial.other.url" [title]="otherAccessPoint.name" titleFont="small">
-            <div class="center">
-                <span class="label">{{otherExpectedEncoding}}</span>
-                <span class="label">{{trial.other.content_type}}</span>
-                <span class="label">{{trial.other.byte}} b</span>
-                <span class="label">{{trial.other.response_sec}} s</span>
-                <span class="label">{{trial.other.status_code}}</span>
-            </div>
-        </app-panel>
+    <div class="pain2" style="padding-right: calc(66px + 15px);">
+        <div class="smart-padding-xsmall">
+            <app-panel [url]="trial.one.url" [title]="oneAccessPoint.name" titleFont="small">
+                <div class="center">
+                    <span class="label">{{oneExpectedEncoding}}</span>
+                    <span class="label">{{trial.one.content_type}}</span>
+                    <span class="label">{{trial.one.byte}} b</span>
+                    <span class="label">{{trial.one.response_sec}} s</span>
+                    <span class="label">{{trial.one.status_code}}</span>
+                </div>
+            </app-panel>
+        </div>
+        <div class="smart-padding-xsmall">
+            <app-panel [url]="trial.other.url" [title]="otherAccessPoint.name" titleFont="small">
+                <div class="center">
+                    <span class="label">{{otherExpectedEncoding}}</span>
+                    <span class="label">{{trial.other.content_type}}</span>
+                    <span class="label">{{trial.other.byte}} b</span>
+                    <span class="label">{{trial.other.response_sec}} s</span>
+                    <span class="label">{{trial.other.status_code}}</span>
+                </div>
+            </app-panel>
+        </div>
     </div>
 </div>
 
@@ -74,6 +77,11 @@
                 </app-diff-viewer>
             </div>
             <div style="padding-top: 40px; padding-left: 10px;">
+                <div>
+                    <mat-button-toggle [checked]="fullscreen" (change)="changeFullscreen($event.source.checked)">
+                        <mat-icon title="Toggl full screen">fullscreen</mat-icon>
+                    </mat-button-toggle>
+                </div>
                 <div>
                     <mat-button-toggle [checked]="unifiedDiff" (change)="changeDiffType($event.source.checked)">
                         <mat-icon title="Toggl diff kind">view_agenda</mat-icon>
