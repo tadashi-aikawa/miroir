@@ -151,7 +151,7 @@
             </p>
             <div *ngIf="activeReport">
                 <div class="center-vertical" style="flex-direction: row-reverse;">
-                    <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}</small>
+                    <small>{{activeReport.summary.time.start | date:'yyyy-MM-dd HH:mm:ss'}} ～ {{activeReport.summary.time.end | date:'yyyy-MM-dd HH:mm:ss'}}</small>
                     <mat-icon>access_time</mat-icon>
                 </div>
                 <div class="center-vertical">
