@@ -275,8 +275,10 @@ export class SummaryComponent implements OnInit {
             this.service.findSummary(keyword)
                 .then((r: DynamoResult) => {
                     this.searchingSummary = false;
+                    // TODO
+                    // FIXME: remove `.replace(/\//g, '-')` after a while (May?)
                     this.rows = r.Items.sort(
-                        (a, b) => b.begin_time > a.begin_time ? 1 : -1
+                        (a, b) => b.begin_time.replace(/\//g, '-') > a.begin_time.replace(/\//g, '-') ? 1 : -1
                     );
                     resolve(this.rows);
                 })

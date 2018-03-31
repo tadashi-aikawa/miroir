@@ -60,8 +60,8 @@
                             {{row.title}}
                         </mat-card-title>
                         <mat-card-subtitle>
-                            {{row.begin_time}}
-                            <span class="card-hashkey-text">({{row.hashkey.substring(0, 7)}})</span>
+                            {{row.begin_time | date:'yyyy-MM-dd HH:mm:ss'}}
+                            ({{row.elapsed_sec}} sec)
                         </mat-card-subtitle>
                     </mat-card-header>
                     <mat-card-content>
@@ -70,6 +70,9 @@
                             <app-badge kind="warning">{{row.different_count}}</app-badge>
                             <app-badge kind="danger">{{row.failure_count}}</app-badge>
                         </app-badge-list>
+                        <div *ngIf="row.tags">
+                            <span class="summary-card-tag" *ngFor="let tag of row.tags.values">{{tag}}</span>
+                        </div>
                         <span *ngIf="loadingReportKey == row.hashkey">
                             Now Loading...
                             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -129,6 +132,7 @@
                         >
                             cloud_download
                         </mat-icon>
+                        <span class="card-hashkey-text" style="float: right;">{{row.hashkey.substring(0, 7)}}</span>
                         <div *ngIf="row.retry_hash" class="card-retry-text">
                             Retried from
                             <span class="hvr-underline-from-center action-text"
@@ -137,9 +141,6 @@
                             </span>
                         </div>
                     </mat-card-actions>
-                    <mat-card-footer class="smart-padding-xsmall" *ngIf="row.tags">
-                        <span class="summary-card-tag" *ngFor="let tag of row.tags.values">{{tag}}</span>
-                    </mat-card-footer>
                 </mat-card>
             </div>
         </mat-sidenav>
@@ -150,7 +151,7 @@
             </p>
             <div *ngIf="activeReport">
                 <div class="center-vertical" style="flex-direction: row-reverse;">
-                    <small>{{activeReport.summary.time.start}} ～ {{activeReport.summary.time.end}}</small>
+                    <small>{{activeReport.summary.time.start | date:'yyyy-MM-dd HH:mm:ss'}} ～ {{activeReport.summary.time.end | date:'yyyy-MM-dd HH:mm:ss'}}</small>
                     <mat-icon>access_time</mat-icon>
                 </div>
                 <div class="center-vertical">
