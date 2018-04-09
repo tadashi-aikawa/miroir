@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
+import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import {Credentials, DynamoDB, S3, TemporaryCredentials} from 'aws-sdk';
 import {ListObjectsV2Output} from 'aws-sdk/clients/s3';
-import {DynamoResult, Report, Trial} from '../models/models';
+import {DynamoResult, Report, Trial, AwsConfiguration} from '../models/models';
 import * as Encoding from 'encoding-japanese';
 import * as _ from 'lodash';
 import {Router} from '@angular/router';
@@ -57,6 +58,9 @@ export class AwsService {
     useLocalStack: boolean = this.settingsService.useLocalStack || false;
     localStackEndpoint: string = this.settingsService.localStackEndpoint || 'http://localhost';
 
+    private sharedAwsConfiguration = new Subject<AwsConfiguration>();
+    public sharedAwsConfiguration$ = this.sharedAwsConfiguration.asObservable();
+
     s3: S3;
     db: DynamoDB.DocumentClient;
 
@@ -90,25 +94,28 @@ export class AwsService {
         });
     }
 
-    updateRegion(region: string) {
-        this.region = region;
-        this.settingsService.region = region;
-        this.assignClients();
-    }
+    update(region: string, table: string, bucket: string, prefix: string) {
+        // Empty string and undefined are different as meaning
+        if (region !== undefined) {
+            this.region = region;
+            this.settingsService.region = region;
+            this.assignClients();
+        }
 
-    updateTable(table: string) {
-        this.table = table;
-        this.settingsService.table = table;
-    }
+        if (table !== undefined) {
+            this.table = table;
+            this.settingsService.table = table;
+        }
+        if (bucket !== undefined) {
+            this.bucket = bucket;
+            this.settingsService.bucket = bucket;
+        }
+        if (prefix !== undefined) {
+            this.prefix = prefix;
+            this.settingsService.prefix = prefix;
+        }
 
-    updateBucket(bucket: string) {
-        this.bucket = bucket;
-        this.settingsService.bucket = bucket;
-    }
-
-    updatePrefix(prefix: string) {
-        this.prefix = prefix;
-        this.settingsService.prefix = prefix;
+        this.sharedAwsConfiguration.next({region, table, bucket, prefix});
     }
 
     login(accessKeyId: string, secretAccessKey: string,
@@ -142,8 +149,8 @@ export class AwsService {
             this.db.query(Object.assign({
                     TableName: this.table,
                     Limit: 1,
-                    KeyConditionExpression: "hashkey = :hash",
-                    ExpressionAttributeValues: {":hash": "something"},
+                    KeyConditionExpression: 'hashkey = :hash',
+                    ExpressionAttributeValues: {':hash': 'something'},
                 }, {}
                 ), err => err ?
                 reject(err.code === 'ResourceNotFoundException' ? `Invalid bucket` : 'Unexpected error') :
@@ -269,7 +276,7 @@ export class AwsService {
             return;
         }
 
-        for (let ks of _.chunk(s3Keys, S3_MAX_PER_PAGE)) {
+        for (const ks of _.chunk(s3Keys, S3_MAX_PER_PAGE)) {
             await deleteObjects(this.s3, this.bucket, ks);
         }
     }
