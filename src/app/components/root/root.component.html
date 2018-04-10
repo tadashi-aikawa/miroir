@@ -7,7 +7,7 @@
 
         <div class="navbar-region center-vertical {{ hasErrorSettings() ? 'region-danger' : 'region-fine' }}">
             <mat-icon style="padding-right: 5px;">{{ hasErrorSettings() ? 'cloud_off' : 'cloud' }}</mat-icon>
-            <span>{{useLocalStack ? "LocalStack" : region}}</span>
+            <span>{{useLocalStack ? "LocalStack" : region}}/{{table}}</span>
         </div>
 
         <span style="width: 15px;"></span>
