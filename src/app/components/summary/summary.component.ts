@@ -246,21 +246,27 @@ export class SummaryComponent implements OnInit {
                 setTimeout(() => this.keyWord.nativeElement.click(), 100);
             });
         }, 0);
-        this.route.params.subscribe(ps => {
-            if (ps.searchWord) {
-                this.word = ps.searchWord;
-                this.searchReport(ps.searchWord);
-            }
-            if (ps.hashKey) {
-                this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
-                    .then((r: Report) => {
-                        this.filteredTrials = r.trials.map(x => Object.assign(new Trial(), x));
-                        if (ps.seq) {
-                            this.showDetail(ps.seq - 1);
-                        }
-                    });
-            }
+
+        this.route.queryParams.subscribe(qs => {
+            this.service.update(qs.region, qs.table, qs.bucket, qs.prefix);
+
+            this.route.params.subscribe(ps => {
+                if (ps.searchWord) {
+                    this.word = ps.searchWord;
+                    this.searchReport(ps.searchWord);
+                }
+                if (ps.hashKey) {
+                    this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
+                        .then((r: Report) => {
+                            this.filteredTrials = r.trials.map(x => Object.assign(new Trial(), x));
+                            if (ps.seq) {
+                                this.showDetail(ps.seq - 1);
+                            }
+                        });
+                }
+            });
         });
+
     }
 
     onSearchReports(keyword: string) {
@@ -613,7 +619,7 @@ export class SummaryComponent implements OnInit {
     }
 
     copyActiveReportLink() {
-        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}`;
+        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}`;
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this report url`, url);
     }

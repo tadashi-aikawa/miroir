@@ -7,7 +7,7 @@
 
         <div class="navbar-region center-vertical {{ hasErrorSettings() ? 'region-danger' : 'region-fine' }}">
             <mat-icon style="padding-right: 5px;">{{ hasErrorSettings() ? 'cloud_off' : 'cloud' }}</mat-icon>
-            <span>{{useLocalStack ? "LocalStack" : region}}</span>
+            <span>{{useLocalStack ? "LocalStack" : region}}/{{table}}</span>
         </div>
 
         <span style="width: 15px;"></span>
@@ -16,9 +16,9 @@
         </button>
     </mat-toolbar>
 
-    <mat-sidenav #sidenav position="end" mode="over" (openedStart)="pingAll()" (closedStart)="update()">
+    <mat-sidenav #sidenav position="end" mode="over" (closedStart)="update()">
         <mat-form-field>
-            <mat-select placeholder="Region" [(ngModel)]="region" (selectionChange)="update(); pingAll()">
+            <mat-select placeholder="Region" [(ngModel)]="region" (selectionChange)="update()">
                 <mat-option *ngFor="let region of REGIONS" [value]="region">
                     {{ region }}
                 </mat-option>
@@ -29,7 +29,7 @@
             <input matInput required
                    placeholder="DynamoDB table name"
                    [(ngModel)]="table"
-                   (focusout)="update(); pingTable()">
+                   (focusout)="update()">
             <mat-spinner *ngIf="connectingTable" diameter="20"></mat-spinner>
             <span class="error-message-small" *ngIf="!connectingTable">{{tableError}}</span>
             <mat-icon *ngIf="connectingTable" matSuffix></mat-icon>
@@ -42,7 +42,7 @@
             <input matInput required
                    placeholder="Bucket name"
                    [(ngModel)]="bucket"
-                   (focusout)="update(); pingBucket(); pingPrefix()">
+                   (focusout)="update()">
             <mat-spinner *ngIf="connectingBucket" diameter="20"></mat-spinner>
             <span class="error-message-small" *ngIf="!connectingBucket">{{bucketError}}</span>
             <mat-icon *ngIf="connectingBucket" matSuffix></mat-icon>
@@ -55,7 +55,7 @@
             <input matInput
                    placeholder="Prefix"
                    [(ngModel)]="prefix"
-                   (focusout)="update(); pingPrefix()">
+                   (focusout)="update()">
             <mat-spinner *ngIf="connectingPrefix" diameter="20"></mat-spinner>
             <span class="error-message-small" *ngIf="!connectingPrefix">{{prefixError}}</span>
             <mat-icon *ngIf="connectingPrefix" matSuffix></mat-icon>

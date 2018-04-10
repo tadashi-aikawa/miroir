@@ -1,7 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
 import {AwsService} from '../../services/aws-service';
-import {ToasterConfig} from "angular2-toaster";
-import {KeyMode, SettingsService} from "../../services/settings-service";
+import {ToasterConfig} from 'angular2-toaster';
+import {KeyMode, SettingsService} from '../../services/settings-service';
 
 const {version} = require('../../../../package.json');
 
@@ -10,60 +11,71 @@ const {version} = require('../../../../package.json');
     templateUrl: './root.component.html',
     styleUrls: ['./root.component.css']
 })
-export class RootComponent implements OnInit {
+export class RootComponent implements OnInit, OnDestroy {
     REGIONS = [
-        "ap-northeast-1",
-        "ap-northeast-2",
-        "ap-southeast-1",
-        "ap-southeast-2",
-        "ap-south-1",
-        "us-east-1",
-        "us-east-2",
-        "us-west-1",
-        "us-west-2",
-        "eu-central-1",
-        "eu-west-1",
-        "eu-west-2",
-        "sa-east-1",
-        "ca-central-1",
+        'ap-northeast-1',
+        'ap-northeast-2',
+        'ap-southeast-1',
+        'ap-southeast-2',
+        'ap-south-1',
+        'us-east-1',
+        'us-east-2',
+        'us-west-1',
+        'us-west-2',
+        'eu-central-1',
+        'eu-west-1',
+        'eu-west-2',
+        'sa-east-1',
+        'ca-central-1',
     ];
 
     KEY_MODES: KeyMode[] = [
-        "default",
-        "vim"
+        'default',
+        'vim'
     ];
 
     version: string = version;
-    region: string = this.awsService.region;
+    region: string;
 
-    table: string = this.awsService.table;
+    table: string;
     connectingTable: boolean;
     tableError: string;
 
-    bucket: string = this.awsService.bucket;
+    bucket: string;
     connectingBucket: boolean;
     bucketError: string;
 
-    prefix: string = this.awsService.prefix;
+    prefix: string;
     connectingPrefix: boolean;
     prefixError: string;
 
-    useLocalStack: boolean = this.awsService.useLocalStack;
-    alwaysIntelligentAnalytics: boolean = this.settingsService.alwaysIntelligentAnalytics;
+    useLocalStack: boolean;
+    alwaysIntelligentAnalytics: boolean;
     keyMode: KeyMode = this.settingsService.keyMode;
 
-    public toasterConfig : ToasterConfig = new ToasterConfig({
+    public toasterConfig: ToasterConfig = new ToasterConfig({
         animation: 'flyRight',
         newestOnTop: false,
         mouseoverTimerStop: true,
     });
+
+    private awsConfigurationSubscription: Subscription;
 
     constructor(private awsService: AwsService, private settingsService: SettingsService) {
         // DO NOTHING
     }
 
     ngOnInit(): void {
+        this.loadFromStorage();
         this.pingAll();
+        this.awsConfigurationSubscription = this.awsService.sharedAwsConfiguration$.subscribe(conf => {
+            this.loadFromStorage();
+            this.pingAll();
+        });
+    }
+
+    ngOnDestroy() {
+        this.awsConfigurationSubscription.unsubscribe();
     }
 
     pingTable() {
@@ -116,13 +128,19 @@ export class RootComponent implements OnInit {
     }
 
     update() {
-        this.awsService.updateRegion(this.region);
-        this.awsService.updateTable(this.table);
-        this.awsService.updateBucket(this.bucket);
-        this.awsService.updatePrefix(this.prefix);
+        this.awsService.update(this.region, this.table, this.bucket, this.prefix);
 
         this.settingsService.alwaysIntelligentAnalytics = this.alwaysIntelligentAnalytics;
         this.settingsService.keyMode = this.keyMode;
+    }
+
+    private loadFromStorage() {
+        this.region = this.awsService.region;
+        this.table = this.awsService.table;
+        this.bucket = this.awsService.bucket;
+        this.prefix = this.awsService.prefix;
+        this.useLocalStack = this.awsService.useLocalStack;
+        this.alwaysIntelligentAnalytics = this.settingsService.alwaysIntelligentAnalytics;
     }
 
 }

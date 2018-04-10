@@ -195,3 +195,10 @@ export class DiffViewConfig {
     sideBySide: boolean;
     theme?: string;
 }
+
+export class AwsConfiguration {
+    region: string;
+    bucket: string;
+    table: string;
+    prefix: string;
+}
