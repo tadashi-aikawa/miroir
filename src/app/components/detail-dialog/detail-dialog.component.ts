@@ -470,7 +470,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     copyActiveTrialLink() {
-        const url = `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}`;
+        const url = `${location.origin}${location.pathname}#/report/${this.reportKey}/${this.reportKey}/${this.trial.seq}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}`;
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this trial url`, url);
     }

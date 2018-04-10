@@ -619,7 +619,7 @@ export class SummaryComponent implements OnInit {
     }
 
     copyActiveReportLink() {
-        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}`;
+        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}`;
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this report url`, url);
     }
