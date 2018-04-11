@@ -57,7 +57,7 @@ export class SettingsService {
     }
 
     get prefix(): string {
-        return this.localStorageService.get<string>('prefix');
+        return this.localStorageService.get<string>('prefix') || '';
     }
 
     set prefix(value: string) {

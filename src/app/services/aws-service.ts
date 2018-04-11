@@ -153,7 +153,7 @@ export class AwsService {
                     ExpressionAttributeValues: {':hash': 'something'},
                 }, {}
                 ), err => err ?
-                reject(err.code === 'ResourceNotFoundException' ? `Invalid bucket` : 'Unexpected error') :
+                reject(err.code === 'ResourceNotFoundException' ? `Invalid table name` : 'Unexpected error') :
                 resolve()
             );
         });
@@ -168,7 +168,7 @@ export class AwsService {
             this.s3.headBucket(
                 {Bucket: this.bucket},
                 err => err ?
-                    reject(err.code === 'NetworkingError' ? `Invalid bucket` : 'Unexpected error') :
+                    reject(err.code === 'NetworkingError' ? `Invalid bucket name` : 'Unexpected error') :
                     resolve()
             );
         });

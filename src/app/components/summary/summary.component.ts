@@ -682,6 +682,7 @@ export class DeleteConfirmDialogComponent {
         <h2 mat-dialog-title>{{title}}</h2>
         <app-editor #editor
                     [config]="editorConfig"
+                    height="95vh" 
         >
         </app-editor>
     `,
