@@ -50,7 +50,7 @@ export class RootComponent implements OnInit, OnDestroy {
     prefixError: string;
 
     useLocalStack: boolean;
-    alwaysIntelligentAnalytics: boolean;
+    alwaysIntelligentAnalytics: boolean = this.settingsService.alwaysIntelligentAnalytics;
     keyMode: KeyMode = this.settingsService.keyMode;
 
     public toasterConfig: ToasterConfig = new ToasterConfig({
@@ -140,7 +140,6 @@ export class RootComponent implements OnInit, OnDestroy {
         this.bucket = this.awsService.bucket;
         this.prefix = this.awsService.prefix;
         this.useLocalStack = this.awsService.useLocalStack;
-        this.alwaysIntelligentAnalytics = this.settingsService.alwaysIntelligentAnalytics;
     }
 
 }
