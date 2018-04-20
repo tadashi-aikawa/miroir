@@ -31,6 +31,7 @@ interface KeyBindings {
     show_next_trail: string;
     show_previous_trail: string;
     copy_trial_url: string;
+    copy_path: string;
     copy_one_url: string;
     copy_other_url: string;
     close_this_dialog: string;
@@ -49,6 +50,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         show_next_trail: 'l',
         show_previous_trail: 'j',
         copy_trial_url: 'C',
+        copy_path: 'P',
         copy_one_url: 'J',
         copy_other_url: 'L',
         close_this_dialog: 'w',
@@ -65,6 +67,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         show_next_trail: 'l',
         show_previous_trail: 'h',
         copy_trial_url: 'Y',
+        copy_path: 'P',
         copy_one_url: 'H',
         copy_other_url: 'L',
         close_this_dialog: 'x',
@@ -250,6 +253,11 @@ export class DetailDialogComponent implements OnInit {
                 this.copyActiveTrialLink();
                 return false;
             }, null, 'Copy trial url.'),
+            new Hotkey(keyMode.copy_path, () => {
+                Clipboard.copy(this.trial.path);
+                this.toasterService.pop('success', `Copied this trial path`, this.trial.path);
+                return false;
+            }, null, 'Copy path.'),
             new Hotkey(keyMode.copy_one_url, () => {
                 Clipboard.copy(this.trial.one.url);
                 this.toasterService.pop('success', `Copied ${this.oneAccessPoint.name} url`, this.trial.one.url);
