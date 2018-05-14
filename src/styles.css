@@ -164,3 +164,17 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
     overflow-y: scroll;
     height: calc(100vh - 64px - 20*2px);
 }
+
+/* Elegant scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, .1);
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 50, .5);
+  border-radius: 10px;
+  box-shadow:0 0 0 1px rgba(255, 255, 255, .3);
+}
