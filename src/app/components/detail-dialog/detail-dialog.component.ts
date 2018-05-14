@@ -23,61 +23,62 @@ import {ToasterConfig, ToasterService} from 'angular2-toaster';
 
 
 interface KeyBindings {
-    move_diff_viewer_tab: string;
-    move_query_parameters_tab: string;
-    move_property_diffs_tab: string;
+    toggle_fullscreen: string;
     move_to_next_diff: string;
     move_to_previous_diff: string;
     show_next_trail: string;
     show_previous_trail: string;
+    move_diff_viewer_tab: string;
+    move_query_parameters_tab: string;
+    move_property_diffs_tab: string;
     copy_trial_url: string;
     copy_path: string;
     copy_one_url: string;
     copy_other_url: string;
-    close_this_dialog: string;
     open_trial_list: string;
-    toggle_fullscreen: string;
-    toggle_cheat_sheet: string;
+    close_this_dialog: string;
+    open_cheat_sheet: string;
+    close_cheat_sheet: string;
 }
 
 const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
     default: {
-        move_diff_viewer_tab: 'd',
-        move_query_parameters_tab: 'q',
-        move_property_diffs_tab: 'p',
+        toggle_fullscreen: 'f',
         move_to_next_diff: 'k',
         move_to_previous_diff: 'i',
         show_next_trail: 'l',
         show_previous_trail: 'j',
+        move_diff_viewer_tab: 'd',
+        move_query_parameters_tab: 'q',
+        move_property_diffs_tab: 'p',
         copy_trial_url: 'C',
         copy_path: 'P',
         copy_one_url: 'J',
         copy_other_url: 'L',
-        close_this_dialog: 'w',
         open_trial_list: '/',
-        toggle_fullscreen: 'f',
-        toggle_cheat_sheet: '?',
+        close_this_dialog: 'w',
+        open_cheat_sheet: '?',
+        close_cheat_sheet: 'esc',
     },
     vim: {
-        move_diff_viewer_tab: 'd',
-        move_query_parameters_tab: 'q',
-        move_property_diffs_tab: 'p',
+        toggle_fullscreen: 'f',
         move_to_next_diff: 'j',
         move_to_previous_diff: 'k',
         show_next_trail: 'l',
         show_previous_trail: 'h',
+        move_diff_viewer_tab: 'd',
+        move_query_parameters_tab: 'q',
+        move_property_diffs_tab: 'p',
         copy_trial_url: 'Y',
         copy_path: 'P',
         copy_one_url: 'H',
         copy_other_url: 'L',
-        close_this_dialog: 'x',
         open_trial_list: 'i',
-        toggle_fullscreen: 'f',
-        toggle_cheat_sheet: '?',
+        close_this_dialog: 'x',
+        open_cheat_sheet: '?',
+        close_cheat_sheet: 'esc',
     }
 };
-
-
 
 interface RowData {
     key: string;
@@ -184,6 +185,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
     @Input() hideIgnoredDiff: boolean = this.settingsService.hideIgnoredDiff;
     @Input() hideCheckedAlreadyDiff: boolean = this.settingsService.hideCheckedAlreadyDiff;
+    @Input() cheatSheet: boolean = false;
 
     @ViewChild('selector') selector;
     @ViewChild('diffView') diffView;
@@ -221,6 +223,26 @@ export class DetailDialogComponent implements OnInit {
         _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
 
         _hotkeysService.add([
+            new Hotkey(keyMode.toggle_fullscreen, () => {
+                this.changeFullscreen(!this.fullscreen);
+                return false;
+            }, null, 'Toggle fullscreen'),
+            new Hotkey(keyMode.move_to_next_diff, () => {
+                this.diffView.moveToNextDiff(true);
+                return false;
+            }, null, 'Move to next diff.'),
+            new Hotkey(keyMode.move_to_previous_diff, () => {
+                this.diffView.moveToPreviousDiff(true);
+                return false;
+            }, null, 'Move to previous diff.'),
+            new Hotkey(keyMode.show_next_trail, () => {
+                this.showNextTrial();
+                return false;
+            }, null, 'Show next trial.'),
+            new Hotkey(keyMode.show_previous_trail, () => {
+                this.showPreviousTrial();
+                return false;
+            }, null, 'Show previous trial.'),
             new Hotkey(keyMode.move_diff_viewer_tab, () => {
                 this.changeTab(0);
                 return false;
@@ -233,22 +255,6 @@ export class DetailDialogComponent implements OnInit {
                 this.changeTab(2);
                 return false;
             }, null, 'Move `Property diffs` tab.'),
-            new Hotkey(keyMode.move_to_previous_diff, () => {
-                this.diffView.moveToPreviousDiff(true);
-                return false;
-            }, null, 'Move to next diff.'),
-            new Hotkey(keyMode.show_previous_trail, () => {
-                this.showPreviousTrial();
-                return false;
-            }, null, 'Show previous trial.'),
-            new Hotkey(keyMode.move_to_next_diff, () => {
-                this.diffView.moveToNextDiff(true);
-                return false;
-            }, null, 'Move to previous diff.'),
-            new Hotkey(keyMode.show_next_trail, () => {
-                this.showNextTrial();
-                return false;
-            }, null, 'Show next trial.'),
             new Hotkey(keyMode.copy_trial_url, () => {
                 this.copyActiveTrialLink();
                 return false;
@@ -268,22 +274,22 @@ export class DetailDialogComponent implements OnInit {
                 this.toasterService.pop('success', `Copied ${this.otherAccessPoint.name} url`, this.trial.other.url);
                 return false;
             }, null, 'Copy other url.'),
-            new Hotkey(keyMode.close_this_dialog, () => {
-                this.closeDialog();
-                return false;
-            }, null, 'Close this dialog'),
             new Hotkey(keyMode.open_trial_list, () => {
                 this.openSelector();
                 return false;
             }, null, 'Open trial list'),
-            new Hotkey(keyMode.toggle_fullscreen, () => {
-                this.changeFullscreen(!this.fullscreen);
+            new Hotkey(keyMode.close_this_dialog, () => {
+                this.closeDialog();
                 return false;
-            }, null, 'Toggle fullscrean'),
-            new Hotkey(keyMode.toggle_cheat_sheet, () => {
-                this.toggleCheatSheet();
+            }, null, 'Close this dialog'),
+            new Hotkey(keyMode.open_cheat_sheet, () => {
+                this.cheatSheet = true;
                 return false;
-            }, null, 'Open/Close cheat sheet')
+            }, null, 'Open cheat sheet'),
+            new Hotkey(keyMode.close_cheat_sheet, () => {
+                this.cheatSheet = false;
+                return false;
+            }, null, 'Close cheat sheet'),
         ]);
     }
 
@@ -315,10 +321,6 @@ export class DetailDialogComponent implements OnInit {
             actions: false
         };
         this.showTrial(this.trial);
-    }
-
-    toggleCheatSheet(): void {
-        this._hotkeysService.cheatSheetToggle.next({});
     }
 
     closeDialog(): void {
