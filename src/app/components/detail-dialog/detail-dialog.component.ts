@@ -218,11 +218,14 @@ export class DetailDialogComponent implements OnInit {
                 private _hotkeysService: HotkeysService,
                 private settingsService: SettingsService,
                 private toasterService: ToasterService) {
-      const keyMode: KeyBindings = KEY_BINDINGS_BY[settingsService.keyMode];
-        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
-        _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
+    }
 
-        _hotkeysService.add([
+    ngOnInit(): void {
+        const keyMode: KeyBindings = KEY_BINDINGS_BY[this.settingsService.keyMode];
+        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
+        this._hotkeysService.hotkeys.splice(0).forEach(x => this._hotkeysService.remove(x));
+
+        this._hotkeysService.add([
             new Hotkey(keyMode.toggle_fullscreen, () => {
                 this.changeFullscreen(!this.fullscreen);
                 return false;
@@ -291,9 +294,7 @@ export class DetailDialogComponent implements OnInit {
                 return false;
             }, null, 'Close cheat sheet'),
         ]);
-    }
 
-    ngOnInit(): void {
         // FIXME
         this.editorConfig = {
             content: this.settingsService.checkList,
