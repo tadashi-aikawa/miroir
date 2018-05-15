@@ -204,6 +204,7 @@ export class DetailDialogComponent implements OnInit {
     diffViewConfig: DiffViewConfig;
     editorConfig: EditorConfig;
     displayedQueries: { key: string, value: string }[];
+    filteredWord: string;
 
     get activeIndexNum(): number {
         return Number(this.activeIndex);
@@ -440,6 +441,11 @@ export class DetailDialogComponent implements OnInit {
 
     changeFullscreen(fullscreen: boolean) {
         this.fullscreen = fullscreen;
+    }
+
+    updateFilteredWord() {
+        console.log(this.filteredWord);
+        this.diffViewConfig = Object.assign({}, this.diffViewConfig, {leftContent: this.filteredWord});
     }
 
     changeDiffType(unifiedDiff: boolean) {

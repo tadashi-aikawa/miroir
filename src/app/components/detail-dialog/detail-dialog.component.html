@@ -71,6 +71,13 @@
                 <div *ngIf="errorMessage">
                     <span class="error-message">{{errorMessage}}</span>
                 </div>
+                <mat-form-field>
+                    <input matInput
+                           placeholder="Filtered word"
+                           [(ngModel)]="filteredWord"
+                           (keyup.enter)="updateFilteredWord()"
+                    >
+                </mat-form-field>
                 <app-diff-viewer #diffView
                                  [config]="diffViewConfig"
                                  height="{{fullscreen ? 'calc(95vh - 160px)' : 'calc(95vh - 290px)'}}"
