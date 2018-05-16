@@ -200,8 +200,7 @@ export class DetailDialogComponent implements OnInit {
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
     propertyDiffsByCognition: PropertyDiffsByCognition;
-    oneExpectedEncoding: string;
-    otherExpectedEncoding: string;
+    expectedEncoding: Pair<string> = new Pair();
 
     activeIndex: string;
     originalEditorBody: Pair<string>;
@@ -390,8 +389,7 @@ export class DetailDialogComponent implements OnInit {
                         'text',
                         !this.unifiedDiff
                     );
-                    this.oneExpectedEncoding = 'None';
-                    this.otherExpectedEncoding = 'None';
+                    this.expectedEncoding = {one: 'None', other: 'None'}
                 }, 100);
             } else {
                 const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
@@ -417,8 +415,7 @@ export class DetailDialogComponent implements OnInit {
                             languagePair.other,
                             !this.unifiedDiff
                         );
-                        this.oneExpectedEncoding = rs[0].encoding;
-                        this.otherExpectedEncoding = rs[1].encoding;
+                        this.expectedEncoding = {one: rs[0].encoding, other: rs[1].encoding}
                     })
                     .catch(err => {
                         this.isLoading = false;
@@ -432,8 +429,7 @@ export class DetailDialogComponent implements OnInit {
             setTimeout(() => {
                 this.isLoading = false;
                 this.diffViewConfig = createConfig('No file', 'No file', 'text', 'text', !this.unifiedDiff);
-                this.oneExpectedEncoding = 'None';
-                this.otherExpectedEncoding = 'None';
+                this.expectedEncoding = {one: 'None', other: 'None'}
             }, 100);
         }
 
