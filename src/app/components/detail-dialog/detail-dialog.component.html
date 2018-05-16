@@ -68,9 +68,9 @@
     <mat-tab label="Diff viewer">
         <div style="display: flex;">
             <div style="flex: 1;">
-                <div *ngIf="enableLineFilter">
-                    <mat-button-toggle [checked]="filteredWordNot"
-                                       (change)="changeFilteredWordNot($event.source.checked)">
+                <div *ngIf="isLineFilterEnabled">
+                    <mat-button-toggle [checked]="isLineFilterNegative"
+                                       (change)="changeLineFilterNegative($event.source.checked)">
                         Not
                     </mat-button-toggle>
                     <mat-form-field>
@@ -98,7 +98,7 @@
                     </mat-button-toggle>
                 </div>
                 <div>
-                    <mat-button-toggle [checked]="hideIgnoredDiff"
+                    <mat-button-toggle [checked]="isIgnoredDiffHidden"
                                        (change)="changeHideIgnoredDiff($event.source.checked)">
                         <mat-icon style="color: green;"
                                   title="Toggl ignored properties visibility">
@@ -107,7 +107,7 @@
                     </mat-button-toggle>
                 </div>
                 <div>
-                    <mat-button-toggle [checked]="hideCheckedAlreadyDiff"
+                    <mat-button-toggle [checked]="isCheckedAlreadyDiffHidden"
                                        (change)="changeHideCheckedAlreadyDiff($event.source.checked)">
                         <mat-icon style="color: red;"
                                   title="Toggl checked already properties visibility">
@@ -116,8 +116,8 @@
                     </mat-button-toggle>
                 </div>
                 <div>
-                    <mat-button-toggle [checked]="enableLineFilter"
-                                       (change)="setLineFilterEnabled($event.source.checked)">
+                    <mat-button-toggle [checked]="isLineFilterEnabled"
+                                       (change)="changeLineFilterEnabled($event.source.checked)">
                         <mat-icon title="Toggl line filter">
                             filter
                         </mat-icon>

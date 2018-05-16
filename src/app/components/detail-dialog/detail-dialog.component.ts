@@ -183,13 +183,15 @@ export class DetailDialogComponent implements OnInit {
     @Input() ignores: IgnoreCase[] = [];
     @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
+    @Input() cheatSheet: boolean = false;
+
+    // Toggles
     @Input() fullscreen = false;
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
-    @Input() hideIgnoredDiff: boolean = this.settingsService.hideIgnoredDiff;
-    @Input() hideCheckedAlreadyDiff: boolean = this.settingsService.hideCheckedAlreadyDiff;
-    @Input() enableLineFilter: boolean = true;
-    @Input() filteredWordNot: boolean = true;
-    @Input() cheatSheet: boolean = false;
+    @Input() isIgnoredDiffHidden: boolean = this.settingsService.isIgnoredDiffHidden;
+    @Input() isCheckedAlreadyDiffHidden: boolean = this.settingsService.isCheckedAlreadyDiffHidden;
+    @Input() isLineFilterEnabled: boolean = this.settingsService.isLineFilterEnabled;
+    @Input() isLineFilterNegative: boolean = this.settingsService.isLineFilterNegative;
 
     @ViewChild('selector') selector;
     @ViewChild('diffView') diffView;
@@ -215,7 +217,7 @@ export class DetailDialogComponent implements OnInit {
         return Number(this.activeIndex);
     }
 
-    @Memoize
+    @Memoize((fullscreen, isLineFilterEnabled) => `${fullscreen}${isLineFilterEnabled}`)
     private calcDiffViewerHeight(fullscreen: boolean, isLineFilterEnabled: boolean): string {
         const heightBehindFullscreen = fullscreen ? 0 : 130;
         const heightBehindLineFilter = isLineFilterEnabled ? 50 : 0;
@@ -223,7 +225,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     get diffViewerHeight(): string {
-        return this.calcDiffViewerHeight(this.fullscreen, this.enableLineFilter)
+        return this.calcDiffViewerHeight(this.fullscreen, this.isLineFilterEnabled)
     }
 
     get trial(): Trial {
@@ -450,11 +452,11 @@ export class DetailDialogComponent implements OnInit {
     }
 
     private maskIgnores(bodyPair: Pair<string>, languagePair: Pair<string>): Pair<string> {
-        const bodyApplyIgnoredPair: Pair<string> = this.hideIgnoredDiff && this.propertyDiffsByCognition ?
+        const bodyApplyIgnoredPair: Pair<string> = this.isIgnoredDiffHidden && this.propertyDiffsByCognition ?
             applyIgnores(bodyPair, languagePair, this.propertyDiffsByCognition.ignored, 'IGNORED') :
             {one: bodyPair.one, other: bodyPair.other};
 
-        return this.hideCheckedAlreadyDiff && this.propertyDiffsByCognition ?
+        return this.isCheckedAlreadyDiffHidden && this.propertyDiffsByCognition ?
             applyIgnores(bodyApplyIgnoredPair, languagePair, this.propertyDiffsByCognition.checkedAlready, 'CHECKD_ALREADY') :
             {one: bodyApplyIgnoredPair.one, other: bodyApplyIgnoredPair.other};
     }
@@ -471,13 +473,13 @@ export class DetailDialogComponent implements OnInit {
     updateEditorBodies() {
         const filtered = (body: string): string =>
             body.split('\n')
-                .filter(x => this.filteredWordNot !== matchRegExp(x, this.filteredWord))
+                .filter(x => this.isLineFilterNegative !== matchRegExp(x, this.filteredWord))
                 .join('\n');
 
         this.diffViewConfig = Object.assign({}, this.diffViewConfig, {
-            leftContent: this.enableLineFilter && this.filteredWord ?
+            leftContent: this.isLineFilterEnabled && this.filteredWord ?
                 filtered(this.originalEditorBody.one) : this.originalEditorBody.one,
-            rightContent: this.enableLineFilter && this.filteredWord ?
+            rightContent: this.isLineFilterEnabled && this.filteredWord ?
                 filtered(this.originalEditorBody.other) : this.originalEditorBody.other,
         });
     }
@@ -486,8 +488,9 @@ export class DetailDialogComponent implements OnInit {
         this.updateEditorBodies();
     }
 
-    changeFilteredWordNot(filteredWordNot: boolean) {
-        this.filteredWordNot = filteredWordNot;
+    changeLineFilterNegative(isLineFilterNegative: boolean) {
+        this.isLineFilterNegative = isLineFilterNegative;
+        this.settingsService.isLineFilterNegative = isLineFilterNegative;
         this.updateEditorBodies();
     }
 
@@ -498,21 +501,22 @@ export class DetailDialogComponent implements OnInit {
     }
 
     changeHideIgnoredDiff(hideIgnored: boolean) {
-        this.hideIgnoredDiff = hideIgnored;
-        this.settingsService.hideIgnoredDiff = hideIgnored;
+        this.isIgnoredDiffHidden = hideIgnored;
+        this.settingsService.isIgnoredDiffHidden = hideIgnored;
         // TODO: Repalce to maskIgnores()
         this.showTrial(this.trial);
     }
 
     changeHideCheckedAlreadyDiff(hideCheckedAlready: boolean) {
-        this.hideCheckedAlreadyDiff = hideCheckedAlready;
-        this.settingsService.hideCheckedAlreadyDiff = hideCheckedAlready;
+        this.isCheckedAlreadyDiffHidden = hideCheckedAlready;
+        this.settingsService.isCheckedAlreadyDiffHidden = hideCheckedAlready;
         // TODO: Repalce to maskIgnores()
         this.showTrial(this.trial);
     }
 
-    setLineFilterEnabled(enabled: boolean) {
-        this.enableLineFilter = enabled;
+    changeLineFilterEnabled(enabled: boolean) {
+        this.isLineFilterEnabled = enabled;
+        this.settingsService.isLineFilterEnabled = enabled;
         this.updateEditorBodies();
     }
 

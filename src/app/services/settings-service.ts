@@ -7,6 +7,8 @@ import DocumentClient = DynamoDB.DocumentClient;
 
 export type KeyMode = 'default' | 'vim';
 const KEY_MODE_DEFAULT: KeyMode = 'default';
+const IS_LINE_FILTER_ENABLED_DEFAULT: boolean = false;
+const IS_LINE_FILTER_NEGATIVE_DEFAULT: boolean = false;
 
 const CHECKLIST_DEFAULT = `
 vars:
@@ -152,20 +154,38 @@ export class SettingsService {
         this.localStorageService.set('unifiedDiff', value);
     }
 
-    get hideIgnoredDiff(): boolean {
-        return this.localStorageService.get<boolean>('hideIgnoredDiff');
+    get isIgnoredDiffHidden(): boolean {
+        return this.localStorageService.get<boolean>('isIgnoredDiffHidden');
     }
 
-    set hideIgnoredDiff(value: boolean) {
-        this.localStorageService.set('hideIgnoredDiff', value);
+    set isIgnoredDiffHidden(value: boolean) {
+        this.localStorageService.set('isIgnoredDiffHidden', value);
     }
 
-    get hideCheckedAlreadyDiff(): boolean {
-        return this.localStorageService.get<boolean>('hideCheckedAlreadyDiff');
+    get isCheckedAlreadyDiffHidden(): boolean {
+        return this.localStorageService.get<boolean>('isCheckedAlreadyDiffHidden');
     }
 
-    set hideCheckedAlreadyDiff(value: boolean) {
-        this.localStorageService.set('hideCheckedAlreadyDiff', value);
+    set isCheckedAlreadyDiffHidden(value: boolean) {
+        this.localStorageService.set('isCheckedAlreadyDiffHidden', value);
+    }
+
+    get isLineFilterEnabled(): boolean {
+        const r = this.localStorageService.get<boolean>('isLineFilterEnabled');
+        return r === null ? IS_LINE_FILTER_ENABLED_DEFAULT : r
+    }
+
+    set isLineFilterEnabled(value: boolean) {
+        this.localStorageService.set('isLineFilterEnabled', value);
+    }
+
+    get isLineFilterNegative(): boolean {
+        const r = this.localStorageService.get<boolean>('isLineFilterNegative');
+        return r === null ? IS_LINE_FILTER_NEGATIVE_DEFAULT : r
+    }
+
+    set isLineFilterNegative(value: boolean) {
+        this.localStorageService.set('isLineFilterNegative', value);
     }
 
     get selectedColumnNames(): string[] {
