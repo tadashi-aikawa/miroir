@@ -204,6 +204,7 @@ export class DetailDialogComponent implements OnInit {
 
     activeIndex: string;
     originalEditorBody: Pair<string>;
+    editorLanguage: Pair<string>;
     options: IOption[];
     isLoading: boolean;
     errorMessage: string;
@@ -351,8 +352,8 @@ export class DetailDialogComponent implements OnInit {
             return false;
         }
 
-        this.showTrial(this.trials[this.activeIndexNum + 1]);
         this.activeIndex = String(this.activeIndexNum + 1);
+        this.showTrial(this.trials[this.activeIndexNum]);
     }
 
     showPreviousTrial(): boolean {
@@ -360,8 +361,8 @@ export class DetailDialogComponent implements OnInit {
             return false;
         }
 
-        this.showTrial(this.trials[this.activeIndexNum - 1]);
         this.activeIndex = String(this.activeIndexNum - 1);
+        this.showTrial(this.trials[this.activeIndexNum]);
     }
 
     openSelector(): void {
@@ -374,18 +375,14 @@ export class DetailDialogComponent implements OnInit {
                 .filter(x => this.isLineFilterNegative !== matchRegExp(x, this.filteredWord))
                 .join('\n');
 
-        const languagePair: Pair<string> = {
-            one: toLanguage(this.trial.one.content_type),
-            other: toLanguage(this.trial.other.content_type)
-        };
-        const bodyPair: Pair<string> = this.maskIgnores(this.originalEditorBody, languagePair);
+        const bodyPair: Pair<string> = this.maskIgnores(this.originalEditorBody, this.editorLanguage);
         const needsFilter: boolean = this.isLineFilterEnabled && !!this.filteredWord;
 
         this.diffViewConfig = createConfig(
             needsFilter ? filtered(bodyPair.one) : bodyPair.one,
             needsFilter ? filtered(bodyPair.other) : bodyPair.other,
-            languagePair.one,
-            languagePair.other,
+            this.editorLanguage.one,
+            this.editorLanguage.other,
             !this.unifiedDiff
         );
     }
@@ -404,7 +401,8 @@ export class DetailDialogComponent implements OnInit {
                         one: 'Binary is not supported to show',
                         other: 'Binary is not supported to show',
                     };
-                    this.expectedEncoding = {one: 'None', other: 'None'}
+                    this.editorLanguage = {one: 'text', other: 'text'}
+                    this.expectedEncoding = {one: 'None', other: 'None'};
                     this.updateDiffEditorBodies()
                 }, 100);
             } else {
@@ -414,8 +412,12 @@ export class DetailDialogComponent implements OnInit {
                         this.isLoading = false;
                         this.errorMessage = undefined;
 
-                        this.originalEditorBody = { one: rs[0].body, other: rs[1].body, };
-                        this.expectedEncoding = {one: rs[0].encoding, other: rs[1].encoding}
+                        this.originalEditorBody = {one: rs[0].body, other: rs[1].body};
+                        this.editorLanguage = {
+                            one: toLanguage(trial.one.content_type),
+                            other: toLanguage(trial.other.content_type)
+                        };
+                        this.expectedEncoding = {one: rs[0].encoding, other: rs[1].encoding};
                         this.updateDiffEditorBodies()
                     })
                     .catch(err => {
@@ -429,8 +431,9 @@ export class DetailDialogComponent implements OnInit {
             // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
             setTimeout(() => {
                 this.isLoading = false;
-                this.originalEditorBody = { one: 'No file', other: 'No file', };
-                this.expectedEncoding = {one: 'None', other: 'None'}
+                this.originalEditorBody = {one: 'No file', other: 'No file',};
+                this.editorLanguage = {one: 'text', other: 'text'}
+                this.expectedEncoding = {one: 'None', other: 'None'};
                 this.updateDiffEditorBodies()
             }, 100);
         }
