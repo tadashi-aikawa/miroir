@@ -20,6 +20,8 @@ import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {ToasterConfig, ToasterService} from 'angular2-toaster';
+import {matchRegExp} from "../../utils/regexp";
+import {Memoize} from "lodash-decorators";
 
 
 interface KeyBindings {
@@ -181,11 +183,15 @@ export class DetailDialogComponent implements OnInit {
     @Input() ignores: IgnoreCase[] = [];
     @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
+    @Input() cheatSheet: boolean = false;
+
+    // Toggles
     @Input() fullscreen = false;
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
-    @Input() hideIgnoredDiff: boolean = this.settingsService.hideIgnoredDiff;
-    @Input() hideCheckedAlreadyDiff: boolean = this.settingsService.hideCheckedAlreadyDiff;
-    @Input() cheatSheet: boolean = false;
+    @Input() isIgnoredDiffHidden: boolean = this.settingsService.isIgnoredDiffHidden;
+    @Input() isCheckedAlreadyDiffHidden: boolean = this.settingsService.isCheckedAlreadyDiffHidden;
+    @Input() isLineFilterEnabled: boolean = this.settingsService.isLineFilterEnabled;
+    @Input() isLineFilterNegative: boolean = this.settingsService.isLineFilterNegative;
 
     @ViewChild('selector') selector;
     @ViewChild('diffView') diffView;
@@ -194,19 +200,32 @@ export class DetailDialogComponent implements OnInit {
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
     propertyDiffsByCognition: PropertyDiffsByCognition;
-    oneExpectedEncoding: string;
-    otherExpectedEncoding: string;
+    expectedEncoding: Pair<string> = new Pair();
 
     activeIndex: string;
+    originalEditorBody: Pair<string>;
+    editorLanguage: Pair<string>;
     options: IOption[];
     isLoading: boolean;
     errorMessage: string;
     diffViewConfig: DiffViewConfig;
     editorConfig: EditorConfig;
     displayedQueries: { key: string, value: string }[];
+    filteredWord: string;
 
     get activeIndexNum(): number {
         return Number(this.activeIndex);
+    }
+
+    @Memoize((fullscreen, isLineFilterEnabled) => `${fullscreen}${isLineFilterEnabled}`)
+    private calcDiffViewerHeight(fullscreen: boolean, isLineFilterEnabled: boolean): string {
+        const heightBehindFullscreen = fullscreen ? 0 : 130;
+        const heightBehindLineFilter = isLineFilterEnabled ? 50 : 0;
+        return `calc(95vh - ${160 + heightBehindFullscreen + heightBehindLineFilter}px)`
+    }
+
+    get diffViewerHeight(): string {
+        return this.calcDiffViewerHeight(this.fullscreen, this.isLineFilterEnabled)
     }
 
     get trial(): Trial {
@@ -333,8 +352,8 @@ export class DetailDialogComponent implements OnInit {
             return false;
         }
 
-        this.showTrial(this.trials[this.activeIndexNum + 1]);
         this.activeIndex = String(this.activeIndexNum + 1);
+        this.showTrial(this.trials[this.activeIndexNum]);
     }
 
     showPreviousTrial(): boolean {
@@ -342,12 +361,30 @@ export class DetailDialogComponent implements OnInit {
             return false;
         }
 
-        this.showTrial(this.trials[this.activeIndexNum - 1]);
         this.activeIndex = String(this.activeIndexNum - 1);
+        this.showTrial(this.trials[this.activeIndexNum]);
     }
 
     openSelector(): void {
         this.selector.open();
+    }
+
+    updateDiffEditorBodies(): void {
+        const filtered = (body: string): string =>
+            body.split('\n')
+                .filter(x => this.isLineFilterNegative !== matchRegExp(x, this.filteredWord))
+                .join('\n');
+
+        const bodyPair: Pair<string> = this.maskIgnores(this.originalEditorBody, this.editorLanguage);
+        const needsFilter: boolean = this.isLineFilterEnabled && !!this.filteredWord;
+
+        this.diffViewConfig = createConfig(
+            needsFilter ? filtered(bodyPair.one) : bodyPair.one,
+            needsFilter ? filtered(bodyPair.other) : bodyPair.other,
+            this.editorLanguage.one,
+            this.editorLanguage.other,
+            !this.unifiedDiff
+        );
     }
 
     showTrial(trial: Trial): void {
@@ -360,15 +397,13 @@ export class DetailDialogComponent implements OnInit {
                 // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
                 setTimeout(() => {
                     this.isLoading = false;
-                    this.diffViewConfig = createConfig(
-                        'Binary is not supported to show',
-                        'Binary is not supported to show',
-                        'text',
-                        'text',
-                        !this.unifiedDiff
-                    );
-                    this.oneExpectedEncoding = 'None';
-                    this.otherExpectedEncoding = 'None';
+                    this.originalEditorBody = {
+                        one: 'Binary is not supported to show',
+                        other: 'Binary is not supported to show',
+                    };
+                    this.editorLanguage = {one: 'text', other: 'text'}
+                    this.expectedEncoding = {one: 'None', other: 'None'};
+                    this.updateDiffEditorBodies()
                 }, 100);
             } else {
                 const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
@@ -377,21 +412,13 @@ export class DetailDialogComponent implements OnInit {
                         this.isLoading = false;
                         this.errorMessage = undefined;
 
-                        const languagePair: Pair<string> = {
+                        this.originalEditorBody = {one: rs[0].body, other: rs[1].body};
+                        this.editorLanguage = {
                             one: toLanguage(trial.one.content_type),
                             other: toLanguage(trial.other.content_type)
                         };
-                        const bodyPair = this.maskIgnores({one: rs[0].body, other: rs[1].body}, languagePair);
-
-                        this.diffViewConfig = createConfig(
-                            bodyPair.one,
-                            bodyPair.other,
-                            languagePair.one,
-                            languagePair.other,
-                            !this.unifiedDiff
-                        );
-                        this.oneExpectedEncoding = rs[0].encoding;
-                        this.otherExpectedEncoding = rs[1].encoding;
+                        this.expectedEncoding = {one: rs[0].encoding, other: rs[1].encoding};
+                        this.updateDiffEditorBodies()
                     })
                     .catch(err => {
                         this.isLoading = false;
@@ -404,9 +431,10 @@ export class DetailDialogComponent implements OnInit {
             // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
             setTimeout(() => {
                 this.isLoading = false;
-                this.diffViewConfig = createConfig('No file', 'No file', 'text', 'text', !this.unifiedDiff);
-                this.oneExpectedEncoding = 'None';
-                this.otherExpectedEncoding = 'None';
+                this.originalEditorBody = {one: 'No file', other: 'No file',};
+                this.editorLanguage = {one: 'text', other: 'text'}
+                this.expectedEncoding = {one: 'None', other: 'None'};
+                this.updateDiffEditorBodies()
             }, 100);
         }
 
@@ -424,12 +452,12 @@ export class DetailDialogComponent implements OnInit {
         );
     }
 
-    private maskIgnores(bodyPair: Pair<string>, languagePair: Pair<string>) {
-        const bodyApplyIgnoredPair: Pair<string> = this.hideIgnoredDiff && this.propertyDiffsByCognition ?
+    private maskIgnores(bodyPair: Pair<string>, languagePair: Pair<string>): Pair<string> {
+        const bodyApplyIgnoredPair: Pair<string> = this.isIgnoredDiffHidden && this.propertyDiffsByCognition ?
             applyIgnores(bodyPair, languagePair, this.propertyDiffsByCognition.ignored, 'IGNORED') :
             {one: bodyPair.one, other: bodyPair.other};
 
-        return this.hideCheckedAlreadyDiff && this.propertyDiffsByCognition ?
+        return this.isCheckedAlreadyDiffHidden && this.propertyDiffsByCognition ?
             applyIgnores(bodyApplyIgnoredPair, languagePair, this.propertyDiffsByCognition.checkedAlready, 'CHECKD_ALREADY') :
             {one: bodyApplyIgnoredPair.one, other: bodyApplyIgnoredPair.other};
     }
@@ -442,24 +470,38 @@ export class DetailDialogComponent implements OnInit {
         this.fullscreen = fullscreen;
     }
 
+    changeFilteredWord() {
+        this.updateDiffEditorBodies();
+    }
+
+    changeLineFilterNegative(isLineFilterNegative: boolean) {
+        this.isLineFilterNegative = isLineFilterNegative;
+        this.settingsService.isLineFilterNegative = isLineFilterNegative;
+        this.updateDiffEditorBodies();
+    }
+
     changeDiffType(unifiedDiff: boolean) {
         this.unifiedDiff = unifiedDiff;
         this.settingsService.unifiedDiff = unifiedDiff;
-        this.diffViewConfig = Object.assign({}, this.diffViewConfig, {sideBySide: !unifiedDiff});
+        this.updateDiffEditorBodies();
     }
 
     changeHideIgnoredDiff(hideIgnored: boolean) {
-        this.hideIgnoredDiff = hideIgnored;
-        this.settingsService.hideIgnoredDiff = hideIgnored;
-        // TODO: Repalce to maskIgnores()
-        this.showTrial(this.trial);
+        this.isIgnoredDiffHidden = hideIgnored;
+        this.settingsService.isIgnoredDiffHidden = hideIgnored;
+        this.updateDiffEditorBodies();
     }
 
     changeHideCheckedAlreadyDiff(hideCheckedAlready: boolean) {
-        this.hideCheckedAlreadyDiff = hideCheckedAlready;
-        this.settingsService.hideCheckedAlreadyDiff = hideCheckedAlready;
-        // TODO: Repalce to maskIgnores()
-        this.showTrial(this.trial);
+        this.isCheckedAlreadyDiffHidden = hideCheckedAlready;
+        this.settingsService.isCheckedAlreadyDiffHidden = hideCheckedAlready;
+        this.updateDiffEditorBodies();
+    }
+
+    changeLineFilterEnabled(enabled: boolean) {
+        this.isLineFilterEnabled = enabled;
+        this.settingsService.isLineFilterEnabled = enabled;
+        this.updateDiffEditorBodies();
     }
 
     afterChangeTab(index: number): void {
