@@ -20,64 +20,67 @@ import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {ToasterConfig, ToasterService} from 'angular2-toaster';
+import {matchRegExp} from "../../utils/regexp";
+import {Memoize} from "lodash-decorators";
 
 
 interface KeyBindings {
-    move_diff_viewer_tab: string;
-    move_query_parameters_tab: string;
-    move_property_diffs_tab: string;
+    toggle_fullscreen: string;
     move_to_next_diff: string;
     move_to_previous_diff: string;
     show_next_trail: string;
     show_previous_trail: string;
+    move_diff_viewer_tab: string;
+    move_query_parameters_tab: string;
+    move_property_diffs_tab: string;
     copy_trial_url: string;
     copy_path: string;
     copy_one_url: string;
     copy_other_url: string;
-    close_this_dialog: string;
     open_trial_list: string;
-    toggle_fullscreen: string;
-    toggle_cheat_sheet: string;
+    close_this_dialog: string;
+    open_cheat_sheet: string;
+    close_cheat_sheet: string;
 }
 
 const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
     default: {
-        move_diff_viewer_tab: 'd',
-        move_query_parameters_tab: 'q',
-        move_property_diffs_tab: 'p',
+        toggle_fullscreen: 'f',
         move_to_next_diff: 'k',
         move_to_previous_diff: 'i',
         show_next_trail: 'l',
         show_previous_trail: 'j',
+        move_diff_viewer_tab: 'd',
+        move_query_parameters_tab: 'q',
+        move_property_diffs_tab: 'p',
         copy_trial_url: 'C',
         copy_path: 'P',
         copy_one_url: 'J',
         copy_other_url: 'L',
-        close_this_dialog: 'w',
         open_trial_list: '/',
-        toggle_fullscreen: 'f',
-        toggle_cheat_sheet: '?',
+        close_this_dialog: 'w',
+        open_cheat_sheet: '?',
+        close_cheat_sheet: 'esc',
     },
     vim: {
-        move_diff_viewer_tab: 'd',
-        move_query_parameters_tab: 'q',
-        move_property_diffs_tab: 'p',
+        toggle_fullscreen: 'f',
         move_to_next_diff: 'j',
         move_to_previous_diff: 'k',
         show_next_trail: 'l',
         show_previous_trail: 'h',
+        move_diff_viewer_tab: 'd',
+        move_query_parameters_tab: 'q',
+        move_property_diffs_tab: 'p',
         copy_trial_url: 'Y',
         copy_path: 'P',
         copy_one_url: 'H',
         copy_other_url: 'L',
-        close_this_dialog: 'x',
         open_trial_list: 'i',
-        toggle_fullscreen: 'f',
-        toggle_cheat_sheet: '?',
+        close_this_dialog: 'x',
+        open_cheat_sheet: '?',
+        close_cheat_sheet: 'esc',
     }
 };
-
-
 
 interface RowData {
     key: string;
@@ -180,10 +183,15 @@ export class DetailDialogComponent implements OnInit {
     @Input() ignores: IgnoreCase[] = [];
     @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
+    @Input() cheatSheet: boolean = false;
+
+    // Toggles
     @Input() fullscreen = false;
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
-    @Input() hideIgnoredDiff: boolean = this.settingsService.hideIgnoredDiff;
-    @Input() hideCheckedAlreadyDiff: boolean = this.settingsService.hideCheckedAlreadyDiff;
+    @Input() isIgnoredDiffHidden: boolean = this.settingsService.isIgnoredDiffHidden;
+    @Input() isCheckedAlreadyDiffHidden: boolean = this.settingsService.isCheckedAlreadyDiffHidden;
+    @Input() isLineFilterEnabled: boolean = this.settingsService.isLineFilterEnabled;
+    @Input() isLineFilterNegative: boolean = this.settingsService.isLineFilterNegative;
 
     @ViewChild('selector') selector;
     @ViewChild('diffView') diffView;
@@ -192,19 +200,32 @@ export class DetailDialogComponent implements OnInit {
     queryTableSettings: any;
     queryTableSource = new LocalDataSource();
     propertyDiffsByCognition: PropertyDiffsByCognition;
-    oneExpectedEncoding: string;
-    otherExpectedEncoding: string;
+    expectedEncoding: Pair<string> = new Pair();
 
     activeIndex: string;
+    originalEditorBody: Pair<string>;
+    editorLanguage: Pair<string>;
     options: IOption[];
     isLoading: boolean;
     errorMessage: string;
     diffViewConfig: DiffViewConfig;
     editorConfig: EditorConfig;
     displayedQueries: { key: string, value: string }[];
+    filteredWord: string;
 
     get activeIndexNum(): number {
         return Number(this.activeIndex);
+    }
+
+    @Memoize((fullscreen, isLineFilterEnabled) => `${fullscreen}${isLineFilterEnabled}`)
+    private calcDiffViewerHeight(fullscreen: boolean, isLineFilterEnabled: boolean): string {
+        const heightBehindFullscreen = fullscreen ? 0 : 130;
+        const heightBehindLineFilter = isLineFilterEnabled ? 50 : 0;
+        return `calc(95vh - ${160 + heightBehindFullscreen + heightBehindLineFilter}px)`
+    }
+
+    get diffViewerHeight(): string {
+        return this.calcDiffViewerHeight(this.fullscreen, this.isLineFilterEnabled)
     }
 
     get trial(): Trial {
@@ -216,11 +237,34 @@ export class DetailDialogComponent implements OnInit {
                 private _hotkeysService: HotkeysService,
                 private settingsService: SettingsService,
                 private toasterService: ToasterService) {
-      const keyMode: KeyBindings = KEY_BINDINGS_BY[settingsService.keyMode];
-        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
-        _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
+    }
 
-        _hotkeysService.add([
+    ngOnInit(): void {
+        const keyMode: KeyBindings = KEY_BINDINGS_BY[this.settingsService.keyMode];
+        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
+        this._hotkeysService.hotkeys.splice(0).forEach(x => this._hotkeysService.remove(x));
+
+        this._hotkeysService.add([
+            new Hotkey(keyMode.toggle_fullscreen, () => {
+                this.changeFullscreen(!this.fullscreen);
+                return false;
+            }, null, 'Toggle fullscreen'),
+            new Hotkey(keyMode.move_to_next_diff, () => {
+                this.diffView.moveToNextDiff(true);
+                return false;
+            }, null, 'Move to next diff.'),
+            new Hotkey(keyMode.move_to_previous_diff, () => {
+                this.diffView.moveToPreviousDiff(true);
+                return false;
+            }, null, 'Move to previous diff.'),
+            new Hotkey(keyMode.show_next_trail, () => {
+                this.showNextTrial();
+                return false;
+            }, null, 'Show next trial.'),
+            new Hotkey(keyMode.show_previous_trail, () => {
+                this.showPreviousTrial();
+                return false;
+            }, null, 'Show previous trial.'),
             new Hotkey(keyMode.move_diff_viewer_tab, () => {
                 this.changeTab(0);
                 return false;
@@ -233,22 +277,6 @@ export class DetailDialogComponent implements OnInit {
                 this.changeTab(2);
                 return false;
             }, null, 'Move `Property diffs` tab.'),
-            new Hotkey(keyMode.move_to_previous_diff, () => {
-                this.diffView.moveToPreviousDiff(true);
-                return false;
-            }, null, 'Move to next diff.'),
-            new Hotkey(keyMode.show_previous_trail, () => {
-                this.showPreviousTrial();
-                return false;
-            }, null, 'Show previous trial.'),
-            new Hotkey(keyMode.move_to_next_diff, () => {
-                this.diffView.moveToNextDiff(true);
-                return false;
-            }, null, 'Move to previous diff.'),
-            new Hotkey(keyMode.show_next_trail, () => {
-                this.showNextTrial();
-                return false;
-            }, null, 'Show next trial.'),
             new Hotkey(keyMode.copy_trial_url, () => {
                 this.copyActiveTrialLink();
                 return false;
@@ -268,26 +296,24 @@ export class DetailDialogComponent implements OnInit {
                 this.toasterService.pop('success', `Copied ${this.otherAccessPoint.name} url`, this.trial.other.url);
                 return false;
             }, null, 'Copy other url.'),
-            new Hotkey(keyMode.close_this_dialog, () => {
-                this.closeDialog();
-                return false;
-            }, null, 'Close this dialog'),
             new Hotkey(keyMode.open_trial_list, () => {
                 this.openSelector();
                 return false;
             }, null, 'Open trial list'),
-            new Hotkey(keyMode.toggle_fullscreen, () => {
-                this.changeFullscreen(!this.fullscreen);
+            new Hotkey(keyMode.close_this_dialog, () => {
+                this.closeDialog();
                 return false;
-            }, null, 'Toggle fullscrean'),
-            new Hotkey(keyMode.toggle_cheat_sheet, () => {
-                this.toggleCheatSheet();
+            }, null, 'Close this dialog'),
+            new Hotkey(keyMode.open_cheat_sheet, () => {
+                this.cheatSheet = true;
                 return false;
-            }, null, 'Open/Close cheat sheet')
+            }, null, 'Open cheat sheet'),
+            new Hotkey(keyMode.close_cheat_sheet, () => {
+                this.cheatSheet = false;
+                return false;
+            }, null, 'Close cheat sheet'),
         ]);
-    }
 
-    ngOnInit(): void {
         // FIXME
         this.editorConfig = {
             content: this.settingsService.checkList,
@@ -317,10 +343,6 @@ export class DetailDialogComponent implements OnInit {
         this.showTrial(this.trial);
     }
 
-    toggleCheatSheet(): void {
-        this._hotkeysService.cheatSheetToggle.next({});
-    }
-
     closeDialog(): void {
         this.dialogRef.close();
     }
@@ -330,8 +352,8 @@ export class DetailDialogComponent implements OnInit {
             return false;
         }
 
-        this.showTrial(this.trials[this.activeIndexNum + 1]);
         this.activeIndex = String(this.activeIndexNum + 1);
+        this.showTrial(this.trials[this.activeIndexNum]);
     }
 
     showPreviousTrial(): boolean {
@@ -339,12 +361,30 @@ export class DetailDialogComponent implements OnInit {
             return false;
         }
 
-        this.showTrial(this.trials[this.activeIndexNum - 1]);
         this.activeIndex = String(this.activeIndexNum - 1);
+        this.showTrial(this.trials[this.activeIndexNum]);
     }
 
     openSelector(): void {
         this.selector.open();
+    }
+
+    updateDiffEditorBodies(): void {
+        const filtered = (body: string): string =>
+            body.split('\n')
+                .filter(x => this.isLineFilterNegative !== matchRegExp(x, this.filteredWord))
+                .join('\n');
+
+        const bodyPair: Pair<string> = this.maskIgnores(this.originalEditorBody, this.editorLanguage);
+        const needsFilter: boolean = this.isLineFilterEnabled && !!this.filteredWord;
+
+        this.diffViewConfig = createConfig(
+            needsFilter ? filtered(bodyPair.one) : bodyPair.one,
+            needsFilter ? filtered(bodyPair.other) : bodyPair.other,
+            this.editorLanguage.one,
+            this.editorLanguage.other,
+            !this.unifiedDiff
+        );
     }
 
     showTrial(trial: Trial): void {
@@ -357,15 +397,13 @@ export class DetailDialogComponent implements OnInit {
                 // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
                 setTimeout(() => {
                     this.isLoading = false;
-                    this.diffViewConfig = createConfig(
-                        'Binary is not supported to show',
-                        'Binary is not supported to show',
-                        'text',
-                        'text',
-                        !this.unifiedDiff
-                    );
-                    this.oneExpectedEncoding = 'None';
-                    this.otherExpectedEncoding = 'None';
+                    this.originalEditorBody = {
+                        one: 'Binary is not supported to show',
+                        other: 'Binary is not supported to show',
+                    };
+                    this.editorLanguage = {one: 'text', other: 'text'}
+                    this.expectedEncoding = {one: 'None', other: 'None'};
+                    this.updateDiffEditorBodies()
                 }, 100);
             } else {
                 const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
@@ -374,21 +412,13 @@ export class DetailDialogComponent implements OnInit {
                         this.isLoading = false;
                         this.errorMessage = undefined;
 
-                        const languagePair: Pair<string> = {
+                        this.originalEditorBody = {one: rs[0].body, other: rs[1].body};
+                        this.editorLanguage = {
                             one: toLanguage(trial.one.content_type),
                             other: toLanguage(trial.other.content_type)
                         };
-                        const bodyPair = this.maskIgnores({one: rs[0].body, other: rs[1].body}, languagePair);
-
-                        this.diffViewConfig = createConfig(
-                            bodyPair.one,
-                            bodyPair.other,
-                            languagePair.one,
-                            languagePair.other,
-                            !this.unifiedDiff
-                        );
-                        this.oneExpectedEncoding = rs[0].encoding;
-                        this.otherExpectedEncoding = rs[1].encoding;
+                        this.expectedEncoding = {one: rs[0].encoding, other: rs[1].encoding};
+                        this.updateDiffEditorBodies()
                     })
                     .catch(err => {
                         this.isLoading = false;
@@ -401,9 +431,10 @@ export class DetailDialogComponent implements OnInit {
             // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
             setTimeout(() => {
                 this.isLoading = false;
-                this.diffViewConfig = createConfig('No file', 'No file', 'text', 'text', !this.unifiedDiff);
-                this.oneExpectedEncoding = 'None';
-                this.otherExpectedEncoding = 'None';
+                this.originalEditorBody = {one: 'No file', other: 'No file',};
+                this.editorLanguage = {one: 'text', other: 'text'}
+                this.expectedEncoding = {one: 'None', other: 'None'};
+                this.updateDiffEditorBodies()
             }, 100);
         }
 
@@ -421,12 +452,12 @@ export class DetailDialogComponent implements OnInit {
         );
     }
 
-    private maskIgnores(bodyPair: Pair<string>, languagePair: Pair<string>) {
-        const bodyApplyIgnoredPair: Pair<string> = this.hideIgnoredDiff && this.propertyDiffsByCognition ?
+    private maskIgnores(bodyPair: Pair<string>, languagePair: Pair<string>): Pair<string> {
+        const bodyApplyIgnoredPair: Pair<string> = this.isIgnoredDiffHidden && this.propertyDiffsByCognition ?
             applyIgnores(bodyPair, languagePair, this.propertyDiffsByCognition.ignored, 'IGNORED') :
             {one: bodyPair.one, other: bodyPair.other};
 
-        return this.hideCheckedAlreadyDiff && this.propertyDiffsByCognition ?
+        return this.isCheckedAlreadyDiffHidden && this.propertyDiffsByCognition ?
             applyIgnores(bodyApplyIgnoredPair, languagePair, this.propertyDiffsByCognition.checkedAlready, 'CHECKD_ALREADY') :
             {one: bodyApplyIgnoredPair.one, other: bodyApplyIgnoredPair.other};
     }
@@ -439,24 +470,38 @@ export class DetailDialogComponent implements OnInit {
         this.fullscreen = fullscreen;
     }
 
+    changeFilteredWord() {
+        this.updateDiffEditorBodies();
+    }
+
+    changeLineFilterNegative(isLineFilterNegative: boolean) {
+        this.isLineFilterNegative = isLineFilterNegative;
+        this.settingsService.isLineFilterNegative = isLineFilterNegative;
+        this.updateDiffEditorBodies();
+    }
+
     changeDiffType(unifiedDiff: boolean) {
         this.unifiedDiff = unifiedDiff;
         this.settingsService.unifiedDiff = unifiedDiff;
-        this.diffViewConfig = Object.assign({}, this.diffViewConfig, {sideBySide: !unifiedDiff});
+        this.updateDiffEditorBodies();
     }
 
     changeHideIgnoredDiff(hideIgnored: boolean) {
-        this.hideIgnoredDiff = hideIgnored;
-        this.settingsService.hideIgnoredDiff = hideIgnored;
-        // TODO: Repalce to maskIgnores()
-        this.showTrial(this.trial);
+        this.isIgnoredDiffHidden = hideIgnored;
+        this.settingsService.isIgnoredDiffHidden = hideIgnored;
+        this.updateDiffEditorBodies();
     }
 
     changeHideCheckedAlreadyDiff(hideCheckedAlready: boolean) {
-        this.hideCheckedAlreadyDiff = hideCheckedAlready;
-        this.settingsService.hideCheckedAlreadyDiff = hideCheckedAlready;
-        // TODO: Repalce to maskIgnores()
-        this.showTrial(this.trial);
+        this.isCheckedAlreadyDiffHidden = hideCheckedAlready;
+        this.settingsService.isCheckedAlreadyDiffHidden = hideCheckedAlready;
+        this.updateDiffEditorBodies();
+    }
+
+    changeLineFilterEnabled(enabled: boolean) {
+        this.isLineFilterEnabled = enabled;
+        this.settingsService.isLineFilterEnabled = enabled;
+        this.updateDiffEditorBodies();
     }
 
     afterChangeTab(index: number): void {
@@ -475,6 +520,7 @@ export class DetailDialogComponent implements OnInit {
         this.propertyDiffsByCognition = createPropertyDiffs(
             this.trial, this.ignores, this.checkedAlready
         );
+        this.updateDiffEditorBodies();
     }
 
     copyActiveTrialLink() {

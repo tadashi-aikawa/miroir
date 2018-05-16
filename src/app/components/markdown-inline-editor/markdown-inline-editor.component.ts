@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {animate, style, transition, trigger} from '@angular/animations';
 import {MatDialog, MatTextareaAutosize} from '@angular/material';
 import {Change} from 'app/models/models';
@@ -69,7 +69,7 @@ import {hasContents} from 'app/utils/regexp';
         </div>
     `
 })
-export class MarkdownInlineEditorComponent {
+export class MarkdownInlineEditorComponent implements OnInit {
 
     @Input() value: string;
     @Output() onUpdate = new EventEmitter<Change<string>>();
@@ -81,19 +81,6 @@ export class MarkdownInlineEditorComponent {
 
     constructor(private _hotkeysService: HotkeysService,
                 private _dialog: MatDialog) {
-        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
-        _hotkeysService.hotkeys.splice(0).forEach(x => _hotkeysService.remove(x));
-
-        _hotkeysService.add([
-            new Hotkey('ctrl+enter', () => {
-                this.editing && this.update();
-                return false;
-            }, ['TEXTAREA'], 'Update.'),
-            new Hotkey('esc', () => {
-                this.editing && this.cancel();
-                return false;
-            }, ['TEXTAREA'], 'Cancel.')
-        ]);
     }
 
     update() {
@@ -134,5 +121,21 @@ export class MarkdownInlineEditorComponent {
             this.autosize.resizeToFitContent();
             document.getElementById('edit-area').focus();
         }, 1);
+    }
+
+    ngOnInit(): void {
+        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
+        this._hotkeysService.hotkeys.splice(0).forEach(x => this._hotkeysService.remove(x));
+
+        this._hotkeysService.add([
+            new Hotkey('ctrl+enter', () => {
+                this.editing && this.update();
+                return false;
+            }, ['TEXTAREA'], 'Update.'),
+            new Hotkey('esc', () => {
+                this.editing && this.cancel();
+                return false;
+            }, ['TEXTAREA'], 'Cancel.')
+        ]);
     }
 }
