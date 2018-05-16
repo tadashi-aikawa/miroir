@@ -71,11 +71,15 @@
                 <div *ngIf="errorMessage">
                     <span class="error-message">{{errorMessage}}</span>
                 </div>
+                <mat-button-toggle [checked]="filteredWordNot"
+                                   (change)="changeFilteredWordNot($event.source.checked)">
+                    Not
+                </mat-button-toggle>
                 <mat-form-field>
                     <input matInput
                            placeholder="Filtered word"
                            [(ngModel)]="filteredWord"
-                           (keyup.enter)="updateFilteredWord()"
+                           (keyup.enter)="changeFilteredWord()"
                     >
                 </mat-form-field>
                 <app-diff-viewer #diffView

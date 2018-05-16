@@ -20,6 +20,7 @@ import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {ToasterConfig, ToasterService} from 'angular2-toaster';
+import {matchRegExp} from "../../utils/regexp";
 
 
 interface KeyBindings {
@@ -185,6 +186,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
     @Input() hideIgnoredDiff: boolean = this.settingsService.hideIgnoredDiff;
     @Input() hideCheckedAlreadyDiff: boolean = this.settingsService.hideCheckedAlreadyDiff;
+    @Input() filteredWordNot: boolean = true;
     @Input() cheatSheet: boolean = false;
 
     @ViewChild('selector') selector;
@@ -198,6 +200,7 @@ export class DetailDialogComponent implements OnInit {
     otherExpectedEncoding: string;
 
     activeIndex: string;
+    originalEditorBody: Pair<string>;
     options: IOption[];
     isLoading: boolean;
     errorMessage: string;
@@ -361,9 +364,13 @@ export class DetailDialogComponent implements OnInit {
                 // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
                 setTimeout(() => {
                     this.isLoading = false;
+                    this.originalEditorBody = {
+                        one: 'Binary is not supported to show',
+                        other: 'Binary is not supported to show',
+                    };
                     this.diffViewConfig = createConfig(
-                        'Binary is not supported to show',
-                        'Binary is not supported to show',
+                        this.originalEditorBody.one,
+                        this.originalEditorBody.other,
                         'text',
                         'text',
                         !this.unifiedDiff
@@ -383,6 +390,10 @@ export class DetailDialogComponent implements OnInit {
                             other: toLanguage(trial.other.content_type)
                         };
                         const bodyPair = this.maskIgnores({one: rs[0].body, other: rs[1].body}, languagePair);
+                        this.originalEditorBody = {
+                            one: bodyPair.one,
+                            other: bodyPair.other,
+                        };
 
                         this.diffViewConfig = createConfig(
                             bodyPair.one,
@@ -425,7 +436,7 @@ export class DetailDialogComponent implements OnInit {
         );
     }
 
-    private maskIgnores(bodyPair: Pair<string>, languagePair: Pair<string>) {
+    private maskIgnores(bodyPair: Pair<string>, languagePair: Pair<string>): Pair<string> {
         const bodyApplyIgnoredPair: Pair<string> = this.hideIgnoredDiff && this.propertyDiffsByCognition ?
             applyIgnores(bodyPair, languagePair, this.propertyDiffsByCognition.ignored, 'IGNORED') :
             {one: bodyPair.one, other: bodyPair.other};
@@ -443,9 +454,26 @@ export class DetailDialogComponent implements OnInit {
         this.fullscreen = fullscreen;
     }
 
-    updateFilteredWord() {
-        console.log(this.filteredWord);
-        this.diffViewConfig = Object.assign({}, this.diffViewConfig, {leftContent: this.filteredWord});
+    // TODO: UUUUUUUUUUUUUUUUUUUUUUUUUUUUSEEEEEEEEEEEEEEEEEEEEEEE
+    updateEditorBodies() {
+        const filtered = (body: string): string =>
+            body.split('\n')
+                .filter(x => this.filteredWordNot !== matchRegExp(x, this.filteredWord))
+                .join('\n');
+
+        this.diffViewConfig = Object.assign({}, this.diffViewConfig, {
+            leftContent: this.filteredWord ? filtered(this.originalEditorBody.one) : this.originalEditorBody.one,
+            rightContent: this.filteredWord ? filtered(this.originalEditorBody.other) : this.originalEditorBody.other,
+        });
+    }
+
+    changeFilteredWord() {
+        this.updateEditorBodies();
+    }
+
+    changeFilteredWordNot(filteredWordNot: boolean) {
+        this.filteredWordNot = filteredWordNot;
+        this.updateEditorBodies();
     }
 
     changeDiffType(unifiedDiff: boolean) {
