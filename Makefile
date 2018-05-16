@@ -61,6 +61,10 @@ release:  ## Release
 	@echo '3. Push'
 	git push
 
+	@echo 'Success All!!'
+	@echo 'Create a pull request and merge to master!!'
+	@echo 'https://github.com/tadashi-aikawa/miroir/compare/$(version)?expand=1'
+
 	@echo 'End $@'
 
 deploy-container: _clean-deploy-container ## Deploy by docker (Set: PORT[def: 8888] and Requirements: dist)
