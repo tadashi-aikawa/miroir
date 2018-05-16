@@ -11,9 +11,9 @@
         <span>{{reportTitle}}</span>
     </div>
     <mat-icon class="action-icon hvr-buzz-out"
-             style="margin-left: auto;"
-             title="[w] Close dialog"
-             (click)="closeDialog()">
+              style="margin-left: auto;"
+              title="[w] Close dialog"
+              (click)="closeDialog()">
         close
     </mat-icon>
 </div>
@@ -64,27 +64,30 @@
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
 <hr/>
-<mat-tab-group  [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
+<mat-tab-group [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
     <mat-tab label="Diff viewer">
         <div style="display: flex;">
             <div style="flex: 1;">
+                <div *ngIf="enableLineFilter">
+                    <mat-button-toggle [checked]="filteredWordNot"
+                                       (change)="changeFilteredWordNot($event.source.checked)">
+                        Not
+                    </mat-button-toggle>
+                    <mat-form-field>
+                        <input matInput
+                               placeholder="Filtered word"
+                               [(ngModel)]="filteredWord"
+                               (keyup.enter)="changeFilteredWord()"
+                        >
+                    </mat-form-field>
+                </div>
                 <div *ngIf="errorMessage">
                     <span class="error-message">{{errorMessage}}</span>
                 </div>
-                <mat-button-toggle [checked]="filteredWordNot"
-                                   (change)="changeFilteredWordNot($event.source.checked)">
-                    Not
-                </mat-button-toggle>
-                <mat-form-field>
-                    <input matInput
-                           placeholder="Filtered word"
-                           [(ngModel)]="filteredWord"
-                           (keyup.enter)="changeFilteredWord()"
-                    >
-                </mat-form-field>
+
                 <app-diff-viewer #diffView
                                  [config]="diffViewConfig"
-                                 height="{{fullscreen ? 'calc(95vh - 160px)' : 'calc(95vh - 290px)'}}"
+                                 [height]="diffViewerHeight"
                 >
                 </app-diff-viewer>
             </div>
@@ -96,19 +99,27 @@
                 </div>
                 <div>
                     <mat-button-toggle [checked]="hideIgnoredDiff"
-                                      (change)="changeHideIgnoredDiff($event.source.checked)">
+                                       (change)="changeHideIgnoredDiff($event.source.checked)">
                         <mat-icon style="color: green;"
-                                 title="Toggl ignored properties visibility">
+                                  title="Toggl ignored properties visibility">
                             visibility_off
                         </mat-icon>
                     </mat-button-toggle>
                 </div>
                 <div>
                     <mat-button-toggle [checked]="hideCheckedAlreadyDiff"
-                                      (change)="changeHideCheckedAlreadyDiff($event.source.checked)">
+                                       (change)="changeHideCheckedAlreadyDiff($event.source.checked)">
                         <mat-icon style="color: red;"
-                                 title="Toggl checked already properties visibility">
+                                  title="Toggl checked already properties visibility">
                             visibility_off
+                        </mat-icon>
+                    </mat-button-toggle>
+                </div>
+                <div>
+                    <mat-button-toggle [checked]="enableLineFilter"
+                                       (change)="setLineFilterEnabled($event.source.checked)">
+                        <mat-icon title="Toggl line filter">
+                            filter
                         </mat-icon>
                     </mat-button-toggle>
                 </div>
@@ -139,15 +150,19 @@
                             </div>
                             <div class="center-horizontal little-horizontal-padding">
                                 <mat-icon class="changed">autorenew</mat-icon>
-                                <span class="diff-type-number">{{propertyDiffsByCognition.unknown.changed.length}}</span>
+                                <span
+                                    class="diff-type-number">{{propertyDiffsByCognition.unknown.changed.length}}</span>
                             </div>
                             <div class="center-horizontal little-horizontal-padding">
                                 <mat-icon class="removed">removed</mat-icon>
-                                <span class="diff-type-number">{{propertyDiffsByCognition.unknown.removed.length}}</span>
+                                <span
+                                    class="diff-type-number">{{propertyDiffsByCognition.unknown.removed.length}}</span>
                             </div>
                         </expansion-panel-title>
-                        <expansion-panel-description-hidden>{{propertyDiffsByCognition.unknown.title}}</expansion-panel-description-hidden>
-                        <expansion-panel-description-toggled>{{propertyDiffsByCognition.unknown.title}}</expansion-panel-description-toggled>
+                        <expansion-panel-description-hidden>{{propertyDiffsByCognition.unknown.title}}
+                        </expansion-panel-description-hidden>
+                        <expansion-panel-description-toggled>{{propertyDiffsByCognition.unknown.title}}
+                        </expansion-panel-description-toggled>
 
                         <expansion-panel-content>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.added" class="center-vertical">
@@ -190,14 +205,18 @@
                         <expansion-panel-description-hidden>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon></a>
+                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”>
+                                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                                </a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
                             </div>
                         </expansion-panel-description-hidden>
                         <expansion-panel-description-toggled>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon></a>
+                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”>
+                                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                                </a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
                             </div>
                         </expansion-panel-description-toggled>
@@ -242,14 +261,18 @@
                         <expansion-panel-description-hidden>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon></a>
+                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”>
+                                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                                </a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
                             </div>
                         </expansion-panel-description-hidden>
                         <expansion-panel-description-toggled>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”><mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon></a>
+                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”>
+                                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                                </a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
                             </div>
                         </expansion-panel-description-toggled>
@@ -275,7 +298,7 @@
                 <div class="center-horizontal" style="height: 50%;">
                     <div class="error-message" style="padding-top: 20px;">
                         ┌────────────────────┐<br/>
-                        ｜ Oops.. I can't understand properties..   <br/>
+                        ｜ Oops.. I can't understand properties.. <br/>
                         └──────────────v─────-┘
                     </div>
                     <div style="padding-top: 5px;">

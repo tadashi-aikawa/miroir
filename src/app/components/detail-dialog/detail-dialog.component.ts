@@ -21,6 +21,7 @@ import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {ToasterConfig, ToasterService} from 'angular2-toaster';
 import {matchRegExp} from "../../utils/regexp";
+import {Memoize} from "lodash-decorators";
 
 
 interface KeyBindings {
@@ -186,6 +187,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() unifiedDiff: boolean = this.settingsService.unifiedDiff;
     @Input() hideIgnoredDiff: boolean = this.settingsService.hideIgnoredDiff;
     @Input() hideCheckedAlreadyDiff: boolean = this.settingsService.hideCheckedAlreadyDiff;
+    @Input() enableLineFilter: boolean = true;
     @Input() filteredWordNot: boolean = true;
     @Input() cheatSheet: boolean = false;
 
@@ -211,6 +213,17 @@ export class DetailDialogComponent implements OnInit {
 
     get activeIndexNum(): number {
         return Number(this.activeIndex);
+    }
+
+    @Memoize
+    private calcDiffViewerHeight(fullscreen: boolean, isLineFilterEnabled: boolean): string {
+        const heightBehindFullscreen = fullscreen ? 0 : 130;
+        const heightBehindLineFilter = isLineFilterEnabled ? 50 : 0;
+        return `calc(95vh - ${160 + heightBehindFullscreen + heightBehindLineFilter}px)`
+    }
+
+    get diffViewerHeight(): string {
+        return this.calcDiffViewerHeight(this.fullscreen, this.enableLineFilter)
     }
 
     get trial(): Trial {
@@ -462,8 +475,10 @@ export class DetailDialogComponent implements OnInit {
                 .join('\n');
 
         this.diffViewConfig = Object.assign({}, this.diffViewConfig, {
-            leftContent: this.filteredWord ? filtered(this.originalEditorBody.one) : this.originalEditorBody.one,
-            rightContent: this.filteredWord ? filtered(this.originalEditorBody.other) : this.originalEditorBody.other,
+            leftContent: this.enableLineFilter && this.filteredWord ?
+                filtered(this.originalEditorBody.one) : this.originalEditorBody.one,
+            rightContent: this.enableLineFilter && this.filteredWord ?
+                filtered(this.originalEditorBody.other) : this.originalEditorBody.other,
         });
     }
 
@@ -494,6 +509,11 @@ export class DetailDialogComponent implements OnInit {
         this.settingsService.hideCheckedAlreadyDiff = hideCheckedAlready;
         // TODO: Repalce to maskIgnores()
         this.showTrial(this.trial);
+    }
+
+    setLineFilterEnabled(enabled: boolean) {
+        this.enableLineFilter = enabled;
+        this.updateEditorBodies();
     }
 
     afterChangeTab(index: number): void {
