@@ -520,6 +520,7 @@ export class DetailDialogComponent implements OnInit {
         this.propertyDiffsByCognition = createPropertyDiffs(
             this.trial, this.ignores, this.checkedAlready
         );
+        this.updateDiffEditorBodies();
     }
 
     copyActiveTrialLink() {
