@@ -368,6 +368,28 @@ export class DetailDialogComponent implements OnInit {
         this.selector.open();
     }
 
+    updateDiffEditorBodies(): void {
+        const filtered = (body: string): string =>
+            body.split('\n')
+                .filter(x => this.isLineFilterNegative !== matchRegExp(x, this.filteredWord))
+                .join('\n');
+
+        const languagePair: Pair<string> = {
+            one: toLanguage(this.trial.one.content_type),
+            other: toLanguage(this.trial.other.content_type)
+        };
+        const bodyPair: Pair<string> = this.maskIgnores(this.originalEditorBody, languagePair);
+        const needsFilter: boolean = this.isLineFilterEnabled && !!this.filteredWord;
+
+        this.diffViewConfig = createConfig(
+            needsFilter ? filtered(bodyPair.one) : bodyPair.one,
+            needsFilter ? filtered(bodyPair.other) : bodyPair.other,
+            languagePair.one,
+            languagePair.other,
+            !this.unifiedDiff
+        );
+    }
+
     showTrial(trial: Trial): void {
         // Diff viewer
         this.isLoading = true;
@@ -382,14 +404,8 @@ export class DetailDialogComponent implements OnInit {
                         one: 'Binary is not supported to show',
                         other: 'Binary is not supported to show',
                     };
-                    this.diffViewConfig = createConfig(
-                        this.originalEditorBody.one,
-                        this.originalEditorBody.other,
-                        'text',
-                        'text',
-                        !this.unifiedDiff
-                    );
                     this.expectedEncoding = {one: 'None', other: 'None'}
+                    this.updateDiffEditorBodies()
                 }, 100);
             } else {
                 const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
@@ -398,24 +414,9 @@ export class DetailDialogComponent implements OnInit {
                         this.isLoading = false;
                         this.errorMessage = undefined;
 
-                        const languagePair: Pair<string> = {
-                            one: toLanguage(trial.one.content_type),
-                            other: toLanguage(trial.other.content_type)
-                        };
-                        const bodyPair = this.maskIgnores({one: rs[0].body, other: rs[1].body}, languagePair);
-                        this.originalEditorBody = {
-                            one: bodyPair.one,
-                            other: bodyPair.other,
-                        };
-
-                        this.diffViewConfig = createConfig(
-                            bodyPair.one,
-                            bodyPair.other,
-                            languagePair.one,
-                            languagePair.other,
-                            !this.unifiedDiff
-                        );
+                        this.originalEditorBody = { one: rs[0].body, other: rs[1].body, };
                         this.expectedEncoding = {one: rs[0].encoding, other: rs[1].encoding}
+                        this.updateDiffEditorBodies()
                     })
                     .catch(err => {
                         this.isLoading = false;
@@ -428,8 +429,9 @@ export class DetailDialogComponent implements OnInit {
             // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
             setTimeout(() => {
                 this.isLoading = false;
-                this.diffViewConfig = createConfig('No file', 'No file', 'text', 'text', !this.unifiedDiff);
+                this.originalEditorBody = { one: 'No file', other: 'No file', };
                 this.expectedEncoding = {one: 'None', other: 'None'}
+                this.updateDiffEditorBodies()
             }, 100);
         }
 
@@ -465,55 +467,38 @@ export class DetailDialogComponent implements OnInit {
         this.fullscreen = fullscreen;
     }
 
-    // TODO: UUUUUUUUUUUUUUUUUUUUUUUUUUUUSEEEEEEEEEEEEEEEEEEEEEEE
-    updateEditorBodies() {
-        const filtered = (body: string): string =>
-            body.split('\n')
-                .filter(x => this.isLineFilterNegative !== matchRegExp(x, this.filteredWord))
-                .join('\n');
-
-        this.diffViewConfig = Object.assign({}, this.diffViewConfig, {
-            leftContent: this.isLineFilterEnabled && this.filteredWord ?
-                filtered(this.originalEditorBody.one) : this.originalEditorBody.one,
-            rightContent: this.isLineFilterEnabled && this.filteredWord ?
-                filtered(this.originalEditorBody.other) : this.originalEditorBody.other,
-        });
-    }
-
     changeFilteredWord() {
-        this.updateEditorBodies();
+        this.updateDiffEditorBodies();
     }
 
     changeLineFilterNegative(isLineFilterNegative: boolean) {
         this.isLineFilterNegative = isLineFilterNegative;
         this.settingsService.isLineFilterNegative = isLineFilterNegative;
-        this.updateEditorBodies();
+        this.updateDiffEditorBodies();
     }
 
     changeDiffType(unifiedDiff: boolean) {
         this.unifiedDiff = unifiedDiff;
         this.settingsService.unifiedDiff = unifiedDiff;
-        this.diffViewConfig = Object.assign({}, this.diffViewConfig, {sideBySide: !unifiedDiff});
+        this.updateDiffEditorBodies();
     }
 
     changeHideIgnoredDiff(hideIgnored: boolean) {
         this.isIgnoredDiffHidden = hideIgnored;
         this.settingsService.isIgnoredDiffHidden = hideIgnored;
-        // TODO: Repalce to maskIgnores()
-        this.showTrial(this.trial);
+        this.updateDiffEditorBodies();
     }
 
     changeHideCheckedAlreadyDiff(hideCheckedAlready: boolean) {
         this.isCheckedAlreadyDiffHidden = hideCheckedAlready;
         this.settingsService.isCheckedAlreadyDiffHidden = hideCheckedAlready;
-        // TODO: Repalce to maskIgnores()
-        this.showTrial(this.trial);
+        this.updateDiffEditorBodies();
     }
 
     changeLineFilterEnabled(enabled: boolean) {
         this.isLineFilterEnabled = enabled;
         this.settingsService.isLineFilterEnabled = enabled;
-        this.updateEditorBodies();
+        this.updateDiffEditorBodies();
     }
 
     afterChangeTab(index: number): void {
