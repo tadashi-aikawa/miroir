@@ -319,10 +319,11 @@
         </div>
     </mat-tab>
 </mat-tab-group>
-<div *ngIf="cheatSheet" class="cheat-sheet">
-    <div style="overflow-y: scroll; height: 90vh; width: 90vw; padding: 50px;">
+<div *ngIf="cheatSheet" class="cheat-sheet" style="overflow-y: scroll;">
+    <div style="height: 90%; width: 90%; padding: 50px;">
         <div *ngFor="let k of _hotkeysService.hotkeys">
             <span class="keyboard">{{k.combo}}</span> <span>{{k.description}}</span>
         </div>
+        <div style="height: 50px;"></div>
     </div>
 </div>
