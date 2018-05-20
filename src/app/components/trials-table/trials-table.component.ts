@@ -36,7 +36,11 @@ export class TrialsTableComponent {
     @Output() onDisplayedTrialsUpdated = new EventEmitter<Trial[]>();
 
     rowClassRules = {
-        'report-table-record-different': 'data.status === "different"',
+        'report-table-record-attention': 'data.attention === "Appears unknown!!" || (data.status === "different" && data.attention === "???")',
+        'report-table-record-both-failure': 'data.attention === "Both failure!!"',
+        'report-table-record-no-diff-keys': 'data.attention === "No diff keys!!"',
+        'report-table-record-failure': 'data.status === "failure"',
+        'report-table-record-checked-already': 'data.checkedAlready.length > 0 && !data.attention',
     };
     defaultColDef = {
         filterParams: {
@@ -169,12 +173,10 @@ export class TrialsTableComponent {
     }
 
     fitColumnWidths() {
-        console.log("fitColumnWidths1")
         // Not initialized case
         if (!this.gridColumnApi) {
             return
         }
-        console.log("fitColumnWidths2")
 
         this.gridColumnApi.autoSizeColumns(
             this.gridColumnApi.getAllColumns().map(x => x.colId)
