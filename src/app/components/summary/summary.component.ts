@@ -24,10 +24,23 @@ import {Clipboard} from 'ts-clipboard';
 import {BodyOutputType, ToasterService} from 'angular2-toaster';
 import {Memoize} from "lodash-decorators";
 import {regexpComparator} from "../../utils/filters";
+import {TrialsTableComponent} from "../trials-table/trials-table.component";
+import {AnalyticsComponent} from "../analystic/analytics.component";
 
-function queriesSummaryRenderer(params) {
-    return params.value.queries;
-}
+
+const toAttention = (t: Trial): string => {
+    if ((!t.diff_keys) && t.status === 'different') {
+        return 'No diff keys!!';
+    }
+    if (t.propertyDiffsByCognition && !t.propertyDiffsByCognition.unknown.isEmpty()) {
+        return 'Appears unknown!!';
+    }
+    if (t.one.status_code >= 400 && t.other.status_code >= 400) {
+        return 'Both failure!!';
+    }
+    return '';
+};
+
 
 interface RowData {
     trial: Trial;
@@ -62,9 +75,8 @@ export class SummaryComponent implements OnInit {
 
     @ViewChild('sidenav') sideNav: MatSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
-
-    private gridApi;
-    private gridColumnApi;
+    @ViewChild('trialsTable') trialsTable: TrialsTableComponent;
+    @ViewChild('analytics') analytics: AnalyticsComponent;
 
     word = '';
 
@@ -237,22 +249,6 @@ export class SummaryComponent implements OnInit {
                     this.checkedAlready = toCheckedAlready(this.settingsService.checkList);
                     this.ignores = r.ignores;
 
-                    const toAttention = (t: Trial): string => {
-                        if (!analysis) {
-                            return '???';
-                        }
-                        if ((!t.diff_keys) && t.status === 'different') {
-                            return 'No diff keys!!';
-                        }
-                        if (t.propertyDiffsByCognition && !t.propertyDiffsByCognition.unknown.isEmpty()) {
-                            return 'Appears unknown!!';
-                        }
-                        if (t.one.status_code >= 400 && t.other.status_code >= 400) {
-                            return 'Both failure!!';
-                        }
-                        return '';
-                    };
-
                     r.trials = _(r.trials)
                         .map(t => Object.assign(new Trial(), t, {
                             propertyDiffsByCognition: analysis ? createPropertyDiffs(t, this.ignores, this.checkedAlready) : undefined
@@ -282,7 +278,7 @@ export class SummaryComponent implements OnInit {
                             oneStatus: t.one.status_code,
                             otherStatus: t.other.status_code,
                             requestTime: t.request_time,
-                            attention: t.attention,
+                            attention: analysis ? toAttention(t) : '???',
                             checkedAlready: analysis ?
                                 (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
                                 ['???'],
@@ -296,31 +292,27 @@ export class SummaryComponent implements OnInit {
     }
 
     downloadReport(key: string, filtered: boolean, event) {
-        // const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
-        //
-        // row.downloading = true;
-        // this.errorMessages = undefined;
-        // this.service.fetchReport(key)
-        //     .then((x: Report) => {
-        //         row.downloading = false;
-        //         const reportName = `${row.title}-${key.substring(0, 7)}.json`;
-        //
-        //         return this.tableSource.getFilteredAndSorted().then((es: RowData[]) => {
-        //             const filteredSeqs: number[] = es.map(e => e.trial.seq);
-        //             const obj: object = !filtered ? x :
-        //                 Object.assign({}, x, {
-        //                     trials: x.trials.filter(t => _.includes(filteredSeqs, t.seq))
-        //                 });
-        //
-        //             fileSaver.saveAs(new Blob([JSON.stringify(obj)]), reportName);
-        //         });
-        //     })
-        //     .catch(err => {
-        //         row.downloading = false;
-        //         row.downloadErrorMessage = err;
-        //     });
-        //
-        // event.stopPropagation();
+        const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
+
+        row.downloading = true;
+        this.errorMessages = undefined;
+        this.service.fetchReport(key)
+            .then((x: Report) => {
+                row.downloading = false;
+                const reportName = `${row.title}-${key.substring(0, 7)}.json`;
+
+                const obj: object = !filtered ? x :
+                    Object.assign({}, x, {
+                        trials: this.displayedTrials
+                    });
+                fileSaver.saveAs(new Blob([JSON.stringify(obj)]), reportName);
+            })
+            .catch(err => {
+                row.downloading = false;
+                row.downloadErrorMessage = err;
+            });
+
+        event.stopPropagation();
     }
 
     downloadArchive(key: string, event) {
@@ -405,25 +397,34 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.ignores = this.ignores;
     }
 
+    afterChangeTab(index: number): void {
+        switch (index) {
+            case 0:
+                this.trialsTable.fitColumnWidths();
+                break;
+            case 2:
+                this.analytics.fitColumnWidths();
+                break;
+        }
+    }
+
     showRequestsAsJson() {
-        // this.tableSource.getFilteredAndSorted().then((rs: RowData[]) => {
-        //     const dialogRef = this._dialog.open(EditorDialogComponent, {
-        //         width: '80vw',
-        //         height: '97%'
-        //     });
-        //     dialogRef.componentInstance.mode = 'json';
-        //     dialogRef.componentInstance.title = 'Requests which can used on jumeaux';
-        //     dialogRef.componentInstance.value = JSON.stringify(
-        //         rs.map((x: RowData) => ({
-        //             name: x.trial.name,
-        //             path: x.trial.path,
-        //             qs: x.trial.queries,
-        //             headers: x.trial.headers
-        //         })),
-        //         null,
-        //         4
-        //     );
-        // });
+        const dialogRef = this._dialog.open(EditorDialogComponent, {
+            width: '80vw',
+            height: '97%'
+        });
+        dialogRef.componentInstance.mode = 'json';
+        dialogRef.componentInstance.title = 'Requests which can used on jumeaux';
+        dialogRef.componentInstance.value = JSON.stringify(
+            this.displayedTrials.map((x: Trial) => ({
+                name: x.name,
+                path: x.path,
+                qs: x.queries,
+                headers: x.headers
+            })),
+            null,
+            4
+        );
     }
 
     showSummaryAsJson() {

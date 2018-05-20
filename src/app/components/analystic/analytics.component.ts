@@ -1,6 +1,6 @@
 import {Memoize} from 'lodash-decorators';
 import {PropertyDiffs, Row, Summary, Trial} from '../../models/models';
-import {Component, Input, Pipe, PipeTransform, Output, EventEmitter} from '@angular/core';
+import {Component, Input, Pipe, PipeTransform, Output, EventEmitter, SimpleChanges, OnChanges} from '@angular/core';
 import * as _ from 'lodash';
 import {Dictionary} from 'lodash';
 
@@ -17,15 +17,39 @@ export class AnalyticsComponent {
 
     @Output() onClickTrials = new EventEmitter<Trial[]>();
 
+    private gridColumnApi;
+
+    handleGridReady(params) {
+        this.gridColumnApi = params.columnApi;
+        this.fitColumnWidths();
+    }
+
+    handleModelUpdated() {
+        this.fitColumnWidths();
+    }
+
+    fitColumnWidths() {
+        // Not initialized case
+        if (!this.gridColumnApi) {
+            return
+        }
+
+        this.gridColumnApi.autoSizeColumns(
+            this.gridColumnApi.getAllColumns().map(x => x.colId)
+        );
+    }
+
     // attentionSummaries: AttentionSummary[];
     attentionColumnDefs = [
         {
             headerName: "Title",
             field: "title",
+            width: 175,
         },
         {
             headerName: "Count",
             field: "count",
+            width: 100,
         },
     ];
 
@@ -33,10 +57,12 @@ export class AnalyticsComponent {
         {
             headerName: "Title",
             field: "title",
+            width: 350,
         },
         {
             headerName: "Count",
             field: "count",
+            width: 100,
         },
     ];
 
@@ -44,10 +70,35 @@ export class AnalyticsComponent {
         {
             headerName: "Title",
             field: "title",
+            width: 350,
         },
         {
             headerName: "Count",
             field: "count",
+            width: 100,
+        },
+    ];
+
+    ignoredPathDefs = [
+        {
+            headerName: "Path",
+            field: "title",
+        },
+        {
+            headerName: "Count",
+            field: "count",
+        },
+        {
+            headerName: "Same",
+            field: "status.same",
+        },
+        {
+            headerName: "Different",
+            field: "status.different",
+        },
+        {
+            headerName: "Failure",
+            field: "status.failure",
         },
     ];
 
@@ -65,12 +116,16 @@ export class AnalyticsComponent {
             .value();
     }
 
-    handleRowClicked(row: Row<DiffSummary>) {
+    handleDiffRowClicked(row: Row<DiffSummary>) {
         this.onClickTrials.emit(row.data.trials);
     }
 
-    handlePathRowClicked(row: Trial[]) {
-        this.onClickTrials.emit(row);
+    handlePathRowClicked(row: Row<PathSummary>) {
+        this.onClickTrials.emit(row.data.trials);
+    }
+
+    handleCheckedAlreadyBatchClicked(trials: Trial[]) {
+        this.onClickTrials.emit(trials);
     }
 
     stopPropagation(event) {

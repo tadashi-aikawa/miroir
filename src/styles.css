@@ -35,6 +35,11 @@
     grid-template-columns: 1fr 1fr;
 }
 
+.pain3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
 div.ellipsis-text {
     display: inline-block;
     overflow: hidden;

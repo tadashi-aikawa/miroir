@@ -215,23 +215,17 @@
                         </small>
                     </app-panel>
                 </div>
-                <mat-tab-group>
+                <mat-tab-group (selectChange)="afterChangeTab($event.index)">
                     <mat-tab label="Table">
                         <div style="padding: 15px;">
                             <app-trials-table
+                               #trialsTable
                                [tableRowData]="tableRowData"
                                (onClickRow)="handleRowClicked($event)"
                                (onDisplayedTrialsUpdated)="handleDisplayedTrialsUpdated($event)"
                             >
                             </app-trials-table>
                         </div>
-                        <app-analytics
-                            [summary]="activeReport.summary"
-                            [trials]="displayedTrials"
-                            (onClickTrials)="showDetail(0, $event)"
-                        >
-                        </app-analytics>
-
                     </mat-tab>
                     <mat-tab label="Chart">
                         <div class="smart-padding">
@@ -244,6 +238,13 @@
                         </div>
                     </mat-tab>
                     <mat-tab label="Analytics">
+                        <app-analytics
+                            #analytics
+                            [summary]="activeReport.summary"
+                            [trials]="displayedTrials"
+                            (onClickTrials)="showDetail(0, $event)"
+                        >
+                        </app-analytics>
                     </mat-tab>
                 </mat-tab-group>
             </div>

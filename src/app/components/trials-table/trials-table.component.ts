@@ -1,5 +1,5 @@
 import {Row, Trial} from '../../models/models';
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {regexpComparator} from "../../utils/filters";
 
 interface RowData {
@@ -150,7 +150,6 @@ export class TrialsTableComponent {
     private gridColumnApi;
 
     handleGridReady(params) {
-        console.log("ready")
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
         this.fitColumnWidths();
@@ -165,14 +164,17 @@ export class TrialsTableComponent {
             this.gridApi ?
                 this.gridApi.getModel().rowsToDisplay.map(x => x.data.trial) :
                 this.tableRowData.map(x => x.trial)
-        )
+        );
+        this.fitColumnWidths();
     }
 
     fitColumnWidths() {
+        console.log("fitColumnWidths1")
         // Not initialized case
         if (!this.gridColumnApi) {
             return
         }
+        console.log("fitColumnWidths2")
 
         this.gridColumnApi.autoSizeColumns(
             this.gridColumnApi.getAllColumns().map(x => x.colId)
