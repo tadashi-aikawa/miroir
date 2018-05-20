@@ -75,126 +75,14 @@ export class SummaryComponent implements OnInit {
     errorMessages: string[];
 
     activeReport: Report;
-    // filteredTrials: Trial[];
+    tableRowData: RowData[];
+    displayedTrials: Trial[];
     checkedAlready: IgnoreCase[];
     ignores: IgnoreCase[];
     loadingReportKey: string;
 
     statuses: CheckStatus[] = CheckStatuses.values;
     toDisplay: (key: CheckStatus) => string = CheckStatuses.toDisplay;
-
-    tableRows: RowData[];
-    rowClassRules = {
-        'report-table-record-different': 'data.status === "different"',
-    };
-    defaultColDef = {
-        filterParams: {
-            textCustomComparator: regexpComparator,
-            debounceMs: 200
-        },
-        floatingFilterComponentParams: {
-            debounceMs: 200
-        }
-    };
-    columnDefs = [
-        {
-            headerName: "seq",
-            field: "seq",
-            pinned: 'left',
-        },
-        {
-            headerName: "name",
-            field: "name",
-            pinned: 'left',
-        },
-        {
-            headerName: "Result",
-            pinned: 'left',
-            children: [
-                {
-                    headerName: "status",
-                    field: "status",
-                },
-                {
-                    headerName: "Intelligent Analytics",
-                    children: [
-                        {headerName: "attention", field: "attention"},
-                        {headerName: "checkedAlready", field: "checkedAlready", columnGroupShow: "open"},
-                        {headerName: "ignored", field: "ignored", columnGroupShow: "open"},
-                    ]
-                },
-            ]
-        },
-        {
-            headerName: "Request",
-            children: [
-                {
-                    headerName: "path",
-                    field: "path",
-                },
-                {
-                    headerName: "queries",
-                    columnGroupShow: "open",
-                    children: [
-                        {
-                            headerName: "number",
-                            field: "queriesNum",
-                            columnGroupShow: "closed",
-                        },
-                        {
-                            headerName: "detail",
-                            field: "queries",
-                            columnGroupShow: "open",
-                        },
-                        {
-                            headerName: "encoded",
-                            field: "encodedQueries",
-                            columnGroupShow: "open",
-                            filterParams: {
-                                textCustomComparator: null
-                            }
-                        },
-                    ]
-                },
-            ]
-        },
-        {
-            headerName: "Response",
-            openByDefault: true,
-            children: [
-                {
-                    headerName: "Status",
-                    columnGroupShow: "everything else",
-                    children: [
-                        {headerName: "one", field: "oneStatus"},
-                        {headerName: "other", field: "otherStatus"},
-                    ]
-                },
-                {
-                    headerName: "Sec",
-                    columnGroupShow: "open",
-                    children: [
-                        {headerName: "one", field: "oneSec", filter: 'agNumberColumnFilter'},
-                        {headerName: "other", field: "otherSec", filter: 'agNumberColumnFilter'},
-                    ]
-                },
-                {
-                    headerName: "Byte",
-                    columnGroupShow: "open",
-                    children: [
-                        {headerName: "one", field: "oneByte", filter: 'agNumberColumnFilter'},
-                        {headerName: "other", field: "otherByte", filter: 'agNumberColumnFilter'},
-                    ]
-                },
-            ]
-        },
-        {
-            headerName: "requestTime",
-            field: "requestTime",
-            pinned: 'right',
-        },
-    ];
-
 
     constructor(private service: AwsService,
                 private _dialog: MatDialog,
@@ -229,28 +117,6 @@ export class SummaryComponent implements OnInit {
                 }
             });
         });
-    }
-
-    get filteredTrials(): Trial[] {
-        return this.gridApi ? this.gridApi.getModel().rowsToDisplay.map(x => x.data.trial) : this.activeReport.trials;
-    }
-
-    onGridReady(params) {
-        console.log("ready")
-        this.gridApi = params.api;
-        this.gridColumnApi = params.columnApi;
-        this.fitColumnWidths();
-    }
-
-    fitColumnWidths() {
-        // Not initialized case
-        if (!this.gridColumnApi) {
-            return
-        }
-
-        this.gridColumnApi.autoSizeColumns(
-            this.gridColumnApi.getAllColumns().map(x => x.colId)
-        );
     }
 
     onSearchReports(keyword: string) {
@@ -397,7 +263,7 @@ export class SummaryComponent implements OnInit {
                         .value();
                     this.activeReport = r;
 
-                    this.tableRows = r.trials.map(t => {
+                    this.tableRowData = r.trials.map(t => {
                         const c = t.propertyDiffsByCognition;
 
                         return <RowData>{
@@ -426,7 +292,6 @@ export class SummaryComponent implements OnInit {
                         };
                     });
                 });
-            this.fitColumnWidths();
         });
     }
 
@@ -515,8 +380,13 @@ export class SummaryComponent implements OnInit {
     }
 
     handleRowClicked(row: Row<RowData>) {
-        this.showDetail(row.rowIndex, this.filteredTrials);
+        this.showDetail(row.rowIndex, this.displayedTrials);
     }
+
+    handleDisplayedTrialsUpdated(trials: Trial[]) {
+        this.displayedTrials = trials;
+    }
+
 
     showDetail(index: number, trials?: Trial[]) {
         console.log("showDetail")
@@ -531,7 +401,7 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.oneAccessPoint = this.activeReport.summary.one;
         dialogRef.componentInstance.otherAccessPoint = this.activeReport.summary.other;
         dialogRef.componentInstance.activeIndex = String(index);
-        dialogRef.componentInstance.trials = trials || this.filteredTrials;
+        dialogRef.componentInstance.trials = trials || this.displayedTrials;
         dialogRef.componentInstance.ignores = this.ignores;
     }
 

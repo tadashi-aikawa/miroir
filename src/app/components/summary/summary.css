@@ -135,6 +135,3 @@ mat-select {
     background: rgba(54, 68, 60, 0.4);
 }
 
-:host ::ng-deep .report-table-record-different {
-    background: mistyrose;
-}

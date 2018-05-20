@@ -218,30 +218,16 @@
                 <mat-tab-group>
                     <mat-tab label="Table">
                         <div style="padding: 15px;">
-                            <ag-grid-angular
-                                #agGrid
-                                style="width: 100%; height: 80vh;"
-                                class="ag-theme-balham"
-                                enableColResize
-                                enableSorting
-                                enableFilter
-                                pagination
-                                animateRows
-                                floatingFilter
-                                [rowData]="tableRows"
-                                [defaultColDef]="defaultColDef"
-                                [columnDefs]="columnDefs"
-                                [rowClassRules]="rowClassRules"
-                                (gridReady)="onGridReady($event)"
-                                (columnGroupOpened)="fitColumnWidths()"
-                                (rowClicked)="handleRowClicked($event)"
+                            <app-trials-table
+                               [tableRowData]="tableRowData"
+                               (onClickRow)="handleRowClicked($event)"
+                               (onDisplayedTrialsUpdated)="handleDisplayedTrialsUpdated($event)"
                             >
-                            </ag-grid-angular>
+                            </app-trials-table>
                         </div>
-
                         <app-analytics
                             [summary]="activeReport.summary"
-                            [trials]="filteredTrials"
+                            [trials]="displayedTrials"
                             (onClickTrials)="showDetail(0, $event)"
                         >
                         </app-analytics>
@@ -251,7 +237,7 @@
                         <div class="smart-padding">
                             <app-response-time-chart
                                 [summary]="activeReport.summary"
-                                [trials]="filteredTrials"
+                                [trials]="displayedTrials"
                                 (onPointClick)="showDetail($event)"
                             >
                             </app-response-time-chart>
