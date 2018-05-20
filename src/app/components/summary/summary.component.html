@@ -38,16 +38,16 @@
             </div>
             <div *ngIf="!searchingSummary && !searchErrorMessage">
                 <mat-card *ngFor="let row of rows"
-                         (click)="onClickCard(row, $event)"
-                         [ngClass]="activeReport && row.hashkey == activeReport.key ?
+                          (click)="onClickCard(row, $event)"
+                          [ngClass]="activeReport && row.hashkey == activeReport.key ?
                             ['hvr-curl-bottom-right', 'summary-card', 'summary-card-active'] :
                                 ['hvr-curl-bottom-right', 'summary-card']"
                 >
                     <div [ngClass]="'check-status '+row.check_status">
                         {{toDisplay(row.check_status)}}
                         <mat-select (change)="onSelectCheckStatus(row.hashkey, $event)"
-                                   (click)="$event.stopPropagation();"
-                                   [(ngModel)]="row.check_status">
+                                    (click)="$event.stopPropagation();"
+                                    [(ngModel)]="row.check_status">
                             <mat-option *ngFor="let status of statuses" [value]="status">
                                 {{toDisplay(status)}}
                             </mat-option>
@@ -55,7 +55,7 @@
                     </div>
                     <mat-card-header>
                         <mat-card-title class="summary-card-title"
-                                       title={{row.title}}
+                                        title={{row.title}}
                         >
                             {{row.title}}
                         </mat-card-title>
@@ -84,7 +84,7 @@
                         <span *ngIf="row.deleteErrorMessage">
                             <mat-chip-list class="smart-padding-without-bottom">
                                 <mat-chip color="warn" selected="true"
-                                         title={{row.deleteErrorMessage}}
+                                          title={{row.deleteErrorMessage}}
                                 >
                                     Fail to delete!!
                                 </mat-chip>
@@ -97,7 +97,7 @@
                         <span *ngIf="row.downloadErrorMessage">
                             <mat-chip-list class="smart-padding-without-bottom">
                                 <mat-chip color="warn" selected="true"
-                                         title={{row.downloadErrorMessage}}
+                                          title={{row.downloadErrorMessage}}
                                 >
                                     Fail to download!!
                                 </mat-chip>
@@ -106,7 +106,7 @@
                         <span *ngIf="row.updatingErrorMessage">
                             <mat-chip-list class="smart-padding-without-bottom">
                                 <mat-chip color="warn" selected="true"
-                                         title={{row.updatingErrorMessage}}
+                                          title={{row.updatingErrorMessage}}
                                 >
                                     Fail to update check status!!
                                 </mat-chip>
@@ -115,20 +115,20 @@
                     </mat-card-content>
                     <mat-card-actions style="padding: 0;">
                         <mat-icon (click)="removeDetail(row.hashkey, $event)"
-                                 class="action-icon hvr-buzz-out"
-                                 title="Remove from S3 storage (never restore)">
+                                  class="action-icon hvr-buzz-out"
+                                  title="Remove from S3 storage (never restore)">
                             delete_forever
                         </mat-icon>
                         <mat-icon (click)="downloadReport(row.hashkey, false, $event)"
-                                 class="action-icon hvr-buzz-out"
-                                 title="Download report.json"
+                                  class="action-icon hvr-buzz-out"
+                                  title="Download report.json"
                         >
                             file_download
                         </mat-icon>
                         <mat-icon *ngIf="row.with_zip"
-                                 (click)="downloadArchive(row.hashkey, $event)"
-                                 class="action-icon hvr-buzz-out"
-                                 title="Download all (zip file)"
+                                  (click)="downloadArchive(row.hashkey, $event)"
+                                  class="action-icon hvr-buzz-out"
+                                  title="Download all (zip file)"
                         >
                             cloud_download
                         </mat-icon>
@@ -146,12 +146,16 @@
         </mat-sidenav>
 
         <div class="smart-padding scrollable-y">
+
             <p *ngFor="let message of errorMessages" class="error-message" style="font-size: 150%; font-weight: bold;">
-                <mat-icon>report_problem</mat-icon> {{message}}
+                <mat-icon>report_problem</mat-icon>
+                {{message}}
             </p>
             <div *ngIf="activeReport">
                 <div class="center-vertical" style="flex-direction: row-reverse;">
-                    <small>{{activeReport.summary.time.start | date:'yyyy-MM-dd HH:mm:ss'}} ～ {{activeReport.summary.time.end | date:'yyyy-MM-dd HH:mm:ss'}}</small>
+                    <small>{{activeReport.summary.time.start | date:'yyyy-MM-dd HH:mm:ss'}} ～
+                        {{activeReport.summary.time.end | date:'yyyy-MM-dd HH:mm:ss'}}
+                    </small>
                     <mat-icon>access_time</mat-icon>
                 </div>
                 <div class="center-vertical">
@@ -207,27 +211,41 @@
                         <small><a [href]="activeReport.summary.one.host">{{activeReport.summary.one.host}}</a></small>
                     </app-panel>
                     <app-panel [title]="activeReport.summary.other.name" class="smart-padding-small">
-                        <small><a [href]="activeReport.summary.other.host">{{activeReport.summary.other.host}}</a></small>
+                        <small><a [href]="activeReport.summary.other.host">{{activeReport.summary.other.host}}</a>
+                        </small>
                     </app-panel>
                 </div>
-                <mat-tab-group (selectedIndexChange)="afterChangeTab($event)">
+                <mat-tab-group>
                     <mat-tab label="Table">
-                        <div class="smart-padding">
-                            <ng-select
-                                [options]="optionColumns"
-                                [multiple]="true"
-                                [(ngModel)]="selectedValues"
-                                (selected)="onSelectColumns($event)"
-                                (deselected)="onSelectColumns($event)"
-                                label="Enable columns"
+                        <div style="padding: 15px;">
+                            <ag-grid-angular
+                                #agGrid
+                                style="width: 100%; height: 80vh;"
+                                class="ag-theme-balham"
+                                enableColResize
+                                enableSorting
+                                enableFilter
+                                pagination
+                                animateRows
+                                floatingFilter
+                                [rowData]="tableRows"
+                                [defaultColDef]="defaultColDef"
+                                [columnDefs]="columnDefs"
+                                [rowClassRules]="rowClassRules"
+                                (gridReady)="onGridReady($event)"
+                                (columnGroupOpened)="fitColumnWidths()"
+                                (rowClicked)="handleRowClicked($event)"
                             >
-                            </ng-select>
-                            <ng2-smart-table [settings]="settings"
-                                             [source]="tableSource"
-                                             (userRowSelect)="onSelectRow($event);"
-                            >
-                            </ng2-smart-table>
+                            </ag-grid-angular>
                         </div>
+
+                        <app-analytics
+                            [summary]="activeReport.summary"
+                            [trials]="filteredTrials"
+                            (onClickTrials)="showDetail(0, $event)"
+                        >
+                        </app-analytics>
+
                     </mat-tab>
                     <mat-tab label="Chart">
                         <div class="smart-padding">
@@ -240,12 +258,6 @@
                         </div>
                     </mat-tab>
                     <mat-tab label="Analytics">
-                        <app-analytics
-                            [summary]="activeReport.summary"
-                            [trials]="filteredTrials"
-                            (onClickTrials)="showDetail(0, $event)"
-                        >
-                        </app-analytics>
                     </mat-tab>
                 </mat-tab-group>
             </div>

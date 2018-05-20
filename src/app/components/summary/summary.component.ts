@@ -1,5 +1,15 @@
 import {ActivatedRoute} from '@angular/router';
-import {Change, DynamoResult, DynamoRow, EditorConfig, IgnoreCase, Report, Summary, Trial} from '../../models/models';
+import {
+    Change,
+    DynamoResult,
+    DynamoRow,
+    EditorConfig,
+    IgnoreCase,
+    Report,
+    Row,
+    Summary,
+    Trial
+} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {LocalDataSource, ViewCell} from 'ng2-smart-table';
@@ -12,175 +22,21 @@ import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {Clipboard} from 'ts-clipboard';
 import {BodyOutputType, ToasterService} from 'angular2-toaster';
+import {Memoize} from "lodash-decorators";
+import {regexpComparator} from "../../utils/filters";
 
-@Component({
-    template: `
-        <span [class]="status">{{renderValue}}</span>
-    `,
-    styles: [
-        '.server-error { color: red; font-weight: bold;}',
-        '.client-error { color: blue; font-weight: bold;}',
-        '.success { color: green; }'
-    ],
-})
-export class StatusCodeComponent implements ViewCell, OnInit {
-    renderValue: string;
-    status: string;
-    @Input() value: string | number;
-    @Input() rowData: any;
-
-    ngOnInit(): void {
-        const v = String(this.value);
-        this.renderValue = v;
-        this.status = v[0] === '5' ? 'server-error' :
-            v[0] === '4' ? 'client-error' : 'success';
-    }
+function queriesSummaryRenderer(params) {
+    return params.value.queries;
 }
-
-
-@Component({
-    template: `
-        <span [title]="hoverValue">{{renderValue}}</span>
-    `
-})
-export class HoverComponent implements ViewCell, OnInit {
-    renderValue: string;
-    hoverValue: string;
-    @Input() value: string | number;
-    @Input() rowData: any;
-
-    ngOnInit(): void {
-        this.renderValue = `${String(this.value).split('&').length} queries`;
-        this.hoverValue = String(this.value);
-    }
-}
-
-@Component({
-    template: `
-        <app-badge-list *ngFor="let v of this.value">
-            <app-badge kind="disabled" size="minimum">{{this.v}}</app-badge>
-        </app-badge-list>
-    `
-})
-export class LabelsComponent {
-    @Input() value: string[];
-}
-
-@Component({
-    selector: 'app-status',
-    template: `
-        <app-badge [kind]="kind" size="small">{{renderValue}}</app-badge>
-    `,
-    styleUrls: ['summary.css']
-})
-export class StatusComponent implements ViewCell, OnInit {
-    renderValue: string;
-    kind: string;
-    @Input() value: string | number;
-    @Input() rowData: any;
-
-    ngOnInit(): void {
-        const v = String(this.value);
-        this.renderValue = v;
-        this.kind = v === 'same' ? 'fine' :
-            v === 'different' ? 'warning' :
-                v === 'failure' ? 'danger' : '';
-    }
-}
-
-
-const filterFunction = (v, q) =>
-    q.split(' and ').every(x => {
-        try {
-            return x.startsWith('not ') ?
-                (v ? !new RegExp(x.replace(/^not /, '')).test(v) : true) :
-                new RegExp(x).test(v);
-        } catch (e) {
-            return false;
-        }
-    });
-
-const arrayFilterFunction = (vs: any[], q) =>
-    q.split(' and ').every(x => {
-        try {
-            return x.startsWith('not ') ?
-                (vs.length > 0 ? !vs.every(v => new RegExp(x.replace(/^not /, '')).test(v)) : true) :
-                vs.some(v => new RegExp(x).test(v));
-        } catch (e) {
-            return false;
-        }
-    });
-
-const TABLE_SETTINGS = {
-    columns: {
-        seq: {title: 'Seq', filterFunction, width: '100px'},
-        name: {title: 'Name', filterFunction},
-        path: {title: 'Path', filterFunction},
-        status: {
-            title: 'Status',
-            type: 'custom',
-            renderComponent: StatusComponent,
-            filterFunction,
-            width: '100px'
-        },
-        queries: {
-            title: 'Queries',
-            type: 'custom',
-            renderComponent: HoverComponent,
-            filterFunction,
-            width: '100px'
-        },
-        originQueries: {
-            title: 'OriginQueries',
-            type: 'custom',
-            renderComponent: HoverComponent,
-            filterFunction,
-            width: '100px'
-        },
-        attention: {title: 'Attention', width: '200px'},
-        checkedAlready: {
-            title: 'CheckedAlready',
-            type: 'custom',
-            renderComponent: LabelsComponent,
-            filterFunction: arrayFilterFunction,
-            width: '600px'
-        },
-        ignored: {
-            title: 'Ignored',
-            type: 'custom',
-            renderComponent: LabelsComponent,
-            filterFunction: arrayFilterFunction,
-            width: '600px'
-        },
-        oneByte: {title: '<- Byte', filterFunction, width: '100px'},
-        otherByte: {title: 'Byte ->', filterFunction, width: '100px'},
-        oneSec: {title: '<- Sec', filterFunction, width: '100px'},
-        otherSec: {title: 'Sec ->', filterFunction, width: '100px'},
-        oneStatus: {
-            title: '<- Status',
-            type: 'custom',
-            renderComponent: StatusCodeComponent,
-            filterFunction,
-            width: '100px'
-        },
-        otherStatus: {
-            title: 'Status ->',
-            type: 'custom',
-            renderComponent: StatusCodeComponent,
-            filterFunction,
-            width: '100px'
-        },
-        requestTime: {title: 'Request time', filterFunction}
-    },
-    actions: false
-};
-
 
 interface RowData {
     trial: Trial;
+    seq: Number;
     name: string;
     path: string;
-    queries: Object;
+    queriesNum: number;
+    queries: string;
+    encodedQueries: string;
     status: string;
     oneByte: number;
     otherByte: number;
@@ -200,11 +56,15 @@ interface RowData {
     styleUrls: [
         './summary.css',
         '../../../../node_modules/hover.css/css/hover.css'
-    ]
+    ],
 })
 export class SummaryComponent implements OnInit {
+
     @ViewChild('sidenav') sideNav: MatSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
+
+    private gridApi;
+    private gridColumnApi;
 
     word = '';
 
@@ -214,23 +74,127 @@ export class SummaryComponent implements OnInit {
     settings: any;
     errorMessages: string[];
 
-    selectedValues: string[] = this.settingsService.selectedColumnNames ||
-        Object.keys(TABLE_SETTINGS.columns);
-    optionColumns: { value: string, label: string }[] = _.map(
-        TABLE_SETTINGS.columns,
-        (v, k) => ({value: k, label: v.title})
-    );
     activeReport: Report;
+    // filteredTrials: Trial[];
     checkedAlready: IgnoreCase[];
     ignores: IgnoreCase[];
     loadingReportKey: string;
-    tableSource = new LocalDataSource();
-
-    // TODO: Update after `onFilterChanged` if implemented by ng2-smart-table
-    filteredTrials: Trial[];
 
     statuses: CheckStatus[] = CheckStatuses.values;
     toDisplay: (key: CheckStatus) => string = CheckStatuses.toDisplay;
+
+    tableRows: RowData[];
+    rowClassRules = {
+        'report-table-record-different': 'data.status === "different"',
+    };
+    defaultColDef = {
+        filterParams: {
+            textCustomComparator: regexpComparator,
+            debounceMs: 200
+        },
+        floatingFilterComponentParams: {
+            debounceMs: 200
+        }
+    };
+    columnDefs = [
+        {
+            headerName: "seq",
+            field: "seq",
+            pinned: 'left',
+        },
+        {
+            headerName: "name",
+            field: "name",
+            pinned: 'left',
+        },
+        {
+            headerName: "Result",
+            pinned: 'left',
+            children: [
+                {
+                    headerName: "status",
+                    field: "status",
+                },
+                {
+                    headerName: "Intelligent Analytics",
+                    children: [
+                        {headerName: "attention", field: "attention"},
+                        {headerName: "checkedAlready", field: "checkedAlready", columnGroupShow: "open"},
+                        {headerName: "ignored", field: "ignored", columnGroupShow: "open"},
+                    ]
+                },
+            ]
+        },
+        {
+            headerName: "Request",
+            children: [
+                {
+                    headerName: "path",
+                    field: "path",
+                },
+                {
+                    headerName: "queries",
+                    columnGroupShow: "open",
+                    children: [
+                        {
+                            headerName: "number",
+                            field: "queriesNum",
+                            columnGroupShow: "closed",
+                        },
+                        {
+                            headerName: "detail",
+                            field: "queries",
+                            columnGroupShow: "open",
+                        },
+                        {
+                            headerName: "encoded",
+                            field: "encodedQueries",
+                            columnGroupShow: "open",
+                            filterParams: {
+                                textCustomComparator: null
+                            }
+                        },
+                    ]
+                },
+            ]
+        },
+        {
+            headerName: "Response",
+            openByDefault: true,
+            children: [
+                {
+                    headerName: "Status",
+                    columnGroupShow: "everything else",
+                    children: [
+                        {headerName: "one", field: "oneStatus"},
+                        {headerName: "other", field: "otherStatus"},
+                    ]
+                },
+                {
+                    headerName: "Sec",
+                    columnGroupShow: "open",
+                    children: [
+                        {headerName: "one", field: "oneSec", filter: 'agNumberColumnFilter'},
+                        {headerName: "other", field: "otherSec", filter: 'agNumberColumnFilter'},
+                    ]
+                },
+                {
+                    headerName: "Byte",
+                    columnGroupShow: "open",
+                    children: [
+                        {headerName: "one", field: "oneByte", filter: 'agNumberColumnFilter'},
+                        {headerName: "other", field: "otherByte", filter: 'agNumberColumnFilter'},
+                    ]
+                },
+            ]
+        },
+        {
+            headerName: "requestTime",
+            field: "requestTime",
+            pinned: 'right',
+        },
+    ];
+
 
     constructor(private service: AwsService,
                 private _dialog: MatDialog,
@@ -258,7 +222,6 @@ export class SummaryComponent implements OnInit {
                 if (ps.hashKey) {
                     this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
                         .then((r: Report) => {
-                            this.filteredTrials = r.trials.map(x => Object.assign(new Trial(), x));
                             if (ps.seq) {
                                 this.showDetail(ps.seq - 1);
                             }
@@ -266,7 +229,28 @@ export class SummaryComponent implements OnInit {
                 }
             });
         });
+    }
 
+    get filteredTrials(): Trial[] {
+        return this.gridApi ? this.gridApi.getModel().rowsToDisplay.map(x => x.data.trial) : this.activeReport.trials;
+    }
+
+    onGridReady(params) {
+        console.log("ready")
+        this.gridApi = params.api;
+        this.gridColumnApi = params.columnApi;
+        this.fitColumnWidths();
+    }
+
+    fitColumnWidths() {
+        // Not initialized case
+        if (!this.gridColumnApi) {
+            return
+        }
+
+        this.gridColumnApi.autoSizeColumns(
+            this.gridColumnApi.getAllColumns().map(x => x.colId)
+        );
     }
 
     onSearchReports(keyword: string) {
@@ -314,10 +298,6 @@ export class SummaryComponent implements OnInit {
             .catch(err => {
                 row.updatingErrorMessage = err;
             });
-    }
-
-    onSelectColumns(event) {
-        this.updateColumnVisibility();
     }
 
     onUpdateTitle(title: Change<string>) {
@@ -417,75 +397,65 @@ export class SummaryComponent implements OnInit {
                         .value();
                     this.activeReport = r;
 
-                    this.updateColumnVisibility();
-                    this.tableSource.load(
-                        r.trials.map(t => {
-                            const c = t.propertyDiffsByCognition;
+                    this.tableRows = r.trials.map(t => {
+                        const c = t.propertyDiffsByCognition;
 
-                            return <RowData>{
-                                trial: t,
-                                seq: t.seq,
-                                name: t.name,
-                                path: t.path,
-                                status: t.status,
-                                queries: t.queryString,
-                                originQueries: t.originQueryString,
-                                oneByte: t.one.byte,
-                                otherByte: t.other.byte,
-                                oneSec: t.one.response_sec,
-                                otherSec: t.other.response_sec,
-                                oneStatus: t.one.status_code,
-                                otherStatus: t.other.status_code,
-                                requestTime: t.request_time,
-                                attention: t.attention,
-                                checkedAlready: analysis ?
-                                    (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
-                                    ['???'],
-                                ignored: analysis ?
-                                    (c ? _(c.ignored).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
-                                    ['???'],
-                            };
-                        })
-                    ).then(() => {
-                        this.tableSource.getFilteredAndSorted()
-                            .then((es: RowData[]) => this.filteredTrials = es.map(x => x.trial));
-                        resolve(r);
+                        return <RowData>{
+                            trial: t,
+                            seq: t.seq,
+                            name: t.name,
+                            path: t.path,
+                            status: t.status,
+                            queriesNum: Object.keys(t.queries).length,
+                            queries: t.queryString,
+                            encodedQueries: t.originQueryString,
+                            oneByte: t.one.byte,
+                            otherByte: t.other.byte,
+                            oneSec: t.one.response_sec,
+                            otherSec: t.other.response_sec,
+                            oneStatus: t.one.status_code,
+                            otherStatus: t.other.status_code,
+                            requestTime: t.request_time,
+                            attention: t.attention,
+                            checkedAlready: analysis ?
+                                (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
+                                ['???'],
+                            ignored: analysis ?
+                                (c ? _(c.ignored).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
+                                ['???'],
+                        };
                     });
-                })
-                .catch(err => {
-                    this.loadingReportKey = undefined;
-                    this.errorMessages = [err];
-                    reject(err);
                 });
+            this.fitColumnWidths();
         });
     }
 
     downloadReport(key: string, filtered: boolean, event) {
-        const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
-
-        row.downloading = true;
-        this.errorMessages = undefined;
-        this.service.fetchReport(key)
-            .then((x: Report) => {
-                row.downloading = false;
-                const reportName = `${row.title}-${key.substring(0, 7)}.json`;
-
-                return this.tableSource.getFilteredAndSorted().then((es: RowData[]) => {
-                    const filteredSeqs: number[] = es.map(e => e.trial.seq);
-                    const obj: object = !filtered ? x :
-                        Object.assign({}, x, {
-                            trials: x.trials.filter(t => _.includes(filteredSeqs, t.seq))
-                        });
-
-                    fileSaver.saveAs(new Blob([JSON.stringify(obj)]), reportName);
-                });
-            })
-            .catch(err => {
-                row.downloading = false;
-                row.downloadErrorMessage = err;
-            });
-
-        event.stopPropagation();
+        // const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
+        //
+        // row.downloading = true;
+        // this.errorMessages = undefined;
+        // this.service.fetchReport(key)
+        //     .then((x: Report) => {
+        //         row.downloading = false;
+        //         const reportName = `${row.title}-${key.substring(0, 7)}.json`;
+        //
+        //         return this.tableSource.getFilteredAndSorted().then((es: RowData[]) => {
+        //             const filteredSeqs: number[] = es.map(e => e.trial.seq);
+        //             const obj: object = !filtered ? x :
+        //                 Object.assign({}, x, {
+        //                     trials: x.trials.filter(t => _.includes(filteredSeqs, t.seq))
+        //                 });
+        //
+        //             fileSaver.saveAs(new Blob([JSON.stringify(obj)]), reportName);
+        //         });
+        //     })
+        //     .catch(err => {
+        //         row.downloading = false;
+        //         row.downloadErrorMessage = err;
+        //     });
+        //
+        // event.stopPropagation();
     }
 
     downloadArchive(key: string, event) {
@@ -544,21 +514,12 @@ export class SummaryComponent implements OnInit {
         event.stopPropagation();
     }
 
-    onSelectRow(event: any) {
-        event.source.getFilteredAndSorted().then((es: RowData[]) => {
-            this.filteredTrials = es.map(x => x.trial);
-            this.showDetail(es.findIndex(e => e === event.data));
-        });
-    }
-
-    afterChangeTab(index: number): void {
-        if (index === 1 || index === 2) {
-            this.tableSource.getFilteredAndSorted()
-                .then((es: RowData[]) => this.filteredTrials = es.map(x => x.trial));
-        }
+    handleRowClicked(row: Row<RowData>) {
+        this.showDetail(row.rowIndex, this.filteredTrials);
     }
 
     showDetail(index: number, trials?: Trial[]) {
+        console.log("showDetail")
         const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '95vw',
             maxWidth: '95vw',
@@ -575,24 +536,24 @@ export class SummaryComponent implements OnInit {
     }
 
     showRequestsAsJson() {
-        this.tableSource.getFilteredAndSorted().then((rs: RowData[]) => {
-            const dialogRef = this._dialog.open(EditorDialogComponent, {
-                width: '80vw',
-                height: '97%'
-            });
-            dialogRef.componentInstance.mode = 'json';
-            dialogRef.componentInstance.title = 'Requests which can used on jumeaux';
-            dialogRef.componentInstance.value = JSON.stringify(
-                rs.map((x: RowData) => ({
-                    name: x.trial.name,
-                    path: x.trial.path,
-                    qs: x.trial.queries,
-                    headers: x.trial.headers
-                })),
-                null,
-                4
-            );
-        });
+        // this.tableSource.getFilteredAndSorted().then((rs: RowData[]) => {
+        //     const dialogRef = this._dialog.open(EditorDialogComponent, {
+        //         width: '80vw',
+        //         height: '97%'
+        //     });
+        //     dialogRef.componentInstance.mode = 'json';
+        //     dialogRef.componentInstance.title = 'Requests which can used on jumeaux';
+        //     dialogRef.componentInstance.value = JSON.stringify(
+        //         rs.map((x: RowData) => ({
+        //             name: x.trial.name,
+        //             path: x.trial.path,
+        //             qs: x.trial.queries,
+        //             headers: x.trial.headers
+        //         })),
+        //         null,
+        //         4
+        //     );
+        // });
     }
 
     showSummaryAsJson() {
@@ -622,13 +583,6 @@ export class SummaryComponent implements OnInit {
         const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}`;
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this report url`, url);
-    }
-
-    private updateColumnVisibility() {
-        this.settingsService.selectedColumnNames = this.selectedValues;
-        this.settings = Object.assign({}, TABLE_SETTINGS,
-            {columns: _.pick(TABLE_SETTINGS.columns, this.selectedValues)}
-        );
     }
 
 }
@@ -682,7 +636,7 @@ export class DeleteConfirmDialogComponent {
         <h2 mat-dialog-title>{{title}}</h2>
         <app-editor #editor
                     [config]="editorConfig"
-                    height="95vh" 
+                    height="95vh"
         >
         </app-editor>
     `,

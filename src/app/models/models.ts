@@ -202,3 +202,8 @@ export class AwsConfiguration {
     table: string;
     prefix: string;
 }
+
+export class Row<T> {
+    rowIndex: number;
+    data: T;
+}

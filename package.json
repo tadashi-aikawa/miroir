@@ -30,6 +30,8 @@
     "@types/highcharts": "^5.0.19",
     "@types/js-yaml": "^3.10.1",
     "@types/lodash": "^4.14.104",
+    "ag-grid": "^17.1.1",
+    "ag-grid-angular": "^17.1.0",
     "angular-2-local-storage": "^1.0.1",
     "angular-markdown": "^0.1.0",
     "angular2-hotkeys": "^2.0.4",

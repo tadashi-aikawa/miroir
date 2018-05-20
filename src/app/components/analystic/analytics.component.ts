@@ -1,5 +1,5 @@
 import {Memoize} from 'lodash-decorators';
-import {PropertyDiffs, Summary, Trial} from '../../models/models';
+import {PropertyDiffs, Row, Summary, Trial} from '../../models/models';
 import {Component, Input, Pipe, PipeTransform, Output, EventEmitter} from '@angular/core';
 import * as _ from 'lodash';
 import {Dictionary} from 'lodash';
@@ -8,7 +8,6 @@ import {Dictionary} from 'lodash';
     selector: 'app-analytics',
     templateUrl: './analytics.component.html',
     styleUrls: [
-        './analytics.css',
         '../../../../node_modules/hover.css/css/hover.css',
     ],
 })
@@ -17,6 +16,40 @@ export class AnalyticsComponent {
     @Input() trials: Trial[];
 
     @Output() onClickTrials = new EventEmitter<Trial[]>();
+
+    // attentionSummaries: AttentionSummary[];
+    attentionColumnDefs = [
+        {
+            headerName: "Title",
+            field: "title",
+        },
+        {
+            headerName: "Count",
+            field: "count",
+        },
+    ];
+
+    checkedAlreadyColumnDefs = [
+        {
+            headerName: "Title",
+            field: "title",
+        },
+        {
+            headerName: "Count",
+            field: "count",
+        },
+    ];
+
+    ignoredColumnDefs = [
+        {
+            headerName: "Title",
+            field: "title",
+        },
+        {
+            headerName: "Count",
+            field: "count",
+        },
+    ];
 
     get checkedAlreadyTrials(): Trial[] {
         return this.filterCheckedAlreadyTrials(this.trials);
@@ -32,19 +65,17 @@ export class AnalyticsComponent {
             .value();
     }
 
-    onClickRow(trials: Trial[]) {
-        this.onClickTrials.emit(trials);
+    handleRowClicked(row: Row<DiffSummary>) {
+        this.onClickTrials.emit(row.data.trials);
+    }
+
+    handlePathRowClicked(row: Trial[]) {
+        this.onClickTrials.emit(row);
     }
 
     stopPropagation(event) {
         event.stopPropagation();
     }
-}
-
-interface AttentionSummary {
-    title: string,
-    count: number,
-    trials: Trial[]
 }
 
 interface PathSummary {
@@ -60,9 +91,9 @@ interface PathSummary {
 
 interface DiffSummary {
     title: string,
-    image: string,
-    link: string,
     count: number,
+    image?: string,
+    link?: string,
     trials: Trial[]
 }
 
@@ -70,11 +101,11 @@ type DiffSummaryWip = Partial<DiffSummary> & { trial: Trial }
 
 @Pipe({name: 'toAttention'})
 export class ToAttentionPipe implements PipeTransform {
-    transform(trials: Trial[]): AttentionSummary[] {
+    transform(trials: Trial[]): DiffSummary[] {
         return _(trials)
             .filter<Trial>((t: Trial) => t.attention)
             .groupBy<Trial>((t: Trial) => t.attention)
-            .map<Trial[], AttentionSummary>((xs: Trial[]) => ({
+            .map<Trial[], DiffSummary>((xs: Trial[]) => ({
                 title: xs[0].attention,
                 count: xs.length,
                 trials: xs,
