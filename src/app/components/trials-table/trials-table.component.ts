@@ -42,6 +42,7 @@ export class TrialsTableComponent {
         'report-table-record-failure': 'data.status === "failure"',
         'report-table-record-checked-already': 'data.checkedAlready.length > 0 && !data.attention',
     };
+
     defaultColDef = {
         filterParams: {
             textCustomComparator: regexpComparator,
@@ -51,6 +52,7 @@ export class TrialsTableComponent {
             debounceMs: 200
         }
     };
+
     columnDefs = [
         {
             headerName: "seq",
