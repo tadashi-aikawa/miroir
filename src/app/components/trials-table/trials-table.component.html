@@ -1,20 +1,26 @@
-<ag-grid-angular
-    #agGrid
-    style="width: 100%; height: 500px;"
-    class="ag-theme-balham"
-    enableColResize
-    enableSorting
-    enableFilter
-    pagination
-    animateRows
-    floatingFilter
-    [rowData]="tableRowData"
-    [defaultColDef]="defaultColDef"
-    [columnDefs]="columnDefs"
-    [rowClassRules]="rowClassRules"
-    (gridReady)="handleGridReady($event)"
-    (columnGroupOpened)="fitColumnWidths()"
-    (modelUpdated)="handleModelUpdated()"
-    (rowClicked)="handleRowClicked($event)"
->
-</ag-grid-angular>
+<div [style.width]="width" style="max-width: 100%;">
+    <div class="smart-padding-xsmall">
+        <button mat-button (click)="clear()">Visible All</button>
+    </div>
+    <ag-grid-angular
+        #agGrid
+        style="width: 100%; height: 500px;"
+        class="ag-theme-balham"
+        enableColResize
+        enableSorting
+        enableFilter
+        pagination
+        animateRows
+        floatingFilter
+        [rowData]="tableRowData"
+        [defaultColDef]="defaultColDef"
+        [columnDefs]="columnDefs"
+        [rowClassRules]="rowClassRules"
+        (gridReady)="handleGridReady($event)"
+        (columnGroupOpened)="fitColumnWidths()"
+        (modelUpdated)="handleModelUpdated()"
+        (rowClicked)="handleRowClicked($event)"
+        (columnVisible)="fitTableWidth($event)"
+    >
+    </ag-grid-angular>
+</div>

@@ -1,6 +1,18 @@
+import * as _ from 'lodash';
 import {Row, Trial} from '../../models/models';
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {
+    Component, Directive,
+    ElementRef,
+    EventEmitter,
+    HostBinding,
+    Input,
+    OnChanges,
+    Output,
+    SimpleChanges,
+    ViewChild
+} from '@angular/core';
 import {regexpComparator} from "../../utils/filters";
+import {Column} from "ag-grid";
 
 interface RowData {
     trial: Trial;
@@ -35,6 +47,7 @@ export class TrialsTableComponent {
     @Output() onClickRow = new EventEmitter<Row<RowData>>();
     @Output() onDisplayedTrialsUpdated = new EventEmitter<Trial[]>();
 
+    width: string;
     rowClassRules = {
         'report-table-record-attention': 'data.attention === "Appears unknown!!" || (data.status === "different" && data.attention === "???")',
         'report-table-record-both-failure': 'data.attention === "Both failure!!"',
@@ -182,6 +195,20 @@ export class TrialsTableComponent {
 
         this.gridColumnApi.autoSizeColumns(
             this.gridColumnApi.getAllColumns().map(x => x.colId)
+        );
+        this.fitTableWidth();
+    }
+
+    fitTableWidth() {
+        const columnsWidth: number = _.sumBy<Column>(this.gridColumnApi.getAllDisplayedColumns(), x => x.getActualWidth());
+        this.width = `${columnsWidth}px`;
+    }
+
+    clear() {
+        console.log(this.gridColumnApi.getAllColumns().map(x => x.colId))
+        this.gridColumnApi.setColumnsVisible(
+            this.gridColumnApi.getAllColumns().map(x => x.colId),
+            true
         );
     }
 
