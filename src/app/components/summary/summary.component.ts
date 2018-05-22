@@ -1,4 +1,4 @@
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Params} from '@angular/router';
 import {
     Change,
     DynamoResult,
@@ -47,7 +47,6 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         close_cheat_sheet: 'esc',
     }
 };
-
 
 
 const toAttention = (t: Trial): string => {
@@ -108,7 +107,7 @@ export class SummaryComponent implements OnInit {
                 private toasterService: ToasterService) {
     }
 
-    ngOnInit(): void {
+    initKeyBindings() {
         const keyMode: KeyBindings = KEY_BINDINGS_BY[this.settingsService.keyMode];
         // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
         this._hotkeysService.hotkeys.splice(0).forEach(x => this._hotkeysService.remove(x));
@@ -116,6 +115,10 @@ export class SummaryComponent implements OnInit {
         this._hotkeysService.add([
             new Hotkey(keyMode.reformat_table, () => {
                 this.trialsTable.fitColumnWidths();
+                return false;
+            }, null, 'Reformat table'),
+            new Hotkey(keyMode.visible_all, () => {
+                this.trialsTable.setAllColumnsVisible();
                 return false;
             }, null, 'Reformat table'),
             new Hotkey(keyMode.open_cheat_sheet, () => {
@@ -127,7 +130,10 @@ export class SummaryComponent implements OnInit {
                 return false;
             }, null, 'Close cheat sheet'),
         ]);
+    }
 
+    ngOnInit(): void {
+        this.initKeyBindings();
         setTimeout(() => {
             this.sideNav.open().then(() => {
                 setTimeout(() => this.keyWord.nativeElement.click(), 100);
@@ -140,13 +146,15 @@ export class SummaryComponent implements OnInit {
             this.route.params.subscribe(ps => {
                 if (ps.searchWord) {
                     this.word = ps.searchWord;
-                    this.searchReport(ps.searchWord);
-                }
-                if (ps.hashKey) {
-                    this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
-                        .then((r: Report) => {
-                            if (ps.seq) {
-                                this.showDetail(ps.seq - 1);
+                    this.searchReport(ps.searchWord)
+                        .then(_ => {
+                            if (ps.hashKey) {
+                                this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
+                                    .then((r: Report) => {
+                                        if (ps.seq) {
+                                            this.showDetail(ps.seq - 1, r.trials);
+                                        }
+                                    });
                             }
                         });
                 }
@@ -312,6 +320,8 @@ export class SummaryComponent implements OnInit {
                                 ['???'],
                         };
                     });
+
+                    resolve(r);
                 });
         });
     }
@@ -406,7 +416,6 @@ export class SummaryComponent implements OnInit {
 
 
     showDetail(index: number, trials?: Trial[]) {
-        console.log("showDetail")
         const dialogRef = this._dialog.open(DetailDialogComponent, {
             width: '95vw',
             maxWidth: '95vw',
@@ -420,6 +429,7 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.activeIndex = String(index);
         dialogRef.componentInstance.trials = trials || this.displayedTrials;
         dialogRef.componentInstance.ignores = this.ignores;
+        dialogRef.afterClosed().subscribe(_ => this.initKeyBindings());
     }
 
     afterChangeTab(index: number): void {
