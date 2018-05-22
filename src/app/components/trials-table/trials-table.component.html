@@ -1,6 +1,6 @@
 <div [style.width]="width" style="max-width: 100%;">
     <div class="smart-padding-xsmall">
-        <button mat-button (click)="clear()">Visible All</button>
+        <button mat-button (click)="setAllColumnsVisible()">Visible All</button>
     </div>
     <ag-grid-angular
         #agGrid
@@ -8,7 +8,6 @@
         class="ag-theme-balham"
         enableColResize
         enableSorting
-        enableFilter
         pagination
         animateRows
         floatingFilter

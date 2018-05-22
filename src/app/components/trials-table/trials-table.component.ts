@@ -144,16 +144,44 @@ export class TrialsTableComponent {
                     headerName: "Sec",
                     columnGroupShow: "open",
                     children: [
-                        {headerName: "one", field: "oneSec", filter: 'agNumberColumnFilter'},
-                        {headerName: "other", field: "otherSec", filter: 'agNumberColumnFilter'},
+                        {
+                            headerName: "one",
+                            field: "oneSec",
+                            filter: 'agNumberColumnFilter',
+                            filterParams: {
+                                defaultOption: "greaterThanOrEqual"
+                            }
+                        },
+                        {
+                            headerName: "other",
+                            field: "otherSec",
+                            filter: 'agNumberColumnFilter',
+                            filterParams: {
+                                defaultOption: "greaterThanOrEqual"
+                            }
+                        },
                     ]
                 },
                 {
                     headerName: "Byte",
                     columnGroupShow: "open",
                     children: [
-                        {headerName: "one", field: "oneByte", filter: 'agNumberColumnFilter'},
-                        {headerName: "other", field: "otherByte", filter: 'agNumberColumnFilter'},
+                        {
+                            headerName: "one",
+                            field: "oneByte",
+                            filter: 'agNumberColumnFilter',
+                            filterParams: {
+                                defaultOption: "greaterThanOrEqual"
+                            }
+                        },
+                        {
+                            headerName: "other",
+                            field: "otherByte",
+                            filter: 'agNumberColumnFilter',
+                            filterParams: {
+                                defaultOption: "greaterThanOrEqual"
+                            }
+                        },
                     ]
                 },
             ]
@@ -204,8 +232,7 @@ export class TrialsTableComponent {
         this.width = `${columnsWidth}px`;
     }
 
-    clear() {
-        console.log(this.gridColumnApi.getAllColumns().map(x => x.colId))
+    setAllColumnsVisible() {
         this.gridColumnApi.setColumnsVisible(
             this.gridColumnApi.getAllColumns().map(x => x.colId),
             true
