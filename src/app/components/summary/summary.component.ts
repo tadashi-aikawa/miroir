@@ -15,6 +15,7 @@ import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angula
 import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
+import {Dictionary} from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 import {SettingsService} from '../../services/settings-service';
@@ -23,6 +24,30 @@ import {Clipboard} from 'ts-clipboard';
 import {BodyOutputType, ToasterService} from 'angular2-toaster';
 import {RowData, TrialsTableComponent} from "../trials-table/trials-table.component";
 import {AnalyticsComponent} from "../analystic/analytics.component";
+import {Hotkey, HotkeysService} from 'angular2-hotkeys';
+
+interface KeyBindings {
+    reformat_table: string;
+    visible_all: string;
+    open_cheat_sheet: string;
+    close_cheat_sheet: string;
+}
+
+const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
+    default: {
+        reformat_table: 'r',
+        visible_all: 'v',
+        open_cheat_sheet: '?',
+        close_cheat_sheet: 'esc',
+    },
+    vim: {
+        reformat_table: 'r',
+        visible_all: 'v',
+        open_cheat_sheet: '?',
+        close_cheat_sheet: 'esc',
+    }
+};
+
 
 
 const toAttention = (t: Trial): string => {
@@ -48,6 +73,8 @@ const toAttention = (t: Trial): string => {
     ],
 })
 export class SummaryComponent implements OnInit {
+
+    @Input() cheatSheet: boolean = false;
 
     @ViewChild('sidenav') sideNav: MatSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
@@ -76,11 +103,31 @@ export class SummaryComponent implements OnInit {
                 private _dialog: MatDialog,
                 private route: ActivatedRoute,
                 private settingsService: SettingsService,
+                private _hotkeysService: HotkeysService,
                 private snackBar: MatSnackBar,
                 private toasterService: ToasterService) {
     }
 
     ngOnInit(): void {
+        const keyMode: KeyBindings = KEY_BINDINGS_BY[this.settingsService.keyMode];
+        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
+        this._hotkeysService.hotkeys.splice(0).forEach(x => this._hotkeysService.remove(x));
+
+        this._hotkeysService.add([
+            new Hotkey(keyMode.reformat_table, () => {
+                this.trialsTable.fitColumnWidths();
+                return false;
+            }, null, 'Reformat table'),
+            new Hotkey(keyMode.open_cheat_sheet, () => {
+                this.cheatSheet = true;
+                return false;
+            }, null, 'Open cheat sheet'),
+            new Hotkey(keyMode.close_cheat_sheet, () => {
+                this.cheatSheet = false;
+                return false;
+            }, null, 'Close cheat sheet'),
+        ]);
+
         setTimeout(() => {
             this.sideNav.open().then(() => {
                 setTimeout(() => this.keyWord.nativeElement.click(), 100);
