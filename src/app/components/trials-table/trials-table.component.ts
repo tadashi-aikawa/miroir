@@ -1,20 +1,10 @@
 import * as _ from 'lodash';
 import {Row, Trial} from '../../models/models';
-import {
-    Component, Directive,
-    ElementRef,
-    EventEmitter,
-    HostBinding,
-    Input,
-    OnChanges,
-    Output,
-    SimpleChanges,
-    ViewChild
-} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {regexpComparator} from "../../utils/filters";
 import {Column} from "ag-grid";
 
-interface RowData {
+export interface RowData {
     trial: Trial;
     seq: Number;
     name: string;
@@ -29,6 +19,8 @@ interface RowData {
     otherSec: number;
     oneStatus: number;
     otherStatus: number;
+    oneContentType: string;
+    otherContentType: string;
     requestTime: string;
     attention: string;
     checkedAlready: string[];
@@ -181,6 +173,20 @@ export class TrialsTableComponent {
                             filterParams: {
                                 defaultOption: "greaterThanOrEqual"
                             }
+                        },
+                    ]
+                },
+                {
+                    headerName: "ContentType",
+                    columnGroupShow: "open",
+                    children: [
+                        {
+                            headerName: "one",
+                            field: "oneContentType",
+                        },
+                        {
+                            headerName: "other",
+                            field: "otherContentType",
                         },
                     ]
                 },

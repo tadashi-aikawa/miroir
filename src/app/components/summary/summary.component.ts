@@ -12,7 +12,6 @@ import {
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
@@ -22,9 +21,7 @@ import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {Clipboard} from 'ts-clipboard';
 import {BodyOutputType, ToasterService} from 'angular2-toaster';
-import {Memoize} from "lodash-decorators";
-import {regexpComparator} from "../../utils/filters";
-import {TrialsTableComponent} from "../trials-table/trials-table.component";
+import {RowData, TrialsTableComponent} from "../trials-table/trials-table.component";
 import {AnalyticsComponent} from "../analystic/analytics.component";
 
 
@@ -41,27 +38,6 @@ const toAttention = (t: Trial): string => {
     return '';
 };
 
-
-interface RowData {
-    trial: Trial;
-    seq: Number;
-    name: string;
-    path: string;
-    queriesNum: number;
-    queries: string;
-    encodedQueries: string;
-    status: string;
-    oneByte: number;
-    otherByte: number;
-    oneSec: number;
-    otherSec: number;
-    oneStatus: number;
-    otherStatus: number;
-    requestTime: string;
-    attention: string;
-    checkedAlready: string[];
-    ignored: string[];
-}
 
 @Component({
     selector: 'app-summary',
@@ -277,6 +253,8 @@ export class SummaryComponent implements OnInit {
                             otherSec: t.other.response_sec,
                             oneStatus: t.one.status_code,
                             otherStatus: t.other.status_code,
+                            oneContentType: t.one.content_type,
+                            otherContentType: t.other.content_type,
                             requestTime: t.request_time,
                             attention: analysis ? toAttention(t) : '???',
                             checkedAlready: analysis ?
