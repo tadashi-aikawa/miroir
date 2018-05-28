@@ -127,11 +127,21 @@
         </div>
     </mat-tab>
     <mat-tab label="Query parameters">
-        <div class="shape-margin">
-            <ng2-smart-table [settings]="queryTableSettings"
-                             [source]="queryTableSource"
+        <div class="smart-padding">
+            <ag-grid-angular
+                #agGrid
+                style="width: 100%; height: 500px;"
+                class="ag-theme-material"
+                enableColResize
+                enableSorting
+                enableFilter
+                animateRows
+                floatingFilter
+                [rowData]="tableQueryRowData"
+                [defaultColDef]="queryDefaultColDef"
+                [columnDefs]="queryColumnDefs"
             >
-            </ng2-smart-table>
+            </ag-grid-angular>
         </div>
     </mat-tab>
     <mat-tab label="Property diffs">

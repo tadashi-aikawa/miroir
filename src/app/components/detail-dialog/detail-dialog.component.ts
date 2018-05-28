@@ -13,15 +13,15 @@ import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {MatDialogRef} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
-import {LocalDataSource} from 'ng2-smart-table';
 import * as _ from 'lodash';
 import {Dictionary} from 'lodash';
 import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
-import {ToasterConfig, ToasterService} from 'angular2-toaster';
+import {ToasterService} from 'angular2-toaster';
 import {matchRegExp} from "../../utils/regexp";
 import {Memoize} from "lodash-decorators";
+import {regexpComparator} from "../../utils/filters";
 
 
 interface KeyBindings {
@@ -82,7 +82,8 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
     }
 };
 
-interface RowData {
+
+interface QueryRowData {
     key: string;
     value: string;
 }
@@ -98,15 +99,6 @@ const toLanguage = (contentType: string) => {
         return 'plain';
     }
 };
-
-const filterFunction = (v, q) =>
-    q.split(' and ').every(x => {
-        try {
-            return new RegExp(x).test(v);
-        } catch (e) {
-            return false;
-        }
-    });
 
 const applyIgnores = (contents: Pair<string>, languages: Pair<string>,
                       ignoreDiffs: PropertyDiffs[], prefix: string): Pair<string> => {
@@ -197,8 +189,7 @@ export class DetailDialogComponent implements OnInit {
     @ViewChild('diffView') diffView;
     @ViewChild('editor') editor;
 
-    queryTableSettings: any;
-    queryTableSource = new LocalDataSource();
+    tableQueryRowData: QueryRowData[];
     propertyDiffsByCognition: PropertyDiffsByCognition;
     expectedEncoding: Pair<string> = new Pair();
 
@@ -212,6 +203,30 @@ export class DetailDialogComponent implements OnInit {
     editorConfig: EditorConfig;
     displayedQueries: { key: string, value: string }[];
     filteredWord: string;
+
+    queryDefaultColDef = {
+        filterParams: {
+            textCustomComparator: regexpComparator,
+            debounceMs: 200
+        },
+        floatingFilterComponentParams: {
+            debounceMs: 200
+        }
+    };
+
+    queryColumnDefs = [
+        {
+            headerName: "Key",
+            field: "key",
+            width: 200,
+            pinned: 'left',
+        },
+        {
+            headerName: "Value",
+            field: "value",
+            width: 600,
+        },
+    ];
 
     get activeIndexNum(): number {
         return Number(this.activeIndex);
@@ -333,13 +348,6 @@ export class DetailDialogComponent implements OnInit {
             value: String(i)
         }));
 
-        this.queryTableSettings = {
-            columns: {
-                key: {title: 'Key', filterFunction: filterFunction},
-                value: {title: 'Value', filterFunction: filterFunction}
-            },
-            actions: false
-        };
         this.showTrial(this.trial);
     }
 
@@ -401,7 +409,7 @@ export class DetailDialogComponent implements OnInit {
                         one: 'Binary is not supported to show',
                         other: 'Binary is not supported to show',
                     };
-                    this.editorLanguage = {one: 'text', other: 'text'}
+                    this.editorLanguage = {one: 'text', other: 'text'};
                     this.expectedEncoding = {one: 'None', other: 'None'};
                     this.updateDiffEditorBodies()
                 }, 100);
@@ -432,7 +440,7 @@ export class DetailDialogComponent implements OnInit {
             setTimeout(() => {
                 this.isLoading = false;
                 this.originalEditorBody = {one: 'No file', other: 'No file',};
-                this.editorLanguage = {one: 'text', other: 'text'}
+                this.editorLanguage = {one: 'text', other: 'text'};
                 this.expectedEncoding = {one: 'None', other: 'None'};
                 this.updateDiffEditorBodies()
             }, 100);
@@ -441,10 +449,10 @@ export class DetailDialogComponent implements OnInit {
         // Query parameters
         this.displayedQueries = Object.keys(trial.queries)
             .map(k => ({key: k, value: trial.queries[k].join(', ')}));
-        this.queryTableSource.load(this.displayedQueries.map(t => (<RowData>{
+        this.tableQueryRowData = this.displayedQueries.map(t => (<QueryRowData>{
             key: t.key,
             value: t.value
-        })));
+        }));
 
         // Property diffs
         this.propertyDiffsByCognition = createPropertyDiffs(

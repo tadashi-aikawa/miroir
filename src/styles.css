@@ -1,5 +1,8 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import '~angular2-toaster/toaster.css';
+@import "~ag-grid/dist/styles/ag-grid.css";
+@import "~ag-grid/dist/styles/ag-theme-balham.css";
+@import "~ag-grid/dist/styles/ag-theme-material.css";
 
 .remaining-space {
     flex: 1 1 auto;
@@ -30,6 +33,11 @@
 .pain2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
+}
+
+.pain3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
 }
 
 div.ellipsis-text {
@@ -168,6 +176,7 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
 /* Elegant scrollbar */
 ::-webkit-scrollbar {
     width: 10px;
+    height: 10px;
 }
 ::-webkit-scrollbar-track {
   border-radius: 10px;

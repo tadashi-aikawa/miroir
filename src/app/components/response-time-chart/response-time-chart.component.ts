@@ -34,13 +34,18 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
     chartOptions: Options;
 
     ngOnChanges(changes: SimpleChanges): void {
+        if (!changes.trials) {
+            return
+        }
         if (!_.isEqual(changes.trials.previousValue, changes.trials.currentValue)) {
             this.chartOptions = this.createChartOptions(this.summary, changes.trials.currentValue);
         }
     }
 
     ngAfterViewInit(): void {
-        this.chartOptions = this.createChartOptions(this.summary, this.trials);
+        if (this.summary && this.trials) {
+            this.chartOptions = this.createChartOptions(this.summary, this.trials);
+        }
     }
 
     private createChartOptions(summary: Summary, trials: Trial[]): Options {

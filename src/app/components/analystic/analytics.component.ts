@@ -1,6 +1,6 @@
 import {Memoize} from 'lodash-decorators';
-import {PropertyDiffs, Summary, Trial} from '../../models/models';
-import {Component, Input, Pipe, PipeTransform, Output, EventEmitter} from '@angular/core';
+import {PropertyDiffs, Row, Summary, Trial} from '../../models/models';
+import {Component, Input, Pipe, PipeTransform, Output, EventEmitter, SimpleChanges, OnChanges} from '@angular/core';
 import * as _ from 'lodash';
 import {Dictionary} from 'lodash';
 
@@ -8,7 +8,6 @@ import {Dictionary} from 'lodash';
     selector: 'app-analytics',
     templateUrl: './analytics.component.html',
     styleUrls: [
-        './analytics.css',
         '../../../../node_modules/hover.css/css/hover.css',
     ],
 })
@@ -17,6 +16,91 @@ export class AnalyticsComponent {
     @Input() trials: Trial[];
 
     @Output() onClickTrials = new EventEmitter<Trial[]>();
+
+    private gridColumnApi;
+
+    handleGridReady(params) {
+        this.gridColumnApi = params.columnApi;
+        this.fitColumnWidths();
+    }
+
+    handleModelUpdated() {
+        this.fitColumnWidths();
+    }
+
+    fitColumnWidths() {
+        // Not initialized case
+        if (!this.gridColumnApi) {
+            return
+        }
+
+        this.gridColumnApi.autoSizeColumns(
+            this.gridColumnApi.getAllColumns().map(x => x.colId)
+        );
+    }
+
+    // attentionSummaries: AttentionSummary[];
+    attentionColumnDefs = [
+        {
+            headerName: "Title",
+            field: "title",
+            width: 175,
+        },
+        {
+            headerName: "Count",
+            field: "count",
+            width: 100,
+        },
+    ];
+
+    checkedAlreadyColumnDefs = [
+        {
+            headerName: "Title",
+            field: "title",
+            width: 350,
+        },
+        {
+            headerName: "Count",
+            field: "count",
+            width: 100,
+        },
+    ];
+
+    ignoredColumnDefs = [
+        {
+            headerName: "Title",
+            field: "title",
+            width: 350,
+        },
+        {
+            headerName: "Count",
+            field: "count",
+            width: 100,
+        },
+    ];
+
+    ignoredPathDefs = [
+        {
+            headerName: "Path",
+            field: "title",
+        },
+        {
+            headerName: "Count",
+            field: "count",
+        },
+        {
+            headerName: "Same",
+            field: "status.same",
+        },
+        {
+            headerName: "Different",
+            field: "status.different",
+        },
+        {
+            headerName: "Failure",
+            field: "status.failure",
+        },
+    ];
 
     get checkedAlreadyTrials(): Trial[] {
         return this.filterCheckedAlreadyTrials(this.trials);
@@ -32,19 +116,21 @@ export class AnalyticsComponent {
             .value();
     }
 
-    onClickRow(trials: Trial[]) {
+    handleDiffRowClicked(row: Row<DiffSummary>) {
+        this.onClickTrials.emit(row.data.trials);
+    }
+
+    handlePathRowClicked(row: Row<PathSummary>) {
+        this.onClickTrials.emit(row.data.trials);
+    }
+
+    handleCheckedAlreadyBatchClicked(trials: Trial[]) {
         this.onClickTrials.emit(trials);
     }
 
     stopPropagation(event) {
         event.stopPropagation();
     }
-}
-
-interface AttentionSummary {
-    title: string,
-    count: number,
-    trials: Trial[]
 }
 
 interface PathSummary {
@@ -60,9 +146,9 @@ interface PathSummary {
 
 interface DiffSummary {
     title: string,
-    image: string,
-    link: string,
     count: number,
+    image?: string,
+    link?: string,
     trials: Trial[]
 }
 
@@ -70,11 +156,11 @@ type DiffSummaryWip = Partial<DiffSummary> & { trial: Trial }
 
 @Pipe({name: 'toAttention'})
 export class ToAttentionPipe implements PipeTransform {
-    transform(trials: Trial[]): AttentionSummary[] {
+    transform(trials: Trial[]): DiffSummary[] {
         return _(trials)
             .filter<Trial>((t: Trial) => t.attention)
             .groupBy<Trial>((t: Trial) => t.attention)
-            .map<Trial[], AttentionSummary>((xs: Trial[]) => ({
+            .map<Trial[], DiffSummary>((xs: Trial[]) => ({
                 title: xs[0].attention,
                 count: xs.length,
                 trials: xs,

@@ -188,14 +188,6 @@ export class SettingsService {
         this.localStorageService.set('isLineFilterNegative', value);
     }
 
-    get selectedColumnNames(): string[] {
-        return this.localStorageService.get<string[]>('selectedColumnNames');
-    }
-
-    set selectedColumnNames(value: string[]) {
-        this.localStorageService.set('selectedColumnNames', value);
-    }
-
     get checkList(): string {
         return this.localStorageService.get<string>('checkList') || CHECKLIST_DEFAULT;
     }

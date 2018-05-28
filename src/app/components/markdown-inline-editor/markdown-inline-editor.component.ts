@@ -1,8 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {animate, style, transition, trigger} from '@angular/animations';
 import {MatDialog, MatTextareaAutosize} from '@angular/material';
 import {Change} from 'app/models/models';
-import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/confirm-dialog.component';
 import {hasContents} from 'app/utils/regexp';
 
@@ -69,7 +68,7 @@ import {hasContents} from 'app/utils/regexp';
         </div>
     `
 })
-export class MarkdownInlineEditorComponent implements OnInit {
+export class MarkdownInlineEditorComponent {
 
     @Input() value: string;
     @Output() onUpdate = new EventEmitter<Change<string>>();
@@ -79,8 +78,7 @@ export class MarkdownInlineEditorComponent implements OnInit {
 
     @ViewChild(MatTextareaAutosize) autosize;
 
-    constructor(private _hotkeysService: HotkeysService,
-                private _dialog: MatDialog) {
+    constructor(private _dialog: MatDialog) {
     }
 
     update() {
@@ -121,21 +119,5 @@ export class MarkdownInlineEditorComponent implements OnInit {
             this.autosize.resizeToFitContent();
             document.getElementById('edit-area').focus();
         }, 1);
-    }
-
-    ngOnInit(): void {
-        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
-        this._hotkeysService.hotkeys.splice(0).forEach(x => this._hotkeysService.remove(x));
-
-        this._hotkeysService.add([
-            new Hotkey('ctrl+enter', () => {
-                this.editing && this.update();
-                return false;
-            }, ['TEXTAREA'], 'Update.'),
-            new Hotkey('esc', () => {
-                this.editing && this.cancel();
-                return false;
-            }, ['TEXTAREA'], 'Cancel.')
-        ]);
     }
 }

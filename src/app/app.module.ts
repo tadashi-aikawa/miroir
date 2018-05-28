@@ -33,6 +33,8 @@ import {HotkeyModule} from 'angular2-hotkeys';
 import {Ng2HighchartsModule} from 'ng2-highcharts';
 import {ExpansionPanelsModule} from 'ng2-expansion-panels';
 import {MarkdownModule} from 'angular2-markdown';
+import {AgGridModule} from 'ag-grid-angular';
+
 
 import 'hammerjs';
 
@@ -41,10 +43,6 @@ import {RootComponent} from './components/root/root.component';
 import {
     DeleteConfirmDialogComponent,
     EditorDialogComponent,
-    HoverComponent,
-    LabelsComponent,
-    StatusCodeComponent,
-    StatusComponent,
     SummaryComponent,
 } from './components/summary/summary.component';
 import {DiffViewerComponent} from './components/diff-viewer/diff-viewer.component';
@@ -74,6 +72,7 @@ import {
 import {ToasterModule} from "angular2-toaster";
 import {PanelComponent} from "./components/panel/panel-component";
 import {HasContentsPipe, EmptyContentsPipe} from "./utils/regexp";
+import {TrialsTableComponent} from "./components/trials-table/trials-table.component";
 
 const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -89,21 +88,18 @@ const appRoutes: Routes = [
         LoginComponent,
         RootComponent,
         SummaryComponent,
+        TrialsTableComponent,
         DiffViewerComponent,
         DetailDialogComponent,
         DeleteConfirmDialogComponent,
         ConfirmDialogComponent,
         EditorDialogComponent,
         EditorComponent,
-        HoverComponent,
-        LabelsComponent,
         InlineEditorComponent,
         MarkdownInlineEditorComponent,
         BadgeComponent,
         BadgeListComponent,
         PanelComponent,
-        StatusCodeComponent,
-        StatusComponent,
         ResponseTimeChartComponent,
         AnalyticsComponent,
         LogoLoadingComponent,
@@ -153,6 +149,7 @@ const appRoutes: Routes = [
         MatDividerModule,
         MatInputModule,
         MatSnackBarModule,
+        AgGridModule.withComponents([]),
     ],
     exports: [
         MatButtonModule,
@@ -182,10 +179,6 @@ const appRoutes: Routes = [
         DeleteConfirmDialogComponent,
         ConfirmDialogComponent,
         EditorDialogComponent,
-        HoverComponent,
-        LabelsComponent,
-        StatusCodeComponent,
-        StatusComponent,
         LogoLoadingComponent
     ],
     providers: [

@@ -158,6 +158,7 @@ export class Trial {
 }
 
 export class ResponseSummary {
+    type: string;
     status_code: number;
     byte: number;
     response_sec: number;
@@ -201,4 +202,9 @@ export class AwsConfiguration {
     bucket: string;
     table: string;
     prefix: string;
+}
+
+export class Row<T> {
+    rowIndex: number;
+    data: T;
 }

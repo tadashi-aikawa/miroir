@@ -1,6 +1,6 @@
 /* Force set width to title editing form */
 /* See https://github.com/angular/material2/pull/7083 */
-:host >>> .mat-form-field .mat-form-field-infix {
+:host ::ng-deep .mat-form-field .mat-form-field-infix {
     width: 500px;
 }
 
@@ -134,3 +134,4 @@ mat-select {
 .check-status.closed {
     background: rgba(54, 68, 60, 0.4);
 }
+
