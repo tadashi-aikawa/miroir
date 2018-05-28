@@ -1,0 +1,15 @@
+:host ::ng-deep .report-table-record-attention {
+    background: pink;
+}
+:host ::ng-deep .report-table-record-checked-already {
+    background: #b6e6b6;
+}
+:host ::ng-deep .report-table-record-both-failure {
+    background: silver;
+}
+:host ::ng-deep .report-table-record-no-diff-keys {
+    background: bisque;
+}
+:host ::ng-deep .report-table-record-failure {
+    background: hotpink;
+}

@@ -1,198 +1,70 @@
-import {ActivatedRoute} from '@angular/router';
-import {Change, DynamoResult, DynamoRow, EditorConfig, IgnoreCase, Report, Summary, Trial} from '../../models/models';
+import {ActivatedRoute, Params} from '@angular/router';
+import {
+    Change,
+    DynamoResult,
+    DynamoRow,
+    EditorConfig,
+    IgnoreCase,
+    Report,
+    Row,
+    Summary,
+    Trial
+} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {LocalDataSource, ViewCell} from 'ng2-smart-table';
 import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
+import {Dictionary} from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {Clipboard} from 'ts-clipboard';
 import {BodyOutputType, ToasterService} from 'angular2-toaster';
+import {RowData, TrialsTableComponent} from "../trials-table/trials-table.component";
+import {AnalyticsComponent} from "../analystic/analytics.component";
+import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 
-@Component({
-    template: `
-        <span [class]="status">{{renderValue}}</span>
-    `,
-    styles: [
-        '.server-error { color: red; font-weight: bold;}',
-        '.client-error { color: blue; font-weight: bold;}',
-        '.success { color: green; }'
-    ],
-})
-export class StatusCodeComponent implements ViewCell, OnInit {
-    renderValue: string;
-    status: string;
-    @Input() value: string | number;
-    @Input() rowData: any;
-
-    ngOnInit(): void {
-        const v = String(this.value);
-        this.renderValue = v;
-        this.status = v[0] === '5' ? 'server-error' :
-            v[0] === '4' ? 'client-error' : 'success';
-    }
+interface KeyBindings {
+    reformat_table: string;
+    visible_all: string;
+    toggle_summary_cards: string
+    open_cheat_sheet: string;
+    close_cheat_sheet: string;
 }
 
-
-@Component({
-    template: `
-        <span [title]="hoverValue">{{renderValue}}</span>
-    `
-})
-export class HoverComponent implements ViewCell, OnInit {
-    renderValue: string;
-    hoverValue: string;
-    @Input() value: string | number;
-    @Input() rowData: any;
-
-    ngOnInit(): void {
-        this.renderValue = `${String(this.value).split('&').length} queries`;
-        this.hoverValue = String(this.value);
-    }
-}
-
-@Component({
-    template: `
-        <app-badge-list *ngFor="let v of this.value">
-            <app-badge kind="disabled" size="minimum">{{this.v}}</app-badge>
-        </app-badge-list>
-    `
-})
-export class LabelsComponent {
-    @Input() value: string[];
-}
-
-@Component({
-    selector: 'app-status',
-    template: `
-        <app-badge [kind]="kind" size="small">{{renderValue}}</app-badge>
-    `,
-    styleUrls: ['summary.css']
-})
-export class StatusComponent implements ViewCell, OnInit {
-    renderValue: string;
-    kind: string;
-    @Input() value: string | number;
-    @Input() rowData: any;
-
-    ngOnInit(): void {
-        const v = String(this.value);
-        this.renderValue = v;
-        this.kind = v === 'same' ? 'fine' :
-            v === 'different' ? 'warning' :
-                v === 'failure' ? 'danger' : '';
-    }
-}
-
-
-const filterFunction = (v, q) =>
-    q.split(' and ').every(x => {
-        try {
-            return x.startsWith('not ') ?
-                (v ? !new RegExp(x.replace(/^not /, '')).test(v) : true) :
-                new RegExp(x).test(v);
-        } catch (e) {
-            return false;
-        }
-    });
-
-const arrayFilterFunction = (vs: any[], q) =>
-    q.split(' and ').every(x => {
-        try {
-            return x.startsWith('not ') ?
-                (vs.length > 0 ? !vs.every(v => new RegExp(x.replace(/^not /, '')).test(v)) : true) :
-                vs.some(v => new RegExp(x).test(v));
-        } catch (e) {
-            return false;
-        }
-    });
-
-const TABLE_SETTINGS = {
-    columns: {
-        seq: {title: 'Seq', filterFunction, width: '100px'},
-        name: {title: 'Name', filterFunction},
-        path: {title: 'Path', filterFunction},
-        status: {
-            title: 'Status',
-            type: 'custom',
-            renderComponent: StatusComponent,
-            filterFunction,
-            width: '100px'
-        },
-        queries: {
-            title: 'Queries',
-            type: 'custom',
-            renderComponent: HoverComponent,
-            filterFunction,
-            width: '100px'
-        },
-        originQueries: {
-            title: 'OriginQueries',
-            type: 'custom',
-            renderComponent: HoverComponent,
-            filterFunction,
-            width: '100px'
-        },
-        attention: {title: 'Attention', width: '200px'},
-        checkedAlready: {
-            title: 'CheckedAlready',
-            type: 'custom',
-            renderComponent: LabelsComponent,
-            filterFunction: arrayFilterFunction,
-            width: '600px'
-        },
-        ignored: {
-            title: 'Ignored',
-            type: 'custom',
-            renderComponent: LabelsComponent,
-            filterFunction: arrayFilterFunction,
-            width: '600px'
-        },
-        oneByte: {title: '<- Byte', filterFunction, width: '100px'},
-        otherByte: {title: 'Byte ->', filterFunction, width: '100px'},
-        oneSec: {title: '<- Sec', filterFunction, width: '100px'},
-        otherSec: {title: 'Sec ->', filterFunction, width: '100px'},
-        oneStatus: {
-            title: '<- Status',
-            type: 'custom',
-            renderComponent: StatusCodeComponent,
-            filterFunction,
-            width: '100px'
-        },
-        otherStatus: {
-            title: 'Status ->',
-            type: 'custom',
-            renderComponent: StatusCodeComponent,
-            filterFunction,
-            width: '100px'
-        },
-        requestTime: {title: 'Request time', filterFunction}
+const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
+    default: {
+        reformat_table: 'r',
+        visible_all: 'v',
+        toggle_summary_cards: 'w',
+        open_cheat_sheet: '?',
+        close_cheat_sheet: 'esc',
     },
-    actions: false
+    vim: {
+        reformat_table: 'r',
+        visible_all: 'v',
+        toggle_summary_cards: 'w',
+        open_cheat_sheet: '?',
+        close_cheat_sheet: 'esc',
+    }
 };
 
 
-interface RowData {
-    trial: Trial;
-    name: string;
-    path: string;
-    queries: Object;
-    status: string;
-    oneByte: number;
-    otherByte: number;
-    oneSec: number;
-    otherSec: number;
-    oneStatus: number;
-    otherStatus: number;
-    requestTime: string;
-    attention: string;
-    checkedAlready: string[];
-    ignored: string[];
-}
+const toAttention = (t: Trial): string => {
+    if ((!t.diff_keys) && t.status === 'different') {
+        return 'No diff keys!!';
+    }
+    if (t.propertyDiffsByCognition && !t.propertyDiffsByCognition.unknown.isEmpty()) {
+        return 'Appears unknown!!';
+    }
+    if (t.one.status_code >= 400 && t.other.status_code >= 400) {
+        return 'Both failure!!';
+    }
+    return '';
+};
+
 
 @Component({
     selector: 'app-summary',
@@ -200,11 +72,16 @@ interface RowData {
     styleUrls: [
         './summary.css',
         '../../../../node_modules/hover.css/css/hover.css'
-    ]
+    ],
 })
 export class SummaryComponent implements OnInit {
+
+    @Input() cheatSheet: boolean = false;
+
     @ViewChild('sidenav') sideNav: MatSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
+    @ViewChild('trialsTable') trialsTable: TrialsTableComponent;
+    @ViewChild('analytics') analytics: AnalyticsComponent;
 
     word = '';
 
@@ -214,20 +91,12 @@ export class SummaryComponent implements OnInit {
     settings: any;
     errorMessages: string[];
 
-    selectedValues: string[] = this.settingsService.selectedColumnNames ||
-        Object.keys(TABLE_SETTINGS.columns);
-    optionColumns: { value: string, label: string }[] = _.map(
-        TABLE_SETTINGS.columns,
-        (v, k) => ({value: k, label: v.title})
-    );
     activeReport: Report;
+    tableRowData: RowData[];
+    displayedTrials: Trial[];
     checkedAlready: IgnoreCase[];
     ignores: IgnoreCase[];
     loadingReportKey: string;
-    tableSource = new LocalDataSource();
-
-    // TODO: Update after `onFilterChanged` if implemented by ng2-smart-table
-    filteredTrials: Trial[];
 
     statuses: CheckStatus[] = CheckStatuses.values;
     toDisplay: (key: CheckStatus) => string = CheckStatuses.toDisplay;
@@ -236,11 +105,42 @@ export class SummaryComponent implements OnInit {
                 private _dialog: MatDialog,
                 private route: ActivatedRoute,
                 private settingsService: SettingsService,
+                private _hotkeysService: HotkeysService,
                 private snackBar: MatSnackBar,
                 private toasterService: ToasterService) {
     }
 
+    initKeyBindings() {
+        const keyMode: KeyBindings = KEY_BINDINGS_BY[this.settingsService.keyMode];
+        // XXX: _hotkeysService.remove(Hotkey[]) is not worked (maybe issues)
+        this._hotkeysService.hotkeys.splice(0).forEach(x => this._hotkeysService.remove(x));
+
+        this._hotkeysService.add([
+            new Hotkey(keyMode.reformat_table, () => {
+                this.trialsTable.fitColumnWidths();
+                return false;
+            }, null, 'Reformat table'),
+            new Hotkey(keyMode.visible_all, () => {
+                this.trialsTable.setAllColumnsVisible();
+                return false;
+            }, null, 'Reformat table'),
+            new Hotkey(keyMode.toggle_summary_cards, () => {
+                this.sideNav.opened ? this.sideNav.close() : this.sideNav.open();
+                return false;
+            }, null, 'Toggle summary cards'),
+            new Hotkey(keyMode.open_cheat_sheet, () => {
+                this.cheatSheet = true;
+                return false;
+            }, null, 'Open cheat sheet'),
+            new Hotkey(keyMode.close_cheat_sheet, () => {
+                this.cheatSheet = false;
+                return false;
+            }, null, 'Close cheat sheet'),
+        ]);
+    }
+
     ngOnInit(): void {
+        this.initKeyBindings();
         setTimeout(() => {
             this.sideNav.open().then(() => {
                 setTimeout(() => this.keyWord.nativeElement.click(), 100);
@@ -253,20 +153,20 @@ export class SummaryComponent implements OnInit {
             this.route.params.subscribe(ps => {
                 if (ps.searchWord) {
                     this.word = ps.searchWord;
-                    this.searchReport(ps.searchWord);
-                }
-                if (ps.hashKey) {
-                    this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
-                        .then((r: Report) => {
-                            this.filteredTrials = r.trials.map(x => Object.assign(new Trial(), x));
-                            if (ps.seq) {
-                                this.showDetail(ps.seq - 1);
+                    this.searchReport(ps.searchWord)
+                        .then(_ => {
+                            if (ps.hashKey) {
+                                this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
+                                    .then((r: Report) => {
+                                        if (ps.seq) {
+                                            this.showDetail(ps.seq - 1, r.trials);
+                                        }
+                                    });
                             }
                         });
                 }
             });
         });
-
     }
 
     onSearchReports(keyword: string) {
@@ -314,10 +214,6 @@ export class SummaryComponent implements OnInit {
             .catch(err => {
                 row.updatingErrorMessage = err;
             });
-    }
-
-    onSelectColumns(event) {
-        this.updateColumnVisibility();
     }
 
     onUpdateTitle(title: Change<string>) {
@@ -391,22 +287,6 @@ export class SummaryComponent implements OnInit {
                     this.checkedAlready = toCheckedAlready(this.settingsService.checkList);
                     this.ignores = r.ignores;
 
-                    const toAttention = (t: Trial): string => {
-                        if (!analysis) {
-                            return '???';
-                        }
-                        if ((!t.diff_keys) && t.status === 'different') {
-                            return 'No diff keys!!';
-                        }
-                        if (t.propertyDiffsByCognition && !t.propertyDiffsByCognition.unknown.isEmpty()) {
-                            return 'Appears unknown!!';
-                        }
-                        if (t.one.status_code >= 400 && t.other.status_code >= 400) {
-                            return 'Both failure!!';
-                        }
-                        return '';
-                    };
-
                     r.trials = _(r.trials)
                         .map(t => Object.assign(new Trial(), t, {
                             propertyDiffsByCognition: analysis ? createPropertyDiffs(t, this.ignores, this.checkedAlready) : undefined
@@ -417,45 +297,40 @@ export class SummaryComponent implements OnInit {
                         .value();
                     this.activeReport = r;
 
-                    this.updateColumnVisibility();
-                    this.tableSource.load(
-                        r.trials.map(t => {
-                            const c = t.propertyDiffsByCognition;
+                    this.tableRowData = r.trials.map(t => {
+                        const c = t.propertyDiffsByCognition;
 
-                            return <RowData>{
-                                trial: t,
-                                seq: t.seq,
-                                name: t.name,
-                                path: t.path,
-                                status: t.status,
-                                queries: t.queryString,
-                                originQueries: t.originQueryString,
-                                oneByte: t.one.byte,
-                                otherByte: t.other.byte,
-                                oneSec: t.one.response_sec,
-                                otherSec: t.other.response_sec,
-                                oneStatus: t.one.status_code,
-                                otherStatus: t.other.status_code,
-                                requestTime: t.request_time,
-                                attention: t.attention,
-                                checkedAlready: analysis ?
-                                    (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
-                                    ['???'],
-                                ignored: analysis ?
-                                    (c ? _(c.ignored).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
-                                    ['???'],
-                            };
-                        })
-                    ).then(() => {
-                        this.tableSource.getFilteredAndSorted()
-                            .then((es: RowData[]) => this.filteredTrials = es.map(x => x.trial));
-                        resolve(r);
+                        return <RowData>{
+                            trial: t,
+                            seq: t.seq,
+                            name: t.name,
+                            path: t.path,
+                            status: t.status,
+                            queriesNum: Object.keys(t.queries).length,
+                            queries: t.queryString,
+                            encodedQueries: t.originQueryString,
+                            oneByte: t.one.byte,
+                            otherByte: t.other.byte,
+                            oneSec: t.one.response_sec,
+                            otherSec: t.other.response_sec,
+                            oneStatus: t.one.status_code,
+                            otherStatus: t.other.status_code,
+                            oneType: t.one.type,
+                            otherType: t.other.type,
+                            oneContentType: t.one.content_type,
+                            otherContentType: t.other.content_type,
+                            requestTime: t.request_time,
+                            attention: analysis ? toAttention(t) : '???',
+                            checkedAlready: analysis ?
+                                (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
+                                ['???'],
+                            ignored: analysis ?
+                                (c ? _(c.ignored).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
+                                ['???'],
+                        };
                     });
-                })
-                .catch(err => {
-                    this.loadingReportKey = undefined;
-                    this.errorMessages = [err];
-                    reject(err);
+
+                    resolve(r);
                 });
         });
     }
@@ -470,15 +345,11 @@ export class SummaryComponent implements OnInit {
                 row.downloading = false;
                 const reportName = `${row.title}-${key.substring(0, 7)}.json`;
 
-                return this.tableSource.getFilteredAndSorted().then((es: RowData[]) => {
-                    const filteredSeqs: number[] = es.map(e => e.trial.seq);
-                    const obj: object = !filtered ? x :
-                        Object.assign({}, x, {
-                            trials: x.trials.filter(t => _.includes(filteredSeqs, t.seq))
-                        });
-
-                    fileSaver.saveAs(new Blob([JSON.stringify(obj)]), reportName);
-                });
+                const obj: object = !filtered ? x :
+                    Object.assign({}, x, {
+                        trials: this.displayedTrials
+                    });
+                fileSaver.saveAs(new Blob([JSON.stringify(obj)]), reportName);
             })
             .catch(err => {
                 row.downloading = false;
@@ -544,19 +415,14 @@ export class SummaryComponent implements OnInit {
         event.stopPropagation();
     }
 
-    onSelectRow(event: any) {
-        event.source.getFilteredAndSorted().then((es: RowData[]) => {
-            this.filteredTrials = es.map(x => x.trial);
-            this.showDetail(es.findIndex(e => e === event.data));
-        });
+    handleRowClicked(row: Row<RowData>) {
+        this.showDetail(row.rowIndex, this.displayedTrials);
     }
 
-    afterChangeTab(index: number): void {
-        if (index === 1 || index === 2) {
-            this.tableSource.getFilteredAndSorted()
-                .then((es: RowData[]) => this.filteredTrials = es.map(x => x.trial));
-        }
+    handleDisplayedTrialsUpdated(trials: Trial[]) {
+        this.displayedTrials = trials;
     }
+
 
     showDetail(index: number, trials?: Trial[]) {
         const dialogRef = this._dialog.open(DetailDialogComponent, {
@@ -570,29 +436,39 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.oneAccessPoint = this.activeReport.summary.one;
         dialogRef.componentInstance.otherAccessPoint = this.activeReport.summary.other;
         dialogRef.componentInstance.activeIndex = String(index);
-        dialogRef.componentInstance.trials = trials || this.filteredTrials;
+        dialogRef.componentInstance.trials = trials || this.displayedTrials;
         dialogRef.componentInstance.ignores = this.ignores;
+        dialogRef.afterClosed().subscribe(_ => this.initKeyBindings());
+    }
+
+    afterChangeTab(index: number): void {
+        switch (index) {
+            case 0:
+                this.trialsTable.fitColumnWidths();
+                break;
+            case 2:
+                this.analytics.fitColumnWidths();
+                break;
+        }
     }
 
     showRequestsAsJson() {
-        this.tableSource.getFilteredAndSorted().then((rs: RowData[]) => {
-            const dialogRef = this._dialog.open(EditorDialogComponent, {
-                width: '80vw',
-                height: '97%'
-            });
-            dialogRef.componentInstance.mode = 'json';
-            dialogRef.componentInstance.title = 'Requests which can used on jumeaux';
-            dialogRef.componentInstance.value = JSON.stringify(
-                rs.map((x: RowData) => ({
-                    name: x.trial.name,
-                    path: x.trial.path,
-                    qs: x.trial.queries,
-                    headers: x.trial.headers
-                })),
-                null,
-                4
-            );
+        const dialogRef = this._dialog.open(EditorDialogComponent, {
+            width: '80vw',
+            height: '97%'
         });
+        dialogRef.componentInstance.mode = 'json';
+        dialogRef.componentInstance.title = 'Requests which can used on jumeaux';
+        dialogRef.componentInstance.value = JSON.stringify(
+            this.displayedTrials.map((x: Trial) => ({
+                name: x.name,
+                path: x.path,
+                qs: x.queries,
+                headers: x.headers
+            })),
+            null,
+            4
+        );
     }
 
     showSummaryAsJson() {
@@ -622,13 +498,6 @@ export class SummaryComponent implements OnInit {
         const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}`;
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this report url`, url);
-    }
-
-    private updateColumnVisibility() {
-        this.settingsService.selectedColumnNames = this.selectedValues;
-        this.settings = Object.assign({}, TABLE_SETTINGS,
-            {columns: _.pick(TABLE_SETTINGS.columns, this.selectedValues)}
-        );
     }
 
 }
@@ -682,7 +551,7 @@ export class DeleteConfirmDialogComponent {
         <h2 mat-dialog-title>{{title}}</h2>
         <app-editor #editor
                     [config]="editorConfig"
-                    height="95vh" 
+                    height="95vh"
         >
         </app-editor>
     `,

@@ -1,97 +1,104 @@
 <div>
-    <h2>Attentions</h2>
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>Attention</th>
-            <th>Count</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let c of (this.trials | toAttention)" (click)="onClickRow(c.trials)">
-            <td>{{c.title}}</td>
-            <td>{{c.count}}</td>
-        </tr>
-        </tbody>
-    </table>
-    <div class="center-vertical">
-        <h2>Checked Already</h2>
-        <app-badge
-            (click)="onClickRow(this.checkedAlreadyTrials)"
-            size="small"
-            cursor="pointer"
-            kind="warning">
-            {{this.checkedAlreadyTrials.length}}
-        </app-badge>
+    <div style="display: grid; grid-template-columns: 3fr 4fr 4fr">
+
+        <div class="center-horizontal">
+            <h2 class="center-vertical">
+                <mat-icon>report_problem</mat-icon>&nbsp;Attentions!!
+            </h2>
+            <div>
+                <ag-grid-angular
+                    style="width: 275px;"
+                    class="ag-theme-material"
+                    enableColResize
+                    enableSorting
+                    animateRows
+                    domLayout="autoHeight"
+                    [rowData]="trials | toAttention"
+                    [columnDefs]="attentionColumnDefs"
+                    (rowClicked)="handleDiffRowClicked($event)"
+                >
+                </ag-grid-angular>
+            </div>
+        </div>
+
+        <div class="center-horizontal">
+            <div class="center-vertical">
+                <h2 class="center-vertical">
+                    <mat-icon>thumb_up</mat-icon>&nbsp;Checked already&nbsp;
+                </h2>
+                <app-badge
+                    (click)="handleCheckedAlreadyBatchClicked(this.checkedAlreadyTrials)"
+                    size="small"
+                    cursor="pointer"
+                    kind="warning">
+                    {{this.checkedAlreadyTrials.length}}
+                </app-badge>
+            </div>
+            <div>
+                <ag-grid-angular
+                    style="width: 450px;"
+                    class="ag-theme-material"
+                    enableColResize
+                    enableSorting
+                    animateRows
+                    domLayout="autoHeight"
+                    [rowData]="trials | toCheckedAlreadyDiffSummary"
+                    [columnDefs]="checkedAlreadyColumnDefs"
+                    (rowClicked)="handleDiffRowClicked($event)"
+                >
+                </ag-grid-angular>
+            </div>
+        </div>
+
+        <div class="center-horizontal">
+            <h2 class="center-vertical">
+                <mat-icon>visibility_off</mat-icon>&nbsp;Ignored
+            </h2>
+            <div>
+                <ag-grid-angular
+                    style="width: 450px;"
+                    class="ag-theme-material"
+                    enableColResize
+                    enableSorting
+                    animateRows
+                    domLayout="autoHeight"
+                    [rowData]="trials | toIgnoredDiffSummary"
+                    [columnDefs]="ignoredColumnDefs"
+                    (rowClicked)="handleDiffRowClicked($event)"
+                >
+                </ag-grid-angular>
+            </div>
+        </div>
     </div>
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th></th>
-            <th>Checked Already</th>
-            <th>Count</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let c of (this.trials | toCheckedAlreadyDiffSummary)" (click)="onClickRow(c.trials)">
-            <td>
-                <div class="center-vertical">
-                    <img *ngIf="c.image" src={{c.image}}/>
-                    <a *ngIf="c.link" href={{c.link}} (click)="stopPropagation($event)" target=”_blank”>
-                        <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
-                    </a>
-                </div>
-            </td>
-            <td>{{c.title}}</td>
-            <td>{{c.count}}</td>
-        </tr>
-        </tbody>
-    </table>
 
-    <h2>Ignored</h2>
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th></th>
-            <th>Ignored</th>
-            <th>Count</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let c of (this.trials | toIgnoredDiffSummary)" (click)="onClickRow(c.trials)">
-            <td>
-                <div class="center-vertical">
-                    <img *ngIf="c.image" src={{c.image}}/>
-                    <a *ngIf="c.link" href={{c.link}} (click)="stopPropagation($event)" target=”_blank”>
-                        <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
-                    </a>
-                </div>
-            </td>
-            <td>{{c.title}}</td>
-            <td>{{c.count}}</td>
-        </tr>
-        </tbody>
-    </table>
+    <!--<div class="center-vertical">-->
+    <!--<img *ngIf="c.image" src={{c.image}}/>-->
+    <!--<a *ngIf="c.link" href={{c.link}} (click)="stopPropagation($event)" target=”_blank”>-->
+    <!--<mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>-->
+    <!--</a>-->
+    <!--</div>-->
 
-    <h2>Path</h2>
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>Path</th>
-            <th>Count</th>
-            <th>Same</th>
-            <th>Different</th>
-            <th>Failure</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let c of (this.trials | toPath)" (click)="onClickRow(c.trials)">
-            <td>{{c.title}}</td>
-            <td><b>{{c.count}}</b></td>
-            <td class="same-color">{{c.status.same}}</td>
-            <td class="different-color">{{c.status.different}}</td>
-            <td class="failure-color">{{c.status.failure}}</td>
-        </tr>
-        </tbody>
-    </table>
+    <mat-divider style="margin-top: 20px;"></mat-divider>
+
+    <div class="center-horizontal">
+        <h2>Path</h2>
+
+        <ag-grid-angular
+            #agGrid
+            style="width: 50%; height: 500px;"
+            class="ag-theme-balham"
+            enableColResize
+            enableSorting
+            enableFilter
+            animateRows
+            floatingFilter
+            [rowData]="trials | toPath"
+            [columnDefs]="ignoredPathDefs"
+            (gridReady)="handleGridReady($event)"
+            (modelUpdated)="handleModelUpdated()"
+            (rowClicked)="handlePathRowClicked($event)"
+        >
+        </ag-grid-angular>
+    </div>
+
 </div>

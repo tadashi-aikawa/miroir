@@ -1,0 +1,30 @@
+<div [style.width]="width" style="max-width: 100%;">
+    <div class="center-vertical">
+        <div class="smart-padding-xsmall">
+            <button mat-button (click)="fitColumnWidths()">Reformat table (R)</button>
+        </div>
+        <div class="smart-padding-xsmall">
+            <button mat-button (click)="setAllColumnsVisible()">Visible all (V)</button>
+        </div>
+    </div>
+    <ag-grid-angular
+        #agGrid
+        style="width: 100%; height: 500px;"
+        class="ag-theme-balham"
+        enableColResize
+        enableSorting
+        pagination
+        animateRows
+        floatingFilter
+        [rowData]="tableRowData"
+        [defaultColDef]="defaultColDef"
+        [columnDefs]="columnDefs"
+        [rowClassRules]="rowClassRules"
+        (gridReady)="handleGridReady($event)"
+        (columnGroupOpened)="fitColumnWidths()"
+        (modelUpdated)="handleModelUpdated()"
+        (rowClicked)="handleRowClicked($event)"
+        (columnVisible)="fitTableWidth()"
+    >
+    </ag-grid-angular>
+</div>
