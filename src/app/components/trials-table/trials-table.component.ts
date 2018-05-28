@@ -19,6 +19,8 @@ export interface RowData {
     otherSec: number;
     oneStatus: number;
     otherStatus: number;
+    oneType: string;
+    otherType: string;
     oneContentType: string;
     otherContentType: string;
     requestTime: string;
@@ -122,11 +124,9 @@ export class TrialsTableComponent {
         },
         {
             headerName: "Response",
-            openByDefault: true,
             children: [
                 {
                     headerName: "Status",
-                    columnGroupShow: "everything else",
                     children: [
                         {headerName: "one", field: "oneStatus"},
                         {headerName: "other", field: "otherStatus"},
@@ -134,7 +134,6 @@ export class TrialsTableComponent {
                 },
                 {
                     headerName: "Sec",
-                    columnGroupShow: "open",
                     children: [
                         {
                             headerName: "one",
@@ -156,7 +155,6 @@ export class TrialsTableComponent {
                 },
                 {
                     headerName: "Byte",
-                    columnGroupShow: "open",
                     children: [
                         {
                             headerName: "one",
@@ -174,6 +172,13 @@ export class TrialsTableComponent {
                                 defaultOption: "greaterThanOrEqual"
                             }
                         },
+                    ]
+                },
+                {
+                    headerName: "Type",
+                    children: [
+                        {headerName: "one", field: "oneType"},
+                        {headerName: "other", field: "otherType"},
                     ]
                 },
                 {

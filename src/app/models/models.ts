@@ -158,6 +158,7 @@ export class Trial {
 }
 
 export class ResponseSummary {
+    type: string;
     status_code: number;
     byte: number;
     response_sec: number;

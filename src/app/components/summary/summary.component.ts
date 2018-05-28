@@ -315,6 +315,8 @@ export class SummaryComponent implements OnInit {
                             otherSec: t.other.response_sec,
                             oneStatus: t.one.status_code,
                             otherStatus: t.other.status_code,
+                            oneType: t.one.type,
+                            otherType: t.other.type,
                             oneContentType: t.one.content_type,
                             otherContentType: t.other.content_type,
                             requestTime: t.request_time,
