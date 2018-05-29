@@ -88,18 +88,6 @@ interface QueryRowData {
     value: string;
 }
 
-const toLanguage = (contentType: string) => {
-    if (contentType.match(/json/)) {
-        return 'json';
-    } else if (contentType.match(/xml/)) {
-        return 'xml';
-    } else if (contentType.match(/html/)) {
-        return 'html';
-    } else {
-        return 'plain';
-    }
-};
-
 const applyIgnores = (contents: Pair<string>, languages: Pair<string>,
                       ignoreDiffs: PropertyDiffs[], prefix: string): Pair<string> => {
     if (languages.one !== 'json' || languages.other !== 'json') {
@@ -422,8 +410,8 @@ export class DetailDialogComponent implements OnInit {
 
                         this.originalEditorBody = {one: rs[0].body, other: rs[1].body};
                         this.editorLanguage = {
-                            one: toLanguage(trial.one.content_type),
-                            other: toLanguage(trial.other.content_type)
+                            one: trial.one.type,
+                            other: trial.other.type,
                         };
                         this.expectedEncoding = {one: rs[0].encoding, other: rs[1].encoding};
                         this.updateDiffEditorBodies()
