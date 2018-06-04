@@ -29,6 +29,7 @@ import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 interface KeyBindings {
     reformat_table: string;
     visible_all: string;
+    clear_all_filters: string;
     toggle_summary_cards: string
     open_cheat_sheet: string;
     close_cheat_sheet: string;
@@ -38,6 +39,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
     default: {
         reformat_table: 'r',
         visible_all: 'v',
+        clear_all_filters: 'c',
         toggle_summary_cards: 'w',
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
@@ -45,6 +47,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
     vim: {
         reformat_table: 'r',
         visible_all: 'v',
+        clear_all_filters: 'c',
         toggle_summary_cards: 'w',
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
@@ -123,7 +126,11 @@ export class SummaryComponent implements OnInit {
             new Hotkey(keyMode.visible_all, () => {
                 this.trialsTable.setAllColumnsVisible();
                 return false;
-            }, null, 'Reformat table'),
+            }, null, 'Set all column visible'),
+            new Hotkey(keyMode.clear_all_filters, () => {
+                this.trialsTable.clearAllFilters();
+                return false;
+            }, null, 'Clear all filters'),
             new Hotkey(keyMode.toggle_summary_cards, () => {
                 this.sideNav.opened ? this.sideNav.close() : this.sideNav.open();
                 return false;

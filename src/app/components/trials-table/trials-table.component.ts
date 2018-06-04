@@ -251,4 +251,8 @@ export class TrialsTableComponent {
         );
     }
 
+    clearAllFilters() {
+        this.gridColumnApi.getAllColumns().map(x => this.gridApi.destroyFilter(x));
+    }
+
 }
