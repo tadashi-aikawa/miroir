@@ -41,7 +41,7 @@ export class TrialsTableComponent {
     @Input() tableRowData: RowData[];
     @Output() onClickRow = new EventEmitter<Row<RowData>>();
     @Output() onDisplayedTrialsUpdated = new EventEmitter<Trial[]>();
-    @Output() onfilteredRowsNumUpdated = new EventEmitter<string>();
+    @Output() onFilteredRowsNumUpdated = new EventEmitter<string>();
 
     width: string;
     rowClassRules = {
@@ -118,6 +118,7 @@ export class TrialsTableComponent {
                             field: "encodedQueries",
                             columnGroupShow: "open",
                             filterParams: {
+                                newRowsAction: 'keep',
                                 textCustomComparator: null
                             }
                         },
@@ -143,6 +144,7 @@ export class TrialsTableComponent {
                             field: "oneSec",
                             filter: 'agNumberColumnFilter',
                             filterParams: {
+                                newRowsAction: 'keep',
                                 defaultOption: "greaterThanOrEqual"
                             }
                         },
@@ -151,6 +153,7 @@ export class TrialsTableComponent {
                             field: "otherSec",
                             filter: 'agNumberColumnFilter',
                             filterParams: {
+                                newRowsAction: 'keep',
                                 defaultOption: "greaterThanOrEqual"
                             }
                         },
@@ -164,6 +167,7 @@ export class TrialsTableComponent {
                             field: "oneByte",
                             filter: 'agNumberColumnFilter',
                             filterParams: {
+                                newRowsAction: 'keep',
                                 defaultOption: "greaterThanOrEqual"
                             }
                         },
@@ -172,6 +176,7 @@ export class TrialsTableComponent {
                             field: "otherByte",
                             filter: 'agNumberColumnFilter',
                             filterParams: {
+                                newRowsAction: 'keep',
                                 defaultOption: "greaterThanOrEqual"
                             }
                         },
@@ -227,9 +232,9 @@ export class TrialsTableComponent {
         this.onDisplayedTrialsUpdated.emit(trials);
 
         const message = this.gridApi && this.gridApi.isAnyFilterPresent() ?
-            `${trials.length} / ${this.tableRowData.length}` :
+            `${trials.length} / ${this.tableRowData.length}　(${Object.keys(this.gridApi.getFilterModel()).length} filters).` :
             undefined;
-        this.onfilteredRowsNumUpdated.emit(message);
+        this.onFilteredRowsNumUpdated.emit(message);
 
         this.fitColumnWidths();
     }
