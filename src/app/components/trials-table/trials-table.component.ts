@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import {animate, style, transition, trigger} from '@angular/animations';
 import {Row, Trial} from '../../models/models';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {regexpComparator} from "../../utils/filters";
@@ -40,6 +41,7 @@ export class TrialsTableComponent {
     @Input() tableRowData: RowData[];
     @Output() onClickRow = new EventEmitter<Row<RowData>>();
     @Output() onDisplayedTrialsUpdated = new EventEmitter<Trial[]>();
+    @Output() onfilteredRowsNumUpdated = new EventEmitter<string>();
 
     width: string;
     rowClassRules = {
@@ -219,11 +221,16 @@ export class TrialsTableComponent {
     }
 
     handleModelUpdated() {
-        this.onDisplayedTrialsUpdated.emit(
-            this.gridApi ?
-                this.gridApi.getModel().rowsToDisplay.map(x => x.data.trial) :
-                this.tableRowData.map(x => x.trial)
-        );
+        const trials: Trial[] = this.gridApi ?
+            this.gridApi.getModel().rowsToDisplay.map(x => x.data.trial) :
+            this.tableRowData.map(x => x.trial);
+        this.onDisplayedTrialsUpdated.emit(trials);
+
+        const message = this.gridApi && this.gridApi.isAnyFilterPresent() ?
+            `${trials.length} / ${this.tableRowData.length}` :
+            undefined;
+        this.onfilteredRowsNumUpdated.emit(message);
+
         this.fitColumnWidths();
     }
 

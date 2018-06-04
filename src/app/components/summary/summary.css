@@ -135,3 +135,12 @@ mat-select {
     background: rgba(54, 68, 60, 0.4);
 }
 
+.filtered-number {
+    font-family: cursive;
+    font-style: italic;
+    margin: 0 15px 0 0;
+    background-color: coral;
+    color: white;
+    border-radius: 8px;
+    padding: 8px;
+}
