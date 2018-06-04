@@ -53,10 +53,11 @@ export class TrialsTableComponent {
     defaultColDef = {
         filterParams: {
             textCustomComparator: regexpComparator,
-            debounceMs: 200
+            debounceMs: 200,
+            newRowsAction: 'keep',
         },
         floatingFilterComponentParams: {
-            debounceMs: 200
+            debounceMs: 200,
         }
     };
 
