@@ -215,14 +215,22 @@
                         </small>
                     </app-panel>
                 </div>
+
+                <div *ngIf="filteredMessage" class="center-vertical filtered-number" style="margin-bottom: 5px;" [@feed]>
+                    <mat-icon>warning</mat-icon>
+                    <span style="margin-left: 3px; margin-right: 10px;">Several rows are filtered:</span>
+                    <span style="margin-left: 5px; font-size: 120%;">{{ filteredMessage }}</span>
+                </div>
+
                 <mat-tab-group (selectChange)="afterChangeTab($event.index)">
                     <mat-tab label="Table">
                         <div style="padding: 15px;">
                             <app-trials-table
-                               #trialsTable
-                               [tableRowData]="tableRowData"
-                               (onClickRow)="handleRowClicked($event)"
-                               (onDisplayedTrialsUpdated)="handleDisplayedTrialsUpdated($event)"
+                                #trialsTable
+                                [tableRowData]="tableRowData"
+                                (onClickRow)="handleRowClicked($event)"
+                                (onDisplayedTrialsUpdated)="handleDisplayedTrialsUpdated($event)"
+                                (onfilteredRowsNumUpdated)="handleFilteredRowsNumUpdated($event)"
                             >
                             </app-trials-table>
                         </div>

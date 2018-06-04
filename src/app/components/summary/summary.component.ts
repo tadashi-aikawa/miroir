@@ -1,4 +1,5 @@
 import {ActivatedRoute, Params} from '@angular/router';
+import {animate, style, transition, trigger} from '@angular/animations';
 import {
     Change,
     DynamoResult,
@@ -76,6 +77,21 @@ const toAttention = (t: Trial): string => {
         './summary.css',
         '../../../../node_modules/hover.css/css/hover.css'
     ],
+    animations: [
+        trigger(
+            'feed',
+            [
+                transition(':enter', [
+                    style({opacity: 0}),
+                    animate('250ms', style({opacity: 1}))
+                ]),
+                transition(':leave', [
+                    style({opacity: 1}),
+                    animate('250ms', style({opacity: 0}))
+                ])
+            ]
+        )
+    ],
 })
 export class SummaryComponent implements OnInit {
 
@@ -97,6 +113,7 @@ export class SummaryComponent implements OnInit {
     activeReport: Report;
     tableRowData: RowData[];
     displayedTrials: Trial[];
+    filteredMessage: string;
     checkedAlready: IgnoreCase[];
     ignores: IgnoreCase[];
     loadingReportKey: string;
@@ -428,6 +445,10 @@ export class SummaryComponent implements OnInit {
 
     handleDisplayedTrialsUpdated(trials: Trial[]) {
         this.displayedTrials = trials;
+    }
+
+    handleFilteredRowsNumUpdated(filteredAndAll: string) {
+        this.filteredMessage = filteredAndAll;
     }
 
 
