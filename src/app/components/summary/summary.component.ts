@@ -1,4 +1,5 @@
 import {ActivatedRoute, Params} from '@angular/router';
+import {animate, style, transition, trigger} from '@angular/animations';
 import {
     Change,
     DynamoResult,
@@ -29,6 +30,7 @@ import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 interface KeyBindings {
     reformat_table: string;
     visible_all: string;
+    clear_all_filters: string;
     toggle_summary_cards: string
     open_cheat_sheet: string;
     close_cheat_sheet: string;
@@ -38,6 +40,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
     default: {
         reformat_table: 'r',
         visible_all: 'v',
+        clear_all_filters: 'c',
         toggle_summary_cards: 'w',
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
@@ -45,6 +48,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
     vim: {
         reformat_table: 'r',
         visible_all: 'v',
+        clear_all_filters: 'c',
         toggle_summary_cards: 'w',
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
@@ -73,6 +77,21 @@ const toAttention = (t: Trial): string => {
         './summary.css',
         '../../../../node_modules/hover.css/css/hover.css'
     ],
+    animations: [
+        trigger(
+            'feed',
+            [
+                transition(':enter', [
+                    style({opacity: 0}),
+                    animate('250ms', style({opacity: 1}))
+                ]),
+                transition(':leave', [
+                    style({opacity: 1}),
+                    animate('250ms', style({opacity: 0}))
+                ])
+            ]
+        )
+    ],
 })
 export class SummaryComponent implements OnInit {
 
@@ -94,6 +113,7 @@ export class SummaryComponent implements OnInit {
     activeReport: Report;
     tableRowData: RowData[];
     displayedTrials: Trial[];
+    filteredMessage: string;
     checkedAlready: IgnoreCase[];
     ignores: IgnoreCase[];
     loadingReportKey: string;
@@ -123,7 +143,11 @@ export class SummaryComponent implements OnInit {
             new Hotkey(keyMode.visible_all, () => {
                 this.trialsTable.setAllColumnsVisible();
                 return false;
-            }, null, 'Reformat table'),
+            }, null, 'Set all column visible'),
+            new Hotkey(keyMode.clear_all_filters, () => {
+                this.trialsTable.clearAllFilters();
+                return false;
+            }, null, 'Clear all filters'),
             new Hotkey(keyMode.toggle_summary_cards, () => {
                 this.sideNav.opened ? this.sideNav.close() : this.sideNav.open();
                 return false;
@@ -421,6 +445,10 @@ export class SummaryComponent implements OnInit {
 
     handleDisplayedTrialsUpdated(trials: Trial[]) {
         this.displayedTrials = trials;
+    }
+
+    handleFilteredRowsNumUpdated(filteredAndAll: string) {
+        this.filteredMessage = filteredAndAll;
     }
 
 

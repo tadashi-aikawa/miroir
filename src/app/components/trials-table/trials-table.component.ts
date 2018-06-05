@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import {animate, style, transition, trigger} from '@angular/animations';
 import {Row, Trial} from '../../models/models';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {regexpComparator} from "../../utils/filters";
@@ -40,6 +41,7 @@ export class TrialsTableComponent {
     @Input() tableRowData: RowData[];
     @Output() onClickRow = new EventEmitter<Row<RowData>>();
     @Output() onDisplayedTrialsUpdated = new EventEmitter<Trial[]>();
+    @Output() onFilteredRowsNumUpdated = new EventEmitter<string>();
 
     width: string;
     rowClassRules = {
@@ -53,10 +55,11 @@ export class TrialsTableComponent {
     defaultColDef = {
         filterParams: {
             textCustomComparator: regexpComparator,
-            debounceMs: 200
+            debounceMs: 200,
+            newRowsAction: 'keep',
         },
         floatingFilterComponentParams: {
-            debounceMs: 200
+            debounceMs: 200,
         }
     };
 
@@ -115,6 +118,7 @@ export class TrialsTableComponent {
                             field: "encodedQueries",
                             columnGroupShow: "open",
                             filterParams: {
+                                newRowsAction: 'keep',
                                 textCustomComparator: null
                             }
                         },
@@ -140,6 +144,7 @@ export class TrialsTableComponent {
                             field: "oneSec",
                             filter: 'agNumberColumnFilter',
                             filterParams: {
+                                newRowsAction: 'keep',
                                 defaultOption: "greaterThanOrEqual"
                             }
                         },
@@ -148,6 +153,7 @@ export class TrialsTableComponent {
                             field: "otherSec",
                             filter: 'agNumberColumnFilter',
                             filterParams: {
+                                newRowsAction: 'keep',
                                 defaultOption: "greaterThanOrEqual"
                             }
                         },
@@ -161,6 +167,7 @@ export class TrialsTableComponent {
                             field: "oneByte",
                             filter: 'agNumberColumnFilter',
                             filterParams: {
+                                newRowsAction: 'keep',
                                 defaultOption: "greaterThanOrEqual"
                             }
                         },
@@ -169,6 +176,7 @@ export class TrialsTableComponent {
                             field: "otherByte",
                             filter: 'agNumberColumnFilter',
                             filterParams: {
+                                newRowsAction: 'keep',
                                 defaultOption: "greaterThanOrEqual"
                             }
                         },
@@ -218,11 +226,16 @@ export class TrialsTableComponent {
     }
 
     handleModelUpdated() {
-        this.onDisplayedTrialsUpdated.emit(
-            this.gridApi ?
-                this.gridApi.getModel().rowsToDisplay.map(x => x.data.trial) :
-                this.tableRowData.map(x => x.trial)
-        );
+        const trials: Trial[] = this.gridApi ?
+            this.gridApi.getModel().rowsToDisplay.map(x => x.data.trial) :
+            this.tableRowData.map(x => x.trial);
+        this.onDisplayedTrialsUpdated.emit(trials);
+
+        const message = this.gridApi && this.gridApi.isAnyFilterPresent() ?
+            `${trials.length} / ${this.tableRowData.length}　(${Object.keys(this.gridApi.getFilterModel()).length} filters).` :
+            undefined;
+        this.onFilteredRowsNumUpdated.emit(message);
+
         this.fitColumnWidths();
     }
 
@@ -248,6 +261,10 @@ export class TrialsTableComponent {
             this.gridColumnApi.getAllColumns().map(x => x.colId),
             true
         );
+    }
+
+    clearAllFilters() {
+        this.gridColumnApi.getAllColumns().map(x => this.gridApi.destroyFilter(x));
     }
 
 }
