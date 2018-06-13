@@ -51,6 +51,10 @@ export class TrialsTableComponent {
         'report-table-record-failure': 'data.status === "failure"',
         'report-table-record-checked-already': 'data.checkedAlready.length > 0 && !data.attention',
     };
+    responseStatusCellClassRules = {
+        'server-error-status-cell': 'x >= 500',
+        'client-error-status-cell': 'x >= 400',
+    };
 
     defaultColDef = {
         filterParams: {
@@ -132,8 +136,16 @@ export class TrialsTableComponent {
                 {
                     headerName: "Status",
                     children: [
-                        {headerName: "one", field: "oneStatus"},
-                        {headerName: "other", field: "otherStatus"},
+                        {
+                            headerName: "one",
+                            field: "oneStatus",
+                            cellClassRules: this.responseStatusCellClassRules,
+                        },
+                        {
+                            headerName: "other",
+                            field: "otherStatus",
+                            cellClassRules: this.responseStatusCellClassRules,
+                        },
                     ]
                 },
                 {
