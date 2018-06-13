@@ -26,7 +26,6 @@ import {
     MatTabsModule,
     MatToolbarModule,
 } from '@angular/material';
-import {Ng2SmartTableModule} from 'ng2-smart-table';
 import {LocalStorageModule} from 'angular-2-local-storage';
 import {SelectModule} from 'ng-select';
 import {HotkeyModule} from 'angular2-hotkeys';
@@ -118,7 +117,6 @@ const appRoutes: Routes = [
         FormsModule,
         ReactiveFormsModule,
         HttpModule,
-        Ng2SmartTableModule,
         SelectModule,
         CommonModule,
         Ng2HighchartsModule,
