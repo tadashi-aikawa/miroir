@@ -1,15 +1,37 @@
 :host ::ng-deep .report-table-record-attention {
     background: pink;
 }
+
 :host ::ng-deep .report-table-record-checked-already {
     background: #b6e6b6;
 }
+
 :host ::ng-deep .report-table-record-both-failure {
     background: silver;
 }
+
 :host ::ng-deep .report-table-record-no-diff-keys {
     background: bisque;
 }
+
 :host ::ng-deep .report-table-record-failure {
     background: hotpink;
+}
+
+::ng-deep .client-error-status-cell {
+    color: white;
+    font-weight: bold;
+    text-shadow: 2px 2px 1px #00F,
+    -2px 2px 1px #00F,
+    2px -2px 1px #00F,
+    -2px -2px 1px #00F;
+}
+
+::ng-deep .server-error-status-cell {
+    color: white;
+    font-weight: bold;
+    text-shadow: 2px 2px 1px #F00,
+    -2px 2px 1px #F00,
+    2px -2px 1px #F00,
+    -2px -2px 1px #F00;
 }
