@@ -524,4 +524,33 @@ export class DetailDialogComponent implements OnInit {
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this trial url`, url);
     }
+
+    @Memoize((body, property) => `${body}${property}`)
+    private pickValue(body: string, property: string): string {
+        console.log(`${this.trial.seq}: ${property}`);
+        return _.get(
+            JSON.parse(body),
+            property.replace('root', '').replace(/></g, '.').replace(/([<>'])/g, '')
+        )
+    }
+
+    getValue(property: string) {
+        // TODO: Get *.prop.json and ...
+        if (!this.originalEditorBody) {
+            return "";
+        }
+        if (this.trial.one.type !== 'json' || this.trial.other.type !== 'json') {
+            return "";
+        }
+        if (this.isLoading) {
+            return "";
+        }
+
+        const one: string = this.pickValue(this.originalEditorBody.one, property);
+        const other: string = this.pickValue(this.originalEditorBody.other, property);
+
+        return one !== undefined && other !== undefined ?
+            `${one}\n\n----------↓↓----------\n\n${other}` :
+            one === undefined ? other : one
+    }
 }

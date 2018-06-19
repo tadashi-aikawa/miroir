@@ -25,6 +25,7 @@ import {
     MatSnackBarModule,
     MatTabsModule,
     MatToolbarModule,
+    MatTooltipModule,
 } from '@angular/material';
 import {LocalStorageModule} from 'angular-2-local-storage';
 import {SelectModule} from 'ng-select';
@@ -135,6 +136,7 @@ const appRoutes: Routes = [
         MatChipsModule,
         MatIconModule,
         MatToolbarModule,
+        MatTooltipModule,
         MatSidenavModule,
         MatProgressSpinnerModule,
         MatOptionModule,
@@ -158,6 +160,7 @@ const appRoutes: Routes = [
         MatChipsModule,
         MatIconModule,
         MatToolbarModule,
+        MatTooltipModule,
         MatSidenavModule,
         MatProgressSpinnerModule,
         MatOptionModule,
