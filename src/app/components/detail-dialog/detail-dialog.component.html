@@ -176,19 +176,19 @@
 
                         <expansion-panel-content>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.added" class="center-vertical">
-                                <button mat-button [matTooltip]="getValue(p)" matTooltipPosition="right">
+                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
                                     <mat-icon class="added">add</mat-icon>
                                 </button>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.changed" class="center-vertical">
-                                <button mat-button [matTooltip]="getValue(p)" matTooltipPosition="right">
+                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
                                     <mat-icon class="changed">autorenew</mat-icon>
                                 </button>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.removed" class="center-vertical">
-                                <button mat-button [matTooltip]="getValue(p)" matTooltipPosition="right">
+                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
                                     <mat-icon class="removed">remove</mat-icon>
                                 </button>
                                 <span class="property-diffs">{{p}}</span>
@@ -239,19 +239,19 @@
 
                         <expansion-panel-content>
                             <div *ngFor="let p of pd.added" class="center-vertical">
-                                <button mat-button [matTooltip]="getValue(p)" matTooltipPosition="right">
+                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
                                     <mat-icon class="added">add</mat-icon>
                                 </button>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of pd.changed" class="center-vertical">
-                                <button mat-button [matTooltip]="getValue(p)" matTooltipPosition="right">
+                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
                                     <mat-icon class="changed">autorenew</mat-icon>
                                 </button>
                                 <span class="property-diffs">{{p}}</span>
                             </div>
                             <div *ngFor="let p of pd.removed" class="center-vertical">
-                                <button mat-button [matTooltip]="getValue(p)" matTooltipPosition="right">
+                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
                                     <mat-icon class="removed">remove</mat-icon>
                                 </button>
                                 <span class="property-diffs">{{p}}</span>

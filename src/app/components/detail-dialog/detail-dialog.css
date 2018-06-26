@@ -64,3 +64,8 @@
     border: 1px outset;
     text-shadow: 5px 5px 3px rgba(0,0,0,0.2);
 }
+
+.diff-button {
+    min-width: 0px;
+    line-height: 25px;
+}

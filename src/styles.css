@@ -220,10 +220,6 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
     display: inline-block;
 }
 
-mat-tooltip-component > .mat-tooltip {
-    white-space: pre;
-    width: 100%;
-    max-width: 500px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.property-snackbar {
+    white-space: pre-line;
 }

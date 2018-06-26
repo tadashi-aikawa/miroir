@@ -10,7 +10,7 @@ import {
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {MatDialogRef} from '@angular/material';
+import {MatDialogRef, MatSnackBar} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import * as _ from 'lodash';
@@ -152,7 +152,7 @@ function createConfig(one: string, other: string, oneContentType: string, otherC
     styleUrls: [
         './detail-dialog.css',
         '../../../../node_modules/hover.css/css/hover.css'
-    ]
+    ],
 })
 export class DetailDialogComponent implements OnInit {
     @Input() reportKey: string;
@@ -240,6 +240,7 @@ export class DetailDialogComponent implements OnInit {
                 @Optional() public dialogRef: MatDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService,
                 private settingsService: SettingsService,
+                public snackBar: MatSnackBar,
                 private toasterService: ToasterService) {
     }
 
@@ -544,8 +545,7 @@ export class DetailDialogComponent implements OnInit {
         )
     }
 
-    getValue(property: string) {
-        // TODO: Get *.prop.json and ...
+    private getValue(property: string): string {
         if (!this.originalEditorBody) {
             return "";
         }
@@ -559,8 +559,17 @@ export class DetailDialogComponent implements OnInit {
         const one: string = this.pickValue(this.property.one, property);
         const other: string = this.pickValue(this.property.other, property);
 
-        return one !== undefined && other !== undefined ?
-            `${JSON.stringify(one)}\n\n----------↓↓----------\n\n${JSON.stringify(other)}` :
-            one === undefined ? JSON.stringify(other) : JSON.stringify(one)
+        return `[[ ${property} ]]\n\n` +
+            (one !== undefined && other !== undefined ?
+                `${JSON.stringify(one)}\n\n----------↓↓----------\n\n${JSON.stringify(other)}` :
+                one === undefined ? JSON.stringify(other) : JSON.stringify(one))
+    }
+
+    showPropertyValue(property: string) {
+        this.snackBar.open(this.getValue(property), 'Close', {
+            verticalPosition: 'top',
+            panelClass: 'property-snackbar',
+        });
     }
 }
+
