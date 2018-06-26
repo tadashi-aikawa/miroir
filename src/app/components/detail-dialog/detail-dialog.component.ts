@@ -183,6 +183,7 @@ export class DetailDialogComponent implements OnInit {
 
     activeIndex: string;
     originalEditorBody: Pair<string>;
+    property: Pair<string>;
     editorLanguage: Pair<string>;
     options: IOption[];
     isLoading: boolean;
@@ -402,8 +403,12 @@ export class DetailDialogComponent implements OnInit {
                     this.updateDiffEditorBodies()
                 }, 100);
             } else {
-                const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
-                Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
+                const fetchFile = (file: string) => this.service.fetchFile(this.reportKey, file);
+
+                Promise.all(
+                    _.compact([trial.one.file, trial.other.file, trial.one.prop_file, trial.other.prop_file])
+                    .map(x => fetchFile(x))
+                )
                     .then((rs: { encoding: string, body: string }[]) => {
                         this.isLoading = false;
                         this.errorMessage = undefined;
@@ -414,6 +419,12 @@ export class DetailDialogComponent implements OnInit {
                             other: trial.other.type,
                         };
                         this.expectedEncoding = {one: rs[0].encoding, other: rs[1].encoding};
+
+                        // has property json?
+                        if (rs.length === 4) {
+                            this.property = { one: rs[2].body, other: rs[3].body };
+                        }
+
                         this.updateDiffEditorBodies()
                     })
                     .catch(err => {
@@ -527,7 +538,6 @@ export class DetailDialogComponent implements OnInit {
 
     @Memoize((body, property) => `${body}${property}`)
     private pickValue(body: string, property: string): string {
-        console.log(`${this.trial.seq}: ${property}`);
         return _.get(
             JSON.parse(body),
             property.replace('root', '').replace(/></g, '.').replace(/([<>'])/g, '')
@@ -539,18 +549,18 @@ export class DetailDialogComponent implements OnInit {
         if (!this.originalEditorBody) {
             return "";
         }
-        if (this.trial.one.type !== 'json' || this.trial.other.type !== 'json') {
+        if (!this.property.one || !this.property.other) {
             return "";
         }
         if (this.isLoading) {
             return "";
         }
 
-        const one: string = this.pickValue(this.originalEditorBody.one, property);
-        const other: string = this.pickValue(this.originalEditorBody.other, property);
+        const one: string = this.pickValue(this.property.one, property);
+        const other: string = this.pickValue(this.property.other, property);
 
         return one !== undefined && other !== undefined ?
-            `${one}\n\n----------↓↓----------\n\n${other}` :
-            one === undefined ? other : one
+            `${JSON.stringify(one)}\n\n----------↓↓----------\n\n${JSON.stringify(other)}` :
+            one === undefined ? JSON.stringify(other) : JSON.stringify(one)
     }
 }
