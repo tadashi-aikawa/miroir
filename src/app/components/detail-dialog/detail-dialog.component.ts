@@ -8,9 +8,10 @@ import {
     PropertyDiffsByCognition,
     Trial
 } from '../../models/models';
+import {animate, style, transition, trigger} from '@angular/animations';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {MatDialogRef} from '@angular/material';
+import {MatDialogRef, MatSnackBar} from '@angular/material';
 import {IOption} from 'ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import * as _ from 'lodash';
@@ -152,7 +153,22 @@ function createConfig(one: string, other: string, oneContentType: string, otherC
     styleUrls: [
         './detail-dialog.css',
         '../../../../node_modules/hover.css/css/hover.css'
-    ]
+    ],
+    animations: [
+        trigger(
+            'diff-property-value',
+            [
+                transition(':enter', [
+                    style({height: 0, opacity: 0}),
+                    animate('150ms', style({opacity: '*', height: '*'})),
+                ]),
+                transition(':leave', [
+                    style({opacity: '*'}),
+                    animate('150ms', style({opacity: 0, height: 0})),
+                ])
+            ]
+        ),
+    ],
 })
 export class DetailDialogComponent implements OnInit {
     @Input() reportKey: string;
@@ -183,6 +199,11 @@ export class DetailDialogComponent implements OnInit {
 
     activeIndex: string;
     originalEditorBody: Pair<string>;
+
+    property: Pair<string>;
+    targetProperty: string;
+    targetPropertyValue: Pair<string>;
+
     editorLanguage: Pair<string>;
     options: IOption[];
     isLoading: boolean;
@@ -239,6 +260,7 @@ export class DetailDialogComponent implements OnInit {
                 @Optional() public dialogRef: MatDialogRef<DetailDialogComponent>,
                 private _hotkeysService: HotkeysService,
                 private settingsService: SettingsService,
+                public snackBar: MatSnackBar,
                 private toasterService: ToasterService) {
     }
 
@@ -393,6 +415,7 @@ export class DetailDialogComponent implements OnInit {
                 // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
                 setTimeout(() => {
                     this.isLoading = false;
+                    this.targetPropertyValue = undefined;
                     this.originalEditorBody = {
                         one: 'Binary is not supported to show',
                         other: 'Binary is not supported to show',
@@ -402,11 +425,16 @@ export class DetailDialogComponent implements OnInit {
                     this.updateDiffEditorBodies()
                 }, 100);
             } else {
-                const fetchFile = (file: string) => this.service.fetchTrial(this.reportKey, file);
-                Promise.all([fetchFile(trial.one.file), fetchFile(trial.other.file)])
+                const fetchFile = (file: string) => this.service.fetchFile(this.reportKey, file);
+
+                this.errorMessage = undefined;
+                Promise.all(
+                    _.compact([trial.one.file, trial.other.file, trial.one.prop_file, trial.other.prop_file])
+                    .map(x => fetchFile(x))
+                )
                     .then((rs: { encoding: string, body: string }[]) => {
                         this.isLoading = false;
-                        this.errorMessage = undefined;
+                        this.targetPropertyValue = undefined;
 
                         this.originalEditorBody = {one: rs[0].body, other: rs[1].body};
                         this.editorLanguage = {
@@ -414,6 +442,12 @@ export class DetailDialogComponent implements OnInit {
                             other: trial.other.type,
                         };
                         this.expectedEncoding = {one: rs[0].encoding, other: rs[1].encoding};
+
+                        // has property json?
+                        if (rs.length === 4) {
+                            this.property = { one: rs[2].body, other: rs[3].body };
+                        }
+
                         this.updateDiffEditorBodies()
                     })
                     .catch(err => {
@@ -427,6 +461,7 @@ export class DetailDialogComponent implements OnInit {
             // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
             setTimeout(() => {
                 this.isLoading = false;
+                this.targetPropertyValue = undefined;
                 this.originalEditorBody = {one: 'No file', other: 'No file',};
                 this.editorLanguage = {one: 'text', other: 'text'};
                 this.expectedEncoding = {one: 'None', other: 'None'};
@@ -524,4 +559,38 @@ export class DetailDialogComponent implements OnInit {
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this trial url`, url);
     }
+
+    @Memoize((body, property) => `${body}${property}`)
+    private pickValue(body: string, property: string): string {
+        return _.get(
+            JSON.parse(body),
+            property.replace('root', '').replace(/></g, '.').replace(/([<>'])/g, '')
+        )
+    }
+
+    private getValue(property: string): Pair<string> | undefined {
+        if (_.some([
+            !this.originalEditorBody,
+            !this.property.one,
+            !this.property.other,
+            this.isLoading,
+            !property,
+        ] )) {
+            return undefined;
+        }
+        const one: string = this.pickValue(this.property.one, property);
+        const other: string = this.pickValue(this.property.other, property);
+
+        return {one: JSON.stringify(one), other: JSON.stringify(other)};
+    }
+
+    showTargetPropertyValue(property: string) {
+        this.targetProperty = property === this.targetProperty ? undefined : property;
+        this.targetPropertyValue = this.getValue(this.targetProperty);
+    }
+
+    judgeDiffColor(property: string): string {
+        return this.targetPropertyValue && this.targetProperty === property ? "red" : "black";
+    }
 }
+

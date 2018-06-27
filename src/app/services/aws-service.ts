@@ -189,7 +189,7 @@ export class AwsService {
         });
     }
 
-    async fetchTrial(key: string, name: string): Promise<{ encoding: string, body: string }> {
+    async fetchFile(key: string, name: string): Promise<{ encoding: string, body: string }> {
         if (!await this.checkCredentialsExpiredAndTreat()) {
             return Promise.reject('Temporary credentials is expired!!');
         }

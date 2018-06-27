@@ -90,6 +90,21 @@ const toAttention = (t: Trial): string => {
                     animate('250ms', style({opacity: 0}))
                 ])
             ]
+        ),
+        trigger(
+            'card-feed',
+            [
+                transition(':enter', [
+                    style({opacity: 0}),
+                    animate('500ms', style({opacity: 1}))
+                ]),
+                transition(':leave', [
+                    style({opacity: 1}),
+                    animate('250ms', style({opacity: 0})),
+                    animate('100ms', style({opacity: 0})),
+                    animate('250ms', style({height: 0})),
+                ])
+            ]
         )
     ],
 })
