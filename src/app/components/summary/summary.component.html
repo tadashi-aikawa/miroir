@@ -37,7 +37,7 @@
                 </mat-chip-list>
             </div>
             <div *ngIf="!searchingSummary && !searchErrorMessage">
-                <mat-card *ngFor="let row of rows"
+                <mat-card *ngFor="let row of rows" [@card-feed]
                           (click)="onClickCard(row, $event)"
                           [ngClass]="activeReport && row.hashkey == activeReport.key ?
                             ['hvr-curl-bottom-right', 'summary-card', 'summary-card-active'] :
