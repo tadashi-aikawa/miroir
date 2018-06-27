@@ -59,9 +59,22 @@
 </div>
 
 <hr/>
-<div class="origin-queries" *ngIf="!isLoading">{{trial.queryString}}</div>
-<div *ngIf="isLoading" style="width: 90%; padding-left: 10px;">
+<div *ngIf="isLoading" style="width: 90%; padding-left: 10px;" [@diff-property-value]>
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<div *ngIf="!isLoading && !targetPropertyValue" class="origin-queries" [@diff-property-value]>
+    {{trial.queryString}}
+</div>
+<div class="diff-property-overlay" style="padding-right: calc(66px + 15px);" *ngIf="!isLoading && targetPropertyValue" [@diff-property-value]>
+    <div style="justify-self: right; align-self: center;">
+        <pre>{{ targetPropertyValue.one }}</pre>
+    </div>
+    <div style="justify-self: center; align-self: center;">
+        <pre>-------></pre>
+    </div>
+    <div style="justify-self: left; align-self: center;">
+        <pre>{{ targetPropertyValue.other }}</pre>
+    </div>
 </div>
 <hr/>
 <mat-tab-group [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
@@ -176,22 +189,22 @@
 
                         <expansion-panel-content>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.added" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
+                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
                                     <mat-icon class="added">add</mat-icon>
                                 </button>
-                                <span class="property-diffs">{{p}}</span>
+                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
                             </div>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.changed" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
+                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
                                     <mat-icon class="changed">autorenew</mat-icon>
                                 </button>
-                                <span class="property-diffs">{{p}}</span>
+                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
                             </div>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.removed" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
-                                    <mat-icon class="removed">remove</mat-icon>
+                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                                    <mat-icon class="removed" >remove</mat-icon>
                                 </button>
-                                <span class="property-diffs">{{p}}</span>
+                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
                             </div>
                         </expansion-panel-content>
                     </expansion-panel>
@@ -239,22 +252,22 @@
 
                         <expansion-panel-content>
                             <div *ngFor="let p of pd.added" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
+                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
                                     <mat-icon class="added">add</mat-icon>
                                 </button>
-                                <span class="property-diffs">{{p}}</span>
+                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
                             </div>
                             <div *ngFor="let p of pd.changed" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
+                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
                                     <mat-icon class="changed">autorenew</mat-icon>
                                 </button>
-                                <span class="property-diffs">{{p}}</span>
+                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
                             </div>
                             <div *ngFor="let p of pd.removed" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showPropertyValue(p)">
+                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
                                     <mat-icon class="removed">remove</mat-icon>
                                 </button>
-                                <span class="property-diffs">{{p}}</span>
+                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
                             </div>
                         </expansion-panel-content>
                     </expansion-panel>

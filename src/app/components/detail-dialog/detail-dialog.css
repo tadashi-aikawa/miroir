@@ -16,6 +16,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 15px;
 }
 
 .origin-queries:hover {
@@ -66,6 +67,15 @@
 }
 
 .diff-button {
-    min-width: 0px;
+    min-width: 0;
     line-height: 25px;
 }
+
+.diff-property-overlay {
+    display: grid;
+    grid-template-columns: 10fr 1fr 10fr;
+    background-color: #000000;
+    color: whitesmoke;
+    opacity: 0.65;
+}
+

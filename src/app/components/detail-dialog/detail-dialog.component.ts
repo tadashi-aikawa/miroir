@@ -8,6 +8,7 @@ import {
     PropertyDiffsByCognition,
     Trial
 } from '../../models/models';
+import {animate, style, transition, trigger} from '@angular/animations';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {MatDialogRef, MatSnackBar} from '@angular/material';
@@ -153,6 +154,21 @@ function createConfig(one: string, other: string, oneContentType: string, otherC
         './detail-dialog.css',
         '../../../../node_modules/hover.css/css/hover.css'
     ],
+    animations: [
+        trigger(
+            'diff-property-value',
+            [
+                transition(':enter', [
+                    style({height: 0, opacity: 0}),
+                    animate('150ms', style({opacity: '*', height: '*'})),
+                ]),
+                transition(':leave', [
+                    style({opacity: '*'}),
+                    animate('150ms', style({opacity: 0, height: 0})),
+                ])
+            ]
+        ),
+    ],
 })
 export class DetailDialogComponent implements OnInit {
     @Input() reportKey: string;
@@ -183,7 +199,11 @@ export class DetailDialogComponent implements OnInit {
 
     activeIndex: string;
     originalEditorBody: Pair<string>;
+
     property: Pair<string>;
+    targetProperty: string;
+    targetPropertyValue: Pair<string>;
+
     editorLanguage: Pair<string>;
     options: IOption[];
     isLoading: boolean;
@@ -395,6 +415,7 @@ export class DetailDialogComponent implements OnInit {
                 // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
                 setTimeout(() => {
                     this.isLoading = false;
+                    this.targetPropertyValue = undefined;
                     this.originalEditorBody = {
                         one: 'Binary is not supported to show',
                         other: 'Binary is not supported to show',
@@ -406,13 +427,14 @@ export class DetailDialogComponent implements OnInit {
             } else {
                 const fetchFile = (file: string) => this.service.fetchFile(this.reportKey, file);
 
+                this.errorMessage = undefined;
                 Promise.all(
                     _.compact([trial.one.file, trial.other.file, trial.one.prop_file, trial.other.prop_file])
                     .map(x => fetchFile(x))
                 )
                     .then((rs: { encoding: string, body: string }[]) => {
                         this.isLoading = false;
-                        this.errorMessage = undefined;
+                        this.targetPropertyValue = undefined;
 
                         this.originalEditorBody = {one: rs[0].body, other: rs[1].body};
                         this.editorLanguage = {
@@ -439,6 +461,7 @@ export class DetailDialogComponent implements OnInit {
             // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
             setTimeout(() => {
                 this.isLoading = false;
+                this.targetPropertyValue = undefined;
                 this.originalEditorBody = {one: 'No file', other: 'No file',};
                 this.editorLanguage = {one: 'text', other: 'text'};
                 this.expectedEncoding = {one: 'None', other: 'None'};
@@ -545,31 +568,29 @@ export class DetailDialogComponent implements OnInit {
         )
     }
 
-    private getValue(property: string): string {
-        if (!this.originalEditorBody) {
-            return "";
+    private getValue(property: string): Pair<string> | undefined {
+        if (_.some([
+            !this.originalEditorBody,
+            !this.property.one,
+            !this.property.other,
+            this.isLoading,
+            !property,
+        ] )) {
+            return undefined;
         }
-        if (!this.property.one || !this.property.other) {
-            return "";
-        }
-        if (this.isLoading) {
-            return "";
-        }
-
         const one: string = this.pickValue(this.property.one, property);
         const other: string = this.pickValue(this.property.other, property);
 
-        return `[[ ${property} ]]\n\n` +
-            (one !== undefined && other !== undefined ?
-                `${JSON.stringify(one)}\n\n----------↓↓----------\n\n${JSON.stringify(other)}` :
-                one === undefined ? JSON.stringify(other) : JSON.stringify(one))
+        return {one: JSON.stringify(one), other: JSON.stringify(other)};
     }
 
-    showPropertyValue(property: string) {
-        this.snackBar.open(this.getValue(property), 'Close', {
-            verticalPosition: 'top',
-            panelClass: 'property-snackbar',
-        });
+    showTargetPropertyValue(property: string) {
+        this.targetProperty = property === this.targetProperty ? undefined : property;
+        this.targetPropertyValue = this.getValue(this.targetProperty);
+    }
+
+    judgeDiffColor(property: string): string {
+        return this.targetPropertyValue && this.targetProperty === property ? "red" : "black";
     }
 }
 
