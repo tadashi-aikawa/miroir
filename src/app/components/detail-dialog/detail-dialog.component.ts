@@ -245,7 +245,7 @@ export class DetailDialogComponent implements OnInit {
     private calcDiffViewerHeight(fullscreen: boolean, isLineFilterEnabled: boolean): string {
         const heightBehindFullscreen = fullscreen ? 0 : 130;
         const heightBehindLineFilter = isLineFilterEnabled ? 50 : 0;
-        return `calc(95vh - ${160 + heightBehindFullscreen + heightBehindLineFilter}px)`
+        return `calc(95vh - ${175 + heightBehindFullscreen + heightBehindLineFilter}px)`
     }
 
     get diffViewerHeight(): string {
