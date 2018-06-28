@@ -159,7 +159,7 @@
     </mat-tab>
     <mat-tab label="Property diffs">
         <div style="display: flex; justify-content: space-between;">
-            <div *ngIf="trial.diff_keys" style="flex: 1;">
+            <div *ngIf="trial.diff_keys" style="flex: 1;" [style.height]="diffViewerHeight" class="scrollable-y">
                 <h2 class="center-vertical">
                     <mat-icon>report_problem</mat-icon>&nbsp;Unknown!!
                 </h2>
