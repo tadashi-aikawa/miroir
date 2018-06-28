@@ -200,7 +200,7 @@ export class DetailDialogComponent implements OnInit {
     activeIndex: string;
     originalEditorBody: Pair<string>;
 
-    property: Pair<string>;
+    propertyObject: Pair<object>;
     targetProperty: string;
     targetPropertyValue: Pair<string>;
 
@@ -445,7 +445,10 @@ export class DetailDialogComponent implements OnInit {
 
                         // has property json?
                         if (rs.length === 4) {
-                            this.property = { one: rs[2].body, other: rs[3].body };
+                            this.propertyObject = {
+                                one: JSON.parse(rs[2].body),
+                                other: JSON.parse(rs[3].body),
+                            };
                         }
 
                         this.updateDiffEditorBodies()
@@ -560,10 +563,9 @@ export class DetailDialogComponent implements OnInit {
         this.toasterService.pop('success', `Copied this trial url`, url);
     }
 
-    @Memoize((body, property) => `${body}${property}`)
-    private pickValue(body: string, property: string): string {
+    private pickValue(propertyObject: object, property: string): string {
         return _.get(
-            JSON.parse(body),
+            propertyObject,
             property.replace('root', '').replace(/></g, '.').replace(/([<>'])/g, '')
         )
     }
@@ -571,15 +573,15 @@ export class DetailDialogComponent implements OnInit {
     private getValue(property: string): Pair<string> | undefined {
         if (_.some([
             !this.originalEditorBody,
-            !this.property.one,
-            !this.property.other,
+            !this.propertyObject.one,
+            !this.propertyObject.other,
             this.isLoading,
             !property,
         ] )) {
             return undefined;
         }
-        const one: string = this.pickValue(this.property.one, property);
-        const other: string = this.pickValue(this.property.other, property);
+        const one: string = this.pickValue(this.propertyObject.one, property);
+        const other: string = this.pickValue(this.propertyObject.other, property);
 
         return {one: JSON.stringify(one), other: JSON.stringify(other)};
     }
