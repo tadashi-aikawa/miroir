@@ -164,6 +164,7 @@ export class ResponseSummary {
     response_sec: number;
     url: string;
     file?: string;
+    prop_file?: string;
     content_type?: string;
 }
 
