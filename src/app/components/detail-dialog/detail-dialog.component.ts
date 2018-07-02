@@ -18,7 +18,7 @@ import * as _ from 'lodash';
 import {Dictionary} from 'lodash';
 import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
-import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
+import {createPropertyDiffs, toCheckedAlready, toLodashPath} from '../../utils/diffs';
 import {ToasterService} from 'angular2-toaster';
 import {matchRegExp} from "../../utils/regexp";
 import {Memoize} from "lodash-decorators";
@@ -99,7 +99,7 @@ const applyIgnores = (contents: Pair<string>, languages: Pair<string>,
         ignoreDiffs,
         (d: PropertyDiffs) => f(d).map(p => ({
             title: d.title,
-            path: p.replace('root', '').replace(/></g, '.').replace(/([<>'])/g, '')
+            path: toLodashPath(p)
         })));
 
     const jsonOne = JSON.parse(contents.one);
@@ -566,7 +566,7 @@ export class DetailDialogComponent implements OnInit {
     private pickValue(propertyObject: object, property: string): string {
         return _.get(
             propertyObject,
-            property.replace('root', '').replace(/></g, '.').replace(/([<>'])/g, '')
+            toLodashPath(property),
         )
     }
 
