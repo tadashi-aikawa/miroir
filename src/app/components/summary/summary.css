@@ -16,6 +16,13 @@ mat-sidenav {
     margin-right: 5px;
 }
 
+.filter-word-form {
+    width: 150px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
 mat-sidenav-container {
     min-height: calc(100vh - 64px)
 }
@@ -143,4 +150,10 @@ mat-select {
     color: white;
     border-radius: 8px;
     padding: 8px;
+}
+
+.word-filtered-number {
+    font-family: cursive;
+    font-style: italic;
+    color: coral;
 }
