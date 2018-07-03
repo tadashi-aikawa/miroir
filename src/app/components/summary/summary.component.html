@@ -155,9 +155,9 @@
                         </div>
                     </mat-card-actions>
                 </mat-card>
-                <div *ngIf="displayedRows && displayedRows.length > 0 && filteredRows.length !== displayedCardNumber" class="center">
+                <div *ngIf="displayedRows && displayedRows.length > 0 && filteredRows.length !== displayedRows.length" class="center">
                     <button mat-button (click)="onClickNextButton()">
-                        Next {{displayedCardNumber}} / {{filteredRows && filteredRows.length}}
+                        Next {{displayedRows && displayedRows.length}} / {{filteredRows && filteredRows.length}}
                     </button>
                 </div>
             </div>

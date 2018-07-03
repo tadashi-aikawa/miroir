@@ -233,7 +233,7 @@ export class SummaryComponent implements OnInit {
                     this.rows = r.Items.sort(
                         (a, b) => b.begin_time.replace(/\//g, '-') > a.begin_time.replace(/\//g, '-') ? 1 : -1
                     );
-                    this.updateDisplayedAndFilteredRows();
+                    this.updateDisplayedAndFilteredRows(10);
                     resolve(this.rows);
                 })
                 .catch(err => {
@@ -245,19 +245,17 @@ export class SummaryComponent implements OnInit {
     }
 
     onClickNextButton() {
-        this.displayedCardNumber = this.displayedCardNumber + 10 > this.filteredRows.length ?
-            this.filteredRows.length : this.displayedCardNumber + 10;
-        this.updateDisplayedAndFilteredRows();
-
+        this.updateDisplayedAndFilteredRows(
+            _.max([this.displayedRows.length + 10, this.filteredRows.length])
+        );
     }
 
     @Debounce(300)
     onReportFilterUpdated() {
-        this.displayedCardNumber = 10;
-        this.updateDisplayedAndFilteredRows();
+        this.updateDisplayedAndFilteredRows(10);
     }
 
-    updateDisplayedAndFilteredRows() {
+    updateDisplayedAndFilteredRows(displayedNumber: number) {
         this.filteredRows =  _(this.rows)
             .filter(x => !this.filterWord || this.filterWord
                 .split(' ')
@@ -265,7 +263,7 @@ export class SummaryComponent implements OnInit {
             .value();
         this.displayedRows =  _.take(
             this.filteredRows,
-            this.filteredRows.length < this.displayedCardNumber ? this.filteredRows.length : this.displayedCardNumber
+            _.min([displayedNumber, this.filteredRows.length])
         );
     }
 
