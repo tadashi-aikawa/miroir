@@ -13,7 +13,7 @@ import {
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material';
+import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar, PageEvent} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import {Dictionary} from 'lodash';
@@ -122,8 +122,12 @@ export class SummaryComponent implements OnInit {
     searchingSummary: boolean;
     searchErrorMessage: string;
     rows: DynamoRow[];
+    displayedRows: DynamoRow[];
     settings: any;
     errorMessages: string[];
+
+    displayedCardNumber = 10;
+
 
     activeReport: Report;
     tableRowData: RowData[];
@@ -225,6 +229,7 @@ export class SummaryComponent implements OnInit {
                     this.rows = r.Items.sort(
                         (a, b) => b.begin_time.replace(/\//g, '-') > a.begin_time.replace(/\//g, '-') ? 1 : -1
                     );
+                    this.updateDisplayedRows()
                     resolve(this.rows);
                 })
                 .catch(err => {
@@ -233,6 +238,16 @@ export class SummaryComponent implements OnInit {
                     reject(err);
                 });
         });
+    }
+
+
+    onClickNextButton() {
+        this.displayedCardNumber += 10;
+        this.updateDisplayedRows();
+    }
+
+    updateDisplayedRows() {
+        this.displayedRows =  _(this.rows).take(this.displayedCardNumber).value();
     }
 
     onClickCard(row: DynamoRow, event) {
