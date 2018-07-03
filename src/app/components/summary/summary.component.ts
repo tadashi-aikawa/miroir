@@ -80,7 +80,7 @@ const formulaMappings: Dictionary<(target: number, value: number) => boolean> = 
     '=': (target: number, value: number): boolean => target === value,
 };
 
-const statusFilter = (x: string, row: DynamoRow): boolean => x === row.check_status;
+const statusFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.check_status, x, true, true);
 const dateFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.begin_time, x);
 const titleFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.title, x, false);
 const sameFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.same_count, Number(x.slice(1)));
