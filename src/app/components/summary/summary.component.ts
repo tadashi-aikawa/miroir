@@ -265,7 +265,7 @@ export class SummaryComponent implements OnInit {
             .value();
         this.displayedRows =  _.take(
             this.filteredRows,
-            this.filteredRows < this.displayedCardNumber ? this.filteredRows.length : this.displayedCardNumber
+            this.filteredRows.length < this.displayedCardNumber ? this.filteredRows.length : this.displayedCardNumber
         );
     }
 
