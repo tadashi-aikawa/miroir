@@ -26,6 +26,19 @@
                 </mat-placeholder>
             </mat-form-field>
 
+            <div *ngIf="rows">
+                <mat-form-field class="filter-word-form">
+                    <input matInput title="Free word filter"
+                           [(ngModel)]="filterWord" (keyup)="onReportFilterUpdated()">
+                    <mat-placeholder>
+                        <mat-icon>search</mat-icon>
+                        Filter word
+                    </mat-placeholder>
+                </mat-form-field>
+
+                <span class="word-filtered-number" [@feed]>{{filteredRows && filteredRows.length}} hits</span>
+            </div>
+
             <div *ngIf="searchingSummary">
                 <mat-spinner></mat-spinner>
             </div>
@@ -142,9 +155,9 @@
                         </div>
                     </mat-card-actions>
                 </mat-card>
-                <div *ngIf="displayedRows" class="center">
+                <div *ngIf="displayedRows && displayedRows.length > 0 && filteredRows.length !== displayedCardNumber" class="center">
                     <button mat-button (click)="onClickNextButton()">
-                        Next {{displayedCardNumber}} / {{rows && rows.length}}
+                        Next {{displayedCardNumber}} / {{filteredRows && filteredRows.length}}
                     </button>
                 </div>
             </div>

@@ -16,6 +16,7 @@ import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angula
 import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar, PageEvent} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
+import { Debounce } from 'lodash-decorators';
 import {Dictionary} from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
@@ -26,6 +27,7 @@ import {BodyOutputType, ToasterService} from 'angular2-toaster';
 import {RowData, TrialsTableComponent} from "../trials-table/trials-table.component";
 import {AnalyticsComponent} from "../analystic/analytics.component";
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
+import {matchRegExp} from "../../utils/regexp";
 
 interface KeyBindings {
     reformat_table: string;
@@ -118,10 +120,12 @@ export class SummaryComponent implements OnInit {
     @ViewChild('analytics') analytics: AnalyticsComponent;
 
     word = '';
+    filterWord = '';
 
     searchingSummary: boolean;
     searchErrorMessage: string;
     rows: DynamoRow[];
+    filteredRows: DynamoRow[];
     displayedRows: DynamoRow[];
     settings: any;
     errorMessages: string[];
@@ -229,7 +233,7 @@ export class SummaryComponent implements OnInit {
                     this.rows = r.Items.sort(
                         (a, b) => b.begin_time.replace(/\//g, '-') > a.begin_time.replace(/\//g, '-') ? 1 : -1
                     );
-                    this.updateDisplayedRows()
+                    this.updateDisplayedAndFilteredRows();
                     resolve(this.rows);
                 })
                 .catch(err => {
@@ -240,14 +244,29 @@ export class SummaryComponent implements OnInit {
         });
     }
 
-
     onClickNextButton() {
-        this.displayedCardNumber += 10;
-        this.updateDisplayedRows();
+        this.displayedCardNumber = this.displayedCardNumber + 10 > this.filteredRows.length ?
+            this.filteredRows.length : this.displayedCardNumber + 10;
+        this.updateDisplayedAndFilteredRows();
+
     }
 
-    updateDisplayedRows() {
-        this.displayedRows =  _(this.rows).take(this.displayedCardNumber).value();
+    @Debounce(300)
+    onReportFilterUpdated() {
+        this.displayedCardNumber = 10;
+        this.updateDisplayedAndFilteredRows();
+    }
+
+    updateDisplayedAndFilteredRows() {
+        this.filteredRows =  _(this.rows)
+            .filter(x => !this.filterWord || this.filterWord
+                .split(' ')
+                .every(f => matchRegExp(x.title, f)))
+            .value();
+        this.displayedRows =  _.take(
+            this.filteredRows,
+            this.filteredRows < this.displayedCardNumber ? this.filteredRows.length : this.displayedCardNumber
+        );
     }
 
     onClickCard(row: DynamoRow, event) {
