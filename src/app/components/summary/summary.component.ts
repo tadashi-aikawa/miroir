@@ -72,6 +72,47 @@ const toAttention = (t: Trial): string => {
 };
 
 
+type CardFilterTarget = 'status' | 's' | 'date' | 'd' | 'title' | 't';
+
+const formulaMappings: Dictionary<(target: number, value: number) => boolean> = {
+    '>': (target: number, value: number): boolean => target > value,
+    '<': (target: number, value: number): boolean => target < value,
+    '=': (target: number, value: number): boolean => target === value,
+};
+
+const statusFilter = (x: string, row: DynamoRow): boolean => x === row.check_status;
+const dateFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.begin_time, x);
+const titleFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.title, x, false);
+const sameFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.same_count, Number(x.slice(1)));
+const differentFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.different_count, Number(x.slice(1)));
+const failureFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.failure_count, Number(x.slice(1)));
+
+const cardFilterMappings: Dictionary<(x: string, row: DynamoRow) => boolean> = {
+    'status': statusFilter,
+    'st': statusFilter,
+    'date': dateFilter,
+    'dt': dateFilter,
+    'title': titleFilter,
+    't': titleFilter,
+    'same': sameFilter,
+    'diff': differentFilter,
+    'fail': failureFilter,
+};
+
+const cardFilter = (word: string, row: DynamoRow): boolean => {
+    let [target, token]: [CardFilterTarget, string] = word.split(':');
+    if (!token) {
+        token = target;
+        target = 'title';
+    }
+
+    const not: boolean = token[0] === '!';
+    const s: string = token.replace('!', '');
+
+    const filter = cardFilterMappings[target] || titleFilter;
+    return not ^ filter(s, row);
+};
+
 @Component({
     selector: 'app-summary',
     templateUrl: './summary.component.html',
@@ -246,7 +287,7 @@ export class SummaryComponent implements OnInit {
 
     onClickNextButton() {
         this.updateDisplayedAndFilteredRows(
-            _.max([this.displayedRows.length + 10, this.filteredRows.length])
+            _.min([this.displayedRows.length + 10, this.filteredRows.length])
         );
     }
 
@@ -256,11 +297,9 @@ export class SummaryComponent implements OnInit {
     }
 
     updateDisplayedAndFilteredRows(displayedNumber: number) {
-        this.filteredRows =  _(this.rows)
-            .filter(x => !this.filterWord || this.filterWord
-                .split(' ')
-                .every(f => matchRegExp(x.title, f)))
-            .value();
+        this.filteredRows = this.rows.filter(
+            x => this.filterWord.split(' ').every(t => !t || cardFilter(t, x))
+        );
         this.displayedRows =  _.take(
             this.filteredRows,
             _.min([displayedNumber, this.filteredRows.length])
