@@ -37,7 +37,7 @@
                 </mat-chip-list>
             </div>
             <div *ngIf="!searchingSummary && !searchErrorMessage">
-                <mat-card *ngFor="let row of rows" [@card-feed]
+                <mat-card *ngFor="let row of displayedRows" [@card-feed]
                           (click)="onClickCard(row, $event)"
                           [ngClass]="activeReport && row.hashkey == activeReport.key ?
                             ['hvr-curl-bottom-right', 'summary-card', 'summary-card-active'] :
@@ -142,6 +142,11 @@
                         </div>
                     </mat-card-actions>
                 </mat-card>
+                <div *ngIf="displayedRows" class="center">
+                    <button mat-button (click)="onClickNextButton()">
+                        Next {{displayedCardNumber}} / {{rows && rows.length}}
+                    </button>
+                </div>
             </div>
         </mat-sidenav>
 
