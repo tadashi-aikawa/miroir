@@ -36,6 +36,7 @@ interface KeyBindings {
     toggle_summary_cards: string
     open_cheat_sheet: string;
     close_cheat_sheet: string;
+    change_status_to_closed: string;
 }
 
 const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
@@ -46,6 +47,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         toggle_summary_cards: 'w',
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
+        change_status_to_closed: 'C',
     },
     vim: {
         reformat_table: 'r',
@@ -54,6 +56,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         toggle_summary_cards: 'w',
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
+        change_status_to_closed: 'C',
     }
 };
 
@@ -225,6 +228,12 @@ export class SummaryComponent implements OnInit {
                 this.cheatSheet = false;
                 return false;
             }, null, 'Close cheat sheet'),
+            new Hotkey(keyMode.change_status_to_closed, () => {
+                // TODO: refactoring to be nice
+                this.rows.find(x => x.hashkey === this.activeReport.key).check_status = 'closed';
+                this.onSelectCheckStatus(this.activeReport.key, 'closed');
+                return false;
+            }, null, 'Change status to closed'),
         ]);
     }
 
@@ -317,11 +326,14 @@ export class SummaryComponent implements OnInit {
         event.stopPropagation();
     }
 
-    onSelectCheckStatus(key: string, event) {
+    onSelectCheckStatus(key: string, value: CheckStatus) {
         const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
 
         row.updatingErrorMessage = undefined;
-        this.service.updateStatus(key, event.value)
+        this.service.updateStatus(key, value)
+            .then(_ => {
+                this.toasterService.pop('success', `Succeeded to update status to '${value}'`);
+            })
             .catch(err => {
                 row.updatingErrorMessage = err;
             });
