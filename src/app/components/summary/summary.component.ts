@@ -171,12 +171,13 @@ export class SummaryComponent implements OnInit {
     searchingSummary: boolean;
     searchErrorMessage: string;
     rows: DynamoRow[];
-    filteredRows: DynamoRow[];
+    filteredRows: DynamoRow[] = [];
     displayedRows: DynamoRow[];
     settings: any;
     errorMessages: string[];
 
     displayedCardNumber = 10;
+    previousFilteredRowsCount = 0;
 
 
     activeReport: Report;
@@ -308,6 +309,7 @@ export class SummaryComponent implements OnInit {
     }
 
     updateDisplayedAndFilteredRows(displayedNumber: number) {
+        this.previousFilteredRowsCount = this.filteredRows.length;
         this.filteredRows = this.rows.filter(
             x => this.filterWord.split(' ').every(t => !t || cardFilter(t, x))
         );

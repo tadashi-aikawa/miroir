@@ -36,7 +36,10 @@
                     </mat-placeholder>
                 </mat-form-field>
 
-                <span class="word-filtered-number" [@feed]>{{filteredRows && filteredRows.length}} hits</span>
+                <span counto [step]="1" [countTo]="filteredRows.length" [countFrom]="previousFilteredRowsCount" [duration]="0.1"
+                      (countoChange)="counto = $event" class="word-filtered-number">
+                    {{counto | number:'1.0-0'}} hits
+                </span>
             </div>
 
             <div *ngIf="searchingSummary">
