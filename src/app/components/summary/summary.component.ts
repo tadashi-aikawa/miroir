@@ -13,7 +13,14 @@ import {
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar, PageEvent} from '@angular/material';
+import {
+    MatAutocompleteSelectedEvent,
+    MatDialog,
+    MatDialogRef,
+    MatSidenav,
+    MatSnackBar,
+    PageEvent
+} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import { Debounce } from 'lodash-decorators';
@@ -28,6 +35,8 @@ import {RowData, TrialsTableComponent} from "../trials-table/trials-table.compon
 import {AnalyticsComponent} from "../analystic/analytics.component";
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {matchRegExp} from "../../utils/regexp";
+import {FormControl} from "@angular/forms";
+import {Observable} from "rxjs/Observable";
 
 interface KeyBindings {
     reformat_table: string;
@@ -75,8 +84,6 @@ const toAttention = (t: Trial): string => {
 };
 
 
-type CardFilterTarget = 'status' | 's' | 'date' | 'd' | 'title' | 't';
-
 const formulaMappings: Dictionary<(target: number, value: number) => boolean> = {
     '>': (target: number, value: number): boolean => target > value,
     '<': (target: number, value: number): boolean => target < value,
@@ -90,21 +97,26 @@ const sameFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]
 const differentFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.different_count, Number(x.slice(1)));
 const failureFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.failure_count, Number(x.slice(1)));
 
-const cardFilterMappings: Dictionary<(x: string, row: DynamoRow) => boolean> = {
-    'status': statusFilter,
-    'st': statusFilter,
-    'date': dateFilter,
-    'dt': dateFilter,
-    'title': titleFilter,
-    't': titleFilter,
-    'same': sameFilter,
-    'diff': differentFilter,
-    'fail': failureFilter,
+class CardFilter {
+    name: string;
+    description: string;
+    filter: (x: string, row: DynamoRow) => boolean;
+}
+
+const CARD_FILTER_MAPPINGS: Dictionary<CardFilter> = {
+    'status': {name: 'status:', filter: statusFilter, description: 'status:todo'},
+    'st': {name: 'st:', filter: statusFilter, description: 'st:!closed'},
+    'date': {name: 'date:', filter: dateFilter, description: 'date:2018-06'},
+    'dt': {name: 'dt:', filter: dateFilter, description: 'dt:10:[0-2].'},
+    'title': {name: 'title:', filter: titleFilter, description: 'title:Test'},
+    't': {name: 't:', filter: titleFilter, description: 't:hoge'},
+    'same': {name: 'same:', filter: sameFilter, description: 'same:>1000'},
+    'diff': {name: 'diff:', filter: differentFilter, description: 'diff:!=0'},
+    'fail': {name: 'fail:', filter: failureFilter, description: 'fail:<5'},
 };
 
 const cardFilter = (word: string, row: DynamoRow): boolean => {
-    // target: CardFilterTarget
-    let target: CardFilterTarget = word.split(':')[0] as CardFilterTarget;
+    let target: string = word.split(':')[0];
     let token: string = word.split(':').slice(1).join(':');
     if (!token) {
         token = target;
@@ -114,7 +126,7 @@ const cardFilter = (word: string, row: DynamoRow): boolean => {
     const not: boolean = token[0] === '!';
     const s: string = token.replace('!', '');
 
-    const filter = cardFilterMappings[target] || titleFilter;
+    const filter = CARD_FILTER_MAPPINGS[target] ? CARD_FILTER_MAPPINGS[target].filter : titleFilter;
     return not !== filter(s, row);
 };
 
@@ -179,6 +191,9 @@ export class SummaryComponent implements OnInit {
     displayedCardNumber = 10;
     previousFilteredRowsCount = 0;
 
+
+    mqlCompletions: Observable<CardFilter[]>;
+    mqlControl = new FormControl();
 
     activeReport: Report;
     tableRowData: RowData[];
@@ -267,6 +282,15 @@ export class SummaryComponent implements OnInit {
                 }
             });
         });
+
+        this.mqlCompletions = this.mqlControl
+            .valueChanges
+            .map(query => _(CARD_FILTER_MAPPINGS)
+                .keys()
+                .filter(k => query.split(' ').some(q => _.includes(`${k}:`, q)))
+                .map(k => CARD_FILTER_MAPPINGS[k])
+                .value()
+            );
     }
 
     onSearchReports(keyword: string) {

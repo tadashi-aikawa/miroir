@@ -5,6 +5,7 @@ import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {
+    MatAutocompleteModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatCardModule,
@@ -128,6 +129,7 @@ const appRoutes: Routes = [
             storageType: 'localStorage'
         }),
         MarkdownModule.forRoot(),
+        MatAutocompleteModule,
         MatButtonModule,
         MatCheckboxModule,
         MatFormFieldModule,
@@ -151,6 +153,7 @@ const appRoutes: Routes = [
         AgGridModule.withComponents([]),
     ],
     exports: [
+        MatAutocompleteModule,
         MatButtonModule,
         MatCheckboxModule,
         MatFormFieldModule,

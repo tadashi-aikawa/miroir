@@ -157,3 +157,20 @@ mat-select {
     font-style: italic;
     color: coral;
 }
+
+
+.mql-completion-name {
+    font-size: 75%;
+    border-radius: 3px;
+    padding: 1px 5px 1px 5px;
+    margin-right: 3px;
+    color: antiquewhite;
+    border: 1px outset;
+    background-color: #3f51b5;
+}
+
+.mql-completion-description {
+    color: gray;
+    font-size: 80%;
+}
+
