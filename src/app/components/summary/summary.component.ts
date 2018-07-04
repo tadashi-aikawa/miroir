@@ -104,7 +104,8 @@ const cardFilterMappings: Dictionary<(x: string, row: DynamoRow) => boolean> = {
 
 const cardFilter = (word: string, row: DynamoRow): boolean => {
     // target: CardFilterTarget
-    let [target, token]: string[] = word.split(':');
+    let target: CardFilterTarget = word.split(':')[0] as CardFilterTarget;
+    let token: string = word.split(':').slice(1).join(':');
     if (!token) {
         token = target;
         target = 'title';
