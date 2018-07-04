@@ -100,7 +100,8 @@ const cardFilterMappings: Dictionary<(x: string, row: DynamoRow) => boolean> = {
 };
 
 const cardFilter = (word: string, row: DynamoRow): boolean => {
-    let [target, token]: [CardFilterTarget, string] = word.split(':');
+    // target: CardFilterTarget
+    let [target, token]: string[] = word.split(':');
     if (!token) {
         token = target;
         target = 'title';
@@ -110,7 +111,7 @@ const cardFilter = (word: string, row: DynamoRow): boolean => {
     const s: string = token.replace('!', '');
 
     const filter = cardFilterMappings[target] || titleFilter;
-    return not ^ filter(s, row);
+    return not !== filter(s, row);
 };
 
 @Component({
