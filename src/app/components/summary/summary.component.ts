@@ -13,9 +13,17 @@ import {
 } from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material';
+import {
+    MatAutocompleteSelectedEvent,
+    MatDialog,
+    MatDialogRef,
+    MatSidenav,
+    MatSnackBar,
+    PageEvent
+} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
+import { Debounce } from 'lodash-decorators';
 import {Dictionary} from 'lodash';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
@@ -26,6 +34,9 @@ import {BodyOutputType, ToasterService} from 'angular2-toaster';
 import {RowData, TrialsTableComponent} from "../trials-table/trials-table.component";
 import {AnalyticsComponent} from "../analystic/analytics.component";
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
+import {matchRegExp} from "../../utils/regexp";
+import {FormControl} from "@angular/forms";
+import {Observable} from "rxjs/Observable";
 
 interface KeyBindings {
     reformat_table: string;
@@ -34,6 +45,7 @@ interface KeyBindings {
     toggle_summary_cards: string
     open_cheat_sheet: string;
     close_cheat_sheet: string;
+    change_status_to_closed: string;
 }
 
 const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
@@ -44,6 +56,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         toggle_summary_cards: 'w',
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
+        change_status_to_closed: 'C',
     },
     vim: {
         reformat_table: 'r',
@@ -52,6 +65,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         toggle_summary_cards: 'w',
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
+        change_status_to_closed: 'C',
     }
 };
 
@@ -69,6 +83,52 @@ const toAttention = (t: Trial): string => {
     return '';
 };
 
+
+const formulaMappings: Dictionary<(target: number, value: number) => boolean> = {
+    '>': (target: number, value: number): boolean => target > value,
+    '<': (target: number, value: number): boolean => target < value,
+    '=': (target: number, value: number): boolean => target === value,
+};
+
+const statusFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.check_status, x, false, true);
+const dateFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.begin_time, x);
+const titleFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.title, x, false, false);
+const sameFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.same_count, Number(x.slice(1)));
+const differentFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.different_count, Number(x.slice(1)));
+const failureFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.failure_count, Number(x.slice(1)));
+
+class CardFilter {
+    name: string;
+    description: string;
+    filter: (x: string, row: DynamoRow) => boolean;
+}
+
+const CARD_FILTER_MAPPINGS: Dictionary<CardFilter> = {
+    'status': {name: 'status:', filter: statusFilter, description: 'status:todo'},
+    'st': {name: 'st:', filter: statusFilter, description: 'st:!closed'},
+    'date': {name: 'date:', filter: dateFilter, description: 'date:2018-06'},
+    'dt': {name: 'dt:', filter: dateFilter, description: 'dt:10:[0-2].'},
+    'title': {name: 'title:', filter: titleFilter, description: 'title:Test'},
+    't': {name: 't:', filter: titleFilter, description: 't:hoge'},
+    'same': {name: 'same:', filter: sameFilter, description: 'same:>1000'},
+    'diff': {name: 'diff:', filter: differentFilter, description: 'diff:!=0'},
+    'fail': {name: 'fail:', filter: failureFilter, description: 'fail:<5'},
+};
+
+const cardFilter = (word: string, row: DynamoRow): boolean => {
+    let target: string = word.split(':')[0];
+    let token: string = word.split(':').slice(1).join(':');
+    if (!token) {
+        token = target;
+        target = 'title';
+    }
+
+    const not: boolean = token[0] === '!';
+    const s: string = token.replace('!', '');
+
+    const filter = CARD_FILTER_MAPPINGS[target] ? CARD_FILTER_MAPPINGS[target].filter : titleFilter;
+    return not !== filter(s, row);
+};
 
 @Component({
     selector: 'app-summary',
@@ -118,12 +178,22 @@ export class SummaryComponent implements OnInit {
     @ViewChild('analytics') analytics: AnalyticsComponent;
 
     word = '';
+    filterWord = '';
 
     searchingSummary: boolean;
     searchErrorMessage: string;
     rows: DynamoRow[];
+    filteredRows: DynamoRow[] = [];
+    displayedRows: DynamoRow[];
     settings: any;
     errorMessages: string[];
+
+    displayedCardNumber = 10;
+    previousFilteredRowsCount = 0;
+
+
+    mqlCompletions: Observable<CardFilter[]>;
+    mqlControl = new FormControl();
 
     activeReport: Report;
     tableRowData: RowData[];
@@ -175,6 +245,12 @@ export class SummaryComponent implements OnInit {
                 this.cheatSheet = false;
                 return false;
             }, null, 'Close cheat sheet'),
+            new Hotkey(keyMode.change_status_to_closed, () => {
+                // TODO: refactoring to be nice
+                this.rows.find(x => x.hashkey === this.activeReport.key).check_status = 'closed';
+                this.onSelectCheckStatus(this.activeReport.key, 'closed');
+                return false;
+            }, null, 'Change status to closed'),
         ]);
     }
 
@@ -206,6 +282,15 @@ export class SummaryComponent implements OnInit {
                 }
             });
         });
+
+        this.mqlCompletions = this.mqlControl
+            .valueChanges
+            .map(query => _(CARD_FILTER_MAPPINGS)
+                .keys()
+                .filter(k => query.split(' ').some(q => _.includes(`${k}:`, q)))
+                .map(k => CARD_FILTER_MAPPINGS[k])
+                .value()
+            );
     }
 
     onSearchReports(keyword: string) {
@@ -225,6 +310,7 @@ export class SummaryComponent implements OnInit {
                     this.rows = r.Items.sort(
                         (a, b) => b.begin_time.replace(/\//g, '-') > a.begin_time.replace(/\//g, '-') ? 1 : -1
                     );
+                    this.updateDisplayedAndFilteredRows(10);
                     resolve(this.rows);
                 })
                 .catch(err => {
@@ -233,6 +319,28 @@ export class SummaryComponent implements OnInit {
                     reject(err);
                 });
         });
+    }
+
+    onClickNextButton() {
+        this.updateDisplayedAndFilteredRows(
+            _.min([this.displayedRows.length + 10, this.filteredRows.length])
+        );
+    }
+
+    @Debounce(300)
+    onReportFilterUpdated() {
+        this.updateDisplayedAndFilteredRows(10);
+    }
+
+    updateDisplayedAndFilteredRows(displayedNumber: number) {
+        this.previousFilteredRowsCount = this.filteredRows.length;
+        this.filteredRows = this.rows.filter(
+            x => this.filterWord.split(' ').every(t => !t || cardFilter(t, x))
+        );
+        this.displayedRows =  _.take(
+            this.filteredRows,
+            _.min([displayedNumber, this.filteredRows.length])
+        );
     }
 
     onClickCard(row: DynamoRow, event) {
@@ -245,11 +353,14 @@ export class SummaryComponent implements OnInit {
         event.stopPropagation();
     }
 
-    onSelectCheckStatus(key: string, event) {
+    onSelectCheckStatus(key: string, value: CheckStatus) {
         const row: DynamoRow = this.rows.find((r: DynamoRow) => r.hashkey === key);
 
         row.updatingErrorMessage = undefined;
-        this.service.updateStatus(key, event.value)
+        this.service.updateStatus(key, value)
+            .then(_ => {
+                this.toasterService.pop('success', `Succeeded to update status to '${value}'`);
+            })
             .catch(err => {
                 row.updatingErrorMessage = err;
             });

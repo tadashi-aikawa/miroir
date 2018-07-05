@@ -4,8 +4,9 @@ export function hasContents(value: string): boolean {
     return value ? !!value.match(/[^\s\t ]/) : false;
 }
 
-export function matchRegExp(value: string, regExp: string): boolean {
-    return regExp ? !!value.match(new RegExp(regExp)) : false;
+export function matchRegExp(value: string, regExp: string, caseSensitive: boolean=true, perfect: boolean=false): boolean {
+    const pattern = perfect ? `^${regExp}$` : regExp;
+    return regExp ? !!value.match(new RegExp(pattern, caseSensitive ? "" : "i")) : false;
 }
 
 @Pipe({name: 'hasContents'})

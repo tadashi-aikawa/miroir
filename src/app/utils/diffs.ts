@@ -14,6 +14,13 @@ function matchRegExp(pattern: string, target: string): boolean {
     return new RegExp(`^${pattern}$`).test(target);
 }
 
+function toLodashPath(property: string): string {
+    return property
+        .replace('root', '')
+        .replace(/</g, '[')
+        .replace(/>/g, ']');
+}
+
 function toCheckedAlready(yamlStr: string): IgnoreCase[] {
     const checkPoint: CheckPoint = yaml.safeLoad(yamlStr);
     const assignVars = (ignoreCase: IgnoreCase): IgnoreCase =>
@@ -84,6 +91,7 @@ function createPropertyDiffs(trial: Trial, ignores: IgnoreCase[], checkedAlready
 
 export {
     toCheckedAlready,
+    toLodashPath,
     createPropertyDiff,
     createPropertyDiffs
 }

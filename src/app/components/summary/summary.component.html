@@ -22,9 +22,34 @@
                        [(ngModel)]="word" (keyup.enter)="onSearchReports(word)">
                 <mat-placeholder>
                     <mat-icon>search</mat-icon>
-                    Search word
+                    Search reports
                 </mat-placeholder>
             </mat-form-field>
+
+            <div *ngIf="rows">
+                <mat-form-field class="filter-word-form">
+                    <input matInput title="ex. simple st:!closed"
+                           [(ngModel)]="filterWord"
+                           (keyup)="onReportFilterUpdated()"
+                           [formControl]="mqlControl"
+                           [matAutocomplete]="auto">
+                    <mat-placeholder>
+                        <mat-icon>filter_list</mat-icon>
+                        Filter with MQL
+                    </mat-placeholder>
+                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onReportFilterUpdated()">
+                        <mat-option *ngFor="let option of mqlCompletions | async" [value]="option.description">
+                            <span class="mql-completion-name">{{option.name}}</span>
+                            <span class="mql-completion-description">{{option.description}}</span>
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+
+                <span counto [step]="1" [countTo]="filteredRows.length" [countFrom]="previousFilteredRowsCount" [duration]="0.1"
+                      (countoChange)="counto = $event" class="word-filtered-number">
+                    {{counto | number:'1.0-0'}} hits
+                </span>
+            </div>
 
             <div *ngIf="searchingSummary">
                 <mat-spinner></mat-spinner>
@@ -37,7 +62,7 @@
                 </mat-chip-list>
             </div>
             <div *ngIf="!searchingSummary && !searchErrorMessage">
-                <mat-card *ngFor="let row of rows" [@card-feed]
+                <mat-card *ngFor="let row of displayedRows" [@card-feed]
                           (click)="onClickCard(row, $event)"
                           [ngClass]="activeReport && row.hashkey == activeReport.key ?
                             ['hvr-curl-bottom-right', 'summary-card', 'summary-card-active'] :
@@ -45,7 +70,7 @@
                 >
                     <div [ngClass]="'check-status '+row.check_status">
                         {{toDisplay(row.check_status)}}
-                        <mat-select (change)="onSelectCheckStatus(row.hashkey, $event)"
+                        <mat-select (change)="onSelectCheckStatus(row.hashkey, $event.value)"
                                     (click)="$event.stopPropagation();"
                                     [(ngModel)]="row.check_status">
                             <mat-option *ngFor="let status of statuses" [value]="status">
@@ -142,6 +167,11 @@
                         </div>
                     </mat-card-actions>
                 </mat-card>
+                <div *ngIf="displayedRows && displayedRows.length > 0 && filteredRows.length !== displayedRows.length" class="center">
+                    <button mat-button (click)="onClickNextButton()">
+                        Next {{displayedRows && displayedRows.length}} / {{filteredRows && filteredRows.length}}
+                    </button>
+                </div>
             </div>
         </mat-sidenav>
 
