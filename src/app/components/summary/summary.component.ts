@@ -90,9 +90,9 @@ const formulaMappings: Dictionary<(target: number, value: number) => boolean> = 
     '=': (target: number, value: number): boolean => target === value,
 };
 
-const statusFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.check_status, x, true, true);
+const statusFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.check_status, x, false, true);
 const dateFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.begin_time, x);
-const titleFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.title, x, false);
+const titleFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.title, x, false, false);
 const sameFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.same_count, Number(x.slice(1)));
 const differentFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.different_count, Number(x.slice(1)));
 const failureFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.failure_count, Number(x.slice(1)));
