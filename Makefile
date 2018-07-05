@@ -25,6 +25,11 @@ init: ## Initialize for build and package
 	@docker build -t tadashi-aikawa/miroir .
 	@echo 'End $@'
 
+serve-docs: ## Initialize for build and package
+	@echo 'Start $@'
+	@npm run docs
+	@echo 'End $@'
+
 _clean-package:
 	@echo 'Start $@'
 	@docker rm -f tmp-miroir || echo "No need to clean"
