@@ -545,10 +545,17 @@ export class SummaryComponent implements OnInit {
                         this.service.removeTrials(s3KeysToRemove)
                             .then(p => this.service.removeSummary(key))
                             .then(() => {
+                                // HACK: OOOOOOOOHHHHNOOOOOOOO
                                 this.rows = this.rows.filter((r: DynamoRow) => r.hashkey !== key);
+                                this.updateDisplayedAndFilteredRows(
+                                    _.min([this.displayedRows.length, this.filteredRows.length - 1])
+                                );
+
                                 if (key === this.activeReport.key) {
                                     // TODO: abnormal
-                                    this.showReport(this.rows[0].hashkey, this.settingsService.alwaysIntelligentAnalytics);
+                                    if (this.rows.length > 0) {
+                                        this.showReport(this.displayedRows[0].hashkey, this.settingsService.alwaysIntelligentAnalytics);
+                                    }
                                 }
                             })
                             .catch(err => {
