@@ -45,7 +45,8 @@
                     </mat-autocomplete>
                 </mat-form-field>
 
-                <span counto [step]="1" [countTo]="filteredRows.length" [countFrom]="previousFilteredRowsCount" [duration]="0.1"
+                <span counto [step]="1" [countTo]="filteredRows.length" [countFrom]="previousFilteredRowsCount"
+                      [duration]="0.1"
                       (countoChange)="counto = $event" class="word-filtered-number">
                     {{counto | number:'1.0-0'}} hits
                 </span>
@@ -94,6 +95,9 @@
                             <app-badge kind="fine">{{row.same_count}}</app-badge>
                             <app-badge kind="warning">{{row.different_count}}</app-badge>
                             <app-badge kind="danger">{{row.failure_count}}</app-badge>
+                            <mat-icon *ngIf="row.description" class="description-icon" style="float: right;">
+                                message
+                            </mat-icon>
                         </app-badge-list>
                         <div *ngIf="row.tags">
                             <span class="summary-card-tag" *ngFor="let tag of row.tags.values">{{tag}}</span>
@@ -167,7 +171,8 @@
                         </div>
                     </mat-card-actions>
                 </mat-card>
-                <div *ngIf="displayedRows && displayedRows.length > 0 && filteredRows.length !== displayedRows.length" class="center">
+                <div *ngIf="displayedRows && displayedRows.length > 0 && filteredRows.length !== displayedRows.length"
+                     class="center">
                     <button mat-button (click)="onClickNextButton()">
                         Next {{displayedRows && displayedRows.length}} / {{filteredRows && filteredRows.length}}
                     </button>
@@ -246,7 +251,8 @@
                     </app-panel>
                 </div>
 
-                <div *ngIf="filteredMessage" class="center-vertical filtered-number" style="margin-bottom: 5px;" [@feed]>
+                <div *ngIf="filteredMessage" class="center-vertical filtered-number" style="margin-bottom: 5px;"
+                     [@feed]>
                     <mat-icon>warning</mat-icon>
                     <span style="margin-left: 3px; margin-right: 10px;">Several rows are filtered:</span>
                     <span style="margin-left: 5px; font-size: 120%;">{{ filteredMessage }}</span>

@@ -84,6 +84,7 @@ export class AwsService {
             maxRetries: 1,
         });
         this.db = new DynamoDB.DocumentClient({
+            convertEmptyValues: true,
             service: new DynamoDB({
                 region: this.region,
                 accessKeyId: this.tmpAccessKeyId,

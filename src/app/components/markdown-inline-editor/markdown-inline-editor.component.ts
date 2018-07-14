@@ -46,9 +46,6 @@ import {hasContents} from 'app/utils/regexp';
                 <div class="smart-padding-xsmall">
                     <textarea id="edit-area" matInput matTextareaAutosize [(ngModel)]="value"></textarea>
                 </div>
-                <span class="error-message-small" *ngIf="value | emptyContents">
-                    <mat-icon>warning</mat-icon> Required!!
-                </span>
                 <hr/>
                 <div class="smart-padding-left-small">
                     <mat-icon class="action-icon-large hvr-buzz-out"
@@ -83,10 +80,6 @@ export class MarkdownInlineEditorComponent {
 
     update() {
         this.editing = false;
-        if (!hasContents(this.value)) {
-            this.value = this.previousValue;
-            return;
-        }
 
         if (this.onUpdate !== null && this.previousValue !== this.value) {
             this.onUpdate.emit({
