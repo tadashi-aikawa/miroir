@@ -144,6 +144,30 @@ export class Trial {
         return this.one.file !== undefined && this.other.file !== undefined;
     }
 
+    static toTsvHeader(): string {
+        return [
+            "Seq", "Name", "Status", "Path", "QueryString",
+            "[One] Status code", "[Other] Status code",
+            "[One] Response sec", "[Other] Response sec",
+            "[One] Byte", "[Other] Byte",
+            "[One] Type", "[Other] Type",
+            "[One] Content type", "[Other] Content type",
+            "Request time",
+        ].join("\t");
+    }
+
+    toTsvRecord(): string {
+        return [
+            this.seq, this.name, this.status, this.path, this.queryString,
+            this.one.status_code, this.other.status_code,
+            this.one.response_sec, this.other.response_sec,
+            this.one.byte, this.other.byte,
+            this.one.type, this.other.type,
+            this.one.content_type, this.other.content_type,
+            this.request_time,
+        ].join("\t");
+    }
+
     get originQueryString(): string {
         return this.one.url.split('?')[1];
     }

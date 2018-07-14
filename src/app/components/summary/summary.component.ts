@@ -46,6 +46,7 @@ interface KeyBindings {
     open_cheat_sheet: string;
     close_cheat_sheet: string;
     change_status_to_closed: string;
+    copy_displayed_trials_as_tsv: string;
 }
 
 const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
@@ -57,6 +58,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
         change_status_to_closed: 'C',
+        copy_displayed_trials_as_tsv: 'T',
     },
     vim: {
         reformat_table: 'r',
@@ -66,6 +68,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
         open_cheat_sheet: '?',
         close_cheat_sheet: 'esc',
         change_status_to_closed: 'C',
+        copy_displayed_trials_as_tsv: 'T',
     }
 };
 
@@ -251,6 +254,15 @@ export class SummaryComponent implements OnInit {
                 this.onSelectCheckStatus(this.activeReport.key, 'closed');
                 return false;
             }, null, 'Change status to closed'),
+            new Hotkey(keyMode.copy_displayed_trials_as_tsv, () => {
+                Clipboard.copy([
+                    Trial.toTsvHeader(), ...this.displayedTrials.map(x => x.toTsvRecord())
+                ].join("\n"));
+                this.toasterService.pop(
+                    'success', `Succeeded to copy ${this.displayedTrials.length} records as TSV`
+                );
+                return false;
+            }, null, 'Copy displayed trials as TSV'),
         ]);
     }
 
