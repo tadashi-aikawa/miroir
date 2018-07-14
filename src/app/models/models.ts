@@ -146,7 +146,7 @@ export class Trial {
 
     static toTsvHeader(): string {
         return [
-            "Seq", "Name", "Status", "Path", "QueryString",
+            "Seq", "Name", "Status", "Path", "QueryString", "OriginQueryString",
             "[One] Status code", "[Other] Status code",
             "[One] Response sec", "[Other] Response sec",
             "[One] Byte", "[Other] Byte",
@@ -158,7 +158,7 @@ export class Trial {
 
     toTsvRecord(): string {
         return [
-            this.seq, this.name, this.status, this.path, this.queryString,
+            this.seq, this.name, this.status, this.path, this.queryString, this.originQueryString,
             this.one.status_code, this.other.status_code,
             this.one.response_sec, this.other.response_sec,
             this.one.byte, this.other.byte,
