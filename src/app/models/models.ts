@@ -1,4 +1,6 @@
 import CheckStatus from '../constants/check-status';
+import * as _ from 'lodash'
+import {LazyGetter} from "typescript-lazy-get-decorator"
 
 export class DynamoResult {
     Count: number;
@@ -107,10 +109,27 @@ export class Summary {
     };
 }
 
+export class QueryCustomization {
+    overwrite?: {[key: string]: string[]}
+    remove?: string[]
+}
+
 export class AccessPoint {
     name: string;
     host: string;
     proxy?: String;
+    query?: QueryCustomization
+
+    @LazyGetter()
+    get queriesOverwritten(): string[] {
+        return this.query && this.query.overwrite ?
+            _.map(this.query.overwrite, (v, k) => `${k}=${v}`) : []
+    }
+
+    @LazyGetter()
+    get queriesRemoved(): string[] {
+        return this.query && this.query.remove || []
+    }
 }
 
 class Time {

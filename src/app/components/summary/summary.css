@@ -177,3 +177,19 @@ mat-select {
 .description-icon {
     color: rgb(86, 120, 226);
 }
+
+.overwritten-query-label {
+    color: whitesmoke;
+    background-color: #71b771;
+    font-size: 75%;
+    border-radius: 15px;
+    padding: 1px 5px 1px 5px;
+}
+
+.removed-query-label {
+    color: whitesmoke;
+    background-color: #f44336;
+    font-size: 75%;
+    border-radius: 15px;
+    padding: 1px 5px 1px 5px;
+}
