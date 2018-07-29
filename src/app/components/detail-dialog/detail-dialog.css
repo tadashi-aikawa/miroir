@@ -66,6 +66,22 @@
     text-shadow: 5px 5px 3px rgba(0,0,0,0.2);
 }
 
+.overwritten-query-label {
+    color: whitesmoke;
+    background-color: #71b771;
+    font-size: 75%;
+    border-radius: 15px;
+    padding: 1px 5px 1px 5px;
+}
+
+.removed-query-label {
+    color: whitesmoke;
+    background-color: #f44336;
+    font-size: 75%;
+    border-radius: 15px;
+    padding: 1px 5px 1px 5px;
+}
+
 .diff-button {
     min-width: 0;
     line-height: 25px;
