@@ -1,6 +1,7 @@
 import {ActivatedRoute, Params} from '@angular/router';
 import {animate, style, transition, trigger} from '@angular/animations';
 import {
+    AccessPoint,
     Change,
     DynamoResult,
     DynamoRow,
@@ -457,6 +458,8 @@ export class SummaryComponent implements OnInit {
                             attention: toAttention(t)
                         }))
                         .value();
+                    r.summary.one = Object.assign(new AccessPoint(), r.summary.one)
+                    r.summary.other = Object.assign(new AccessPoint(), r.summary.other)
                     this.activeReport = r;
 
                     this.tableRowData = r.trials.map(t => {

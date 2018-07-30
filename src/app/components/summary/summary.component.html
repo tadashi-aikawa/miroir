@@ -244,10 +244,25 @@
                 <div class="pain2 smart-padding">
                     <app-panel [title]="activeReport.summary.one.name" class="smart-padding-small">
                         <small><a [href]="activeReport.summary.one.host">{{activeReport.summary.one.host}}</a></small>
+                        <div>
+                            <span class="overwritten-query-label" *ngFor="let v of activeReport.summary.one.queriesOverwritten">
+                                + {{v}}
+                            </span>
+                            <span class="removed-query-label" *ngFor="let v of activeReport.summary.one.queriesRemoved">
+                                x {{v}}
+                            </span>
+                        </div>
                     </app-panel>
                     <app-panel [title]="activeReport.summary.other.name" class="smart-padding-small">
-                        <small><a [href]="activeReport.summary.other.host">{{activeReport.summary.other.host}}</a>
-                        </small>
+                        <small><a [href]="activeReport.summary.other.host">{{activeReport.summary.other.host}}</a></small>
+                        <div>
+                            <span class="overwritten-query-label" *ngFor="let v of activeReport.summary.other.queriesOverwritten">
+                                + {{v}}
+                            </span>
+                            <span class="removed-query-label" *ngFor="let v of activeReport.summary.other.queriesRemoved">
+                                x {{v}}
+                            </span>
+                        </div>
                     </app-panel>
                 </div>
 

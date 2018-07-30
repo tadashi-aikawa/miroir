@@ -42,6 +42,14 @@
                     <span class="label">{{trial.one.response_sec}} s</span>
                     <span class="label">{{trial.one.status_code}}</span>
                 </div>
+                <div class="center">
+                    <span class="overwritten-query-label" *ngFor="let v of oneAccessPoint.queriesOverwritten">
+                        + {{v}}
+                    </span>
+                    <span class="removed-query-label" *ngFor="let v of oneAccessPoint.queriesRemoved">
+                        x {{v}}
+                    </span>
+                </div>
             </app-panel>
         </div>
         <div class="smart-padding-xsmall">
@@ -52,6 +60,14 @@
                     <span class="label">{{trial.other.byte}} b</span>
                     <span class="label">{{trial.other.response_sec}} s</span>
                     <span class="label">{{trial.other.status_code}}</span>
+                </div>
+                <div class="center">
+                    <span class="overwritten-query-label" *ngFor="let v of otherAccessPoint.queriesOverwritten">
+                        + {{v}}
+                    </span>
+                    <span class="removed-query-label" *ngFor="let v of otherAccessPoint.queriesRemoved">
+                        x {{v}}
+                    </span>
                 </div>
             </app-panel>
         </div>
