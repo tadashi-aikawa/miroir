@@ -1,5 +1,6 @@
 - [Getting started](index.md)
 - Releases
+  - [0.20.0](releases/0.20.0.md)
   - [0.19.0](releases/0.19.0.md)
   - 0.18.x
     - [0.18.1](releases/0.18.1.md)
