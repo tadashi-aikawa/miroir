@@ -496,6 +496,11 @@ export class SummaryComponent implements OnInit {
                     });
 
                     resolve(r);
+                })
+                .catch(err => {
+                    this.loadingReportKey = undefined;
+                    this.activeReport = undefined;
+                    this.errorMessages = [err];
                 });
         });
     }
