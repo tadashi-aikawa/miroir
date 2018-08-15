@@ -409,7 +409,7 @@ export class DetailDialogComponent implements OnInit {
         // Diff viewer
         this.isLoading = true;
         if (trial.hasResponse()) {
-            if (trial.one.content_type.match(/octet-stream/) || trial.other.content_type.match(/octet-stream/)) {
+            if (trial.one.type === "octet-stream" || trial.other.type === "octet-stream") {
                 this.errorMessage = undefined;
                 // We must initialize diffView after set config.
                 // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
