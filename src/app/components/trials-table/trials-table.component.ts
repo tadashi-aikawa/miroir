@@ -18,6 +18,7 @@ export interface RowData {
     otherByte: number;
     oneSec: number;
     otherSec: number;
+    diffSec: number;
     oneStatus: number;
     otherStatus: number;
     oneType: string;
@@ -163,6 +164,15 @@ export class TrialsTableComponent {
                         {
                             headerName: "other",
                             field: "otherSec",
+                            filter: 'agNumberColumnFilter',
+                            filterParams: {
+                                newRowsAction: 'keep',
+                                defaultOption: "greaterThanOrEqual"
+                            }
+                        },
+                        {
+                            headerName: "diff",
+                            field: "diffSec",
                             filter: 'agNumberColumnFilter',
                             filterParams: {
                                 newRowsAction: 'keep',

@@ -478,6 +478,7 @@ export class SummaryComponent implements OnInit {
                             otherByte: t.other.byte,
                             oneSec: t.one.response_sec,
                             otherSec: t.other.response_sec,
+                            diffSec: t.responseSecDiff,
                             oneStatus: t.one.status_code,
                             otherStatus: t.other.status_code,
                             oneType: t.one.type,
