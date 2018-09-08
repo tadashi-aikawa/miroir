@@ -298,10 +298,10 @@ export class SummaryComponent implements OnInit {
 
         this.mqlCompletions = this.mqlControl
             .valueChanges
-            .map(query => _(CARD_FILTER_MAPPINGS)
+            .map((query: string) => _(CARD_FILTER_MAPPINGS)
                 .keys()
-                .filter(k => query.split(' ').some(q => _.includes(`${k}:`, q)))
-                .map(k => CARD_FILTER_MAPPINGS[k])
+                .filter((k: string) => query.split(' ').some(q => _.includes(`${k}:`, q)))
+                .map((k: string) => CARD_FILTER_MAPPINGS[k])
                 .value()
             );
     }

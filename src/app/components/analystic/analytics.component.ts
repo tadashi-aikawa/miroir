@@ -158,13 +158,14 @@ type DiffSummaryWip = Partial<DiffSummary> & { trial: Trial }
 export class ToAttentionPipe implements PipeTransform {
     transform(trials: Trial[]): DiffSummary[] {
         return _(trials)
-            .filter<Trial>((t: Trial) => t.attention)
+            .filter((t: Trial) => !!t.attention)
             .groupBy<Trial>((t: Trial) => t.attention)
-            .map<Trial[], DiffSummary>((xs: Trial[]) => ({
+            .mapValues<Dictionary<Trial[]>, DiffSummary>((xs: Trial[]) => ({
                 title: xs[0].attention,
                 count: xs.length,
                 trials: xs,
             }))
+            .values()
             .value();
     }
 }
@@ -188,13 +189,14 @@ export class ToCheckedAlreadyDiffSummaryPipe implements PipeTransform {
                 )
             )
             .groupBy((pd: DiffSummaryWip) => pd.title)
-            .map<(DiffSummaryWip)[], DiffSummary>(xs => ({
+            .mapValues<Dictionary<DiffSummaryWip[]>, DiffSummary>(xs => ({
                 title: xs[0].title,
                 image: xs[0].image,
                 link: xs[0].link,
                 count: xs.length,
                 trials: xs.map(x => x.trial)
             }))
+            .values()
             .value();
     }
 }
@@ -216,13 +218,14 @@ export class ToIgnoredDiffSummaryPipe implements PipeTransform {
                 })
             ))
             .groupBy((xs: DiffSummaryWip) => xs.title)
-            .map<(DiffSummaryWip)[], DiffSummary>(xs => ({
+            .mapValues<Dictionary<DiffSummaryWip[]>, DiffSummary>(xs => ({
                 title: xs[0].title,
                 image: xs[0].image,
                 link: xs[0].link,
                 count: xs.length,
                 trials: xs.map(x => x.trial)
             }))
+            .values()
             .value();
     }
 }
@@ -232,7 +235,7 @@ export class ToPathPipe implements PipeTransform {
     transform(trials: Trial[]): PathSummary[] {
         return _(trials)
             .groupBy<Trial>((t: Trial) => t.path)
-            .map<Trial[], PathSummary>((xs: Trial[]) => ({
+            .mapValues<Dictionary<Trial[]>, PathSummary>((xs: Trial[]) => ({
                 title: xs[0].path,
                 count: xs.length,
                 status: _(xs)
@@ -241,6 +244,7 @@ export class ToPathPipe implements PipeTransform {
                     .value() as { same: number, different: number, failure: number },
                 trials: xs,
             }))
+            .values()
             .value();
     }
 }
