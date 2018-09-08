@@ -110,6 +110,7 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
 
 .action-icon {
     cursor: pointer;
+    margin: 3px;
 }
 
 .action-icon-large {
