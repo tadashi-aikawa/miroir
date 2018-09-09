@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
-import {animate, style, transition, trigger} from '@angular/animations';
 import {Row, Trial} from '../../models/models';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {regexpComparator} from "../../utils/filters";
-import {Column} from "ag-grid";
+import {regexpComparator} from '../../utils/filters';
+import {Column} from 'ag-grid';
 
 export interface RowData {
     trial: Trial;
