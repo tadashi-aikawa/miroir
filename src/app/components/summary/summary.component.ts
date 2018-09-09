@@ -279,20 +279,32 @@ export class SummaryComponent implements OnInit {
             this.service.update(qs.region, qs.table, qs.bucket, qs.prefix);
 
             this.route.params.subscribe(ps => {
-                if (ps.searchWord) {
-                    this.word = ps.searchWord;
-                    this.searchReport(ps.searchWord)
-                        .then(_ => {
-                            if (ps.hashKey) {
-                                this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
-                                    .then((r: Report) => {
-                                        if (ps.seq) {
-                                            this.showDetail(ps.seq - 1, r.trials);
-                                        }
-                                    });
-                            }
-                        });
+                if (!ps.searchWord) {
+                    return
                 }
+
+                this.word = ps.searchWord;
+                this.searchReport(ps.searchWord)
+                    .then(rows => {
+                        if (!ps.hashKey) {
+                            return
+                        }
+
+                        const targetRow: DynamoRow = _.find(
+                            rows,
+                            (x: DynamoRow) => x.hashkey.startsWith(ps.hashKey)
+                        )
+                        if (!targetRow) {
+                            return
+                        }
+
+                        this.showReport(targetRow.hashkey, this.settingsService.alwaysIntelligentAnalytics)
+                            .then((r: Report) => {
+                                if (ps.seq) {
+                                    this.showDetail(ps.seq - 1, r.trials);
+                                }
+                            });
+                });
             });
         });
 
@@ -677,7 +689,7 @@ export class SummaryComponent implements OnInit {
     }
 
     copyActiveReportLink() {
-        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}`;
+        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key.slice(0, 7)}/${this.activeReport.key.slice(0, 7)}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}`;
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this report url`, url);
     }
