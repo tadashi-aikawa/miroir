@@ -295,4 +295,12 @@ export class TrialsTableComponent {
     getFilters() {
         return this.gridApi.getFilterModel()
     }
+
+    setSorts(model) {
+        this.gridApi.setSortModel(model)
+    }
+
+    getSorts() {
+        return this.gridApi.getSortModel()
+    }
 }

@@ -304,6 +304,9 @@ export class SummaryComponent implements OnInit {
                                     if (qs.trialFilter) {
                                         this.trialsTable.setFilters(JSON.parse(qs.trialFilter))
                                     }
+                                    if (qs.trialSort) {
+                                        this.trialsTable.setSorts(JSON.parse(qs.trialSort))
+                                    }
                                     setTimeout(() => {
                                         if (ps.seq) {
                                             this.showDetail(ps.seq - 1, this.displayedTrials);
@@ -697,7 +700,7 @@ export class SummaryComponent implements OnInit {
     }
 
     copyActiveReportLink() {
-        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key.slice(0, 7)}/${this.activeReport.key.slice(0, 7)}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}&trialFilter=${JSON.stringify(this.trialsTable.getFilters())}`;
+        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key.slice(0, 7)}/${this.activeReport.key.slice(0, 7)}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}&trialFilter=${JSON.stringify(this.trialsTable.getFilters())}&trialSort=${JSON.stringify(this.trialsTable.getSorts()}`;
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this report url`, url);
     }
