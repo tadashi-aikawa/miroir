@@ -288,4 +288,19 @@ export class TrialsTableComponent {
         this.gridColumnApi.getAllColumns().map(x => this.gridApi.destroyFilter(x));
     }
 
+    setFilters(model) {
+        this.gridApi.setFilterModel(model)
+    }
+
+    getFilters() {
+        return this.gridApi.getFilterModel()
+    }
+
+    setSorts(model) {
+        this.gridApi.setSortModel(model)
+    }
+
+    getSorts() {
+        return this.gridApi.getSortModel()
+    }
 }
