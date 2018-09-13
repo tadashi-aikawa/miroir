@@ -279,29 +279,52 @@ export class SummaryComponent implements OnInit {
             this.service.update(qs.region, qs.table, qs.bucket, qs.prefix);
 
             this.route.params.subscribe(ps => {
-                if (ps.searchWord) {
-                    this.word = ps.searchWord;
-                    this.searchReport(ps.searchWord)
-                        .then(_ => {
-                            if (ps.hashKey) {
-                                this.showReport(ps.hashKey, this.settingsService.alwaysIntelligentAnalytics)
-                                    .then((r: Report) => {
-                                        if (ps.seq) {
-                                            this.showDetail(ps.seq - 1, r.trials);
-                                        }
-                                    });
-                            }
-                        });
+                if (!ps.searchWord) {
+                    return
                 }
+
+                this.word = ps.searchWord;
+                this.searchReport(ps.searchWord)
+                    .then(rows => {
+                        if (!ps.hashKey) {
+                            return
+                        }
+
+                        const targetRow: DynamoRow = _.find(
+                            rows,
+                            (x: DynamoRow) => x.hashkey.startsWith(ps.hashKey)
+                        )
+                        if (!targetRow) {
+                            return
+                        }
+
+                        this.showReport(targetRow.hashkey, this.settingsService.alwaysIntelligentAnalytics)
+                            .then((r: Report) => {
+                                setTimeout(() => {
+                                    if (qs.trialFilter) {
+                                        this.trialsTable.setFilters(JSON.parse(qs.trialFilter))
+                                    }
+                                    if (qs.trialSort) {
+                                        this.trialsTable.setSorts(JSON.parse(qs.trialSort))
+                                    }
+                                    setTimeout(() => {
+                                        if (ps.seq) {
+                                            this.showDetail(ps.seq - 1, this.displayedTrials);
+                                        }
+                                    }, 200);
+                                }, 500);
+
+                            });
+                });
             });
         });
 
         this.mqlCompletions = this.mqlControl
             .valueChanges
-            .map(query => _(CARD_FILTER_MAPPINGS)
+            .map((query: string) => _(CARD_FILTER_MAPPINGS)
                 .keys()
-                .filter(k => query.split(' ').some(q => _.includes(`${k}:`, q)))
-                .map(k => CARD_FILTER_MAPPINGS[k])
+                .filter((k: string) => query.split(' ').some(q => _.includes(`${k}:`, q)))
+                .map((k: string) => CARD_FILTER_MAPPINGS[k])
                 .value()
             );
     }
@@ -677,7 +700,7 @@ export class SummaryComponent implements OnInit {
     }
 
     copyActiveReportLink() {
-        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key}/${this.activeReport.key}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}`;
+        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key.slice(0, 7)}/${this.activeReport.key.slice(0, 7)}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}&trialFilter=${JSON.stringify(this.trialsTable.getFilters())}&trialSort=${JSON.stringify(this.trialsTable.getSorts())}`;
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this report url`, url);
     }

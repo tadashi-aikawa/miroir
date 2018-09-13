@@ -12,7 +12,7 @@
                     enableColResize
                     enableSorting
                     animateRows
-                    domLayout="autoHeight"
+                    gridAutoHeight
                     [rowData]="trials | toAttention"
                     [columnDefs]="attentionColumnDefs"
                     (rowClicked)="handleDiffRowClicked($event)"
@@ -41,7 +41,7 @@
                     enableColResize
                     enableSorting
                     animateRows
-                    domLayout="autoHeight"
+                    gridAutoHeight
                     [rowData]="trials | toCheckedAlreadyDiffSummary"
                     [columnDefs]="checkedAlreadyColumnDefs"
                     (rowClicked)="handleDiffRowClicked($event)"
@@ -61,7 +61,7 @@
                     enableColResize
                     enableSorting
                     animateRows
-                    domLayout="autoHeight"
+                    gridAutoHeight
                     [rowData]="trials | toIgnoredDiffSummary"
                     [columnDefs]="ignoredColumnDefs"
                     (rowClicked)="handleDiffRowClicked($event)"

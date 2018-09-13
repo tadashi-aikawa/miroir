@@ -1,5 +1,5 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import {AwsService} from '../../services/aws-service';
 import {ToasterConfig} from 'angular2-toaster';
 import {KeyMode, SettingsService} from '../../services/settings-service';

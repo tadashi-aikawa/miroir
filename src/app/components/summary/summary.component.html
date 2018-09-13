@@ -71,7 +71,7 @@
                 >
                     <div [ngClass]="'check-status '+row.check_status">
                         {{toDisplay(row.check_status)}}
-                        <mat-select (change)="onSelectCheckStatus(row.hashkey, $event.value)"
+                        <mat-select (selectionChange)="onSelectCheckStatus(row.hashkey, $event.value)"
                                     (click)="$event.stopPropagation();"
                                     [(ngModel)]="row.check_status">
                             <mat-option *ngFor="let status of statuses" [value]="status">

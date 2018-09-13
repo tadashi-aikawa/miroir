@@ -34,7 +34,7 @@ import {Ng2HighchartsModule} from 'ng2-highcharts';
 import {ExpansionPanelsModule} from 'ng2-expansion-panels';
 import {MarkdownModule} from 'angular2-markdown';
 import {AgGridModule} from 'ag-grid-angular';
-import { CountoModule }  from 'angular2-counto';
+import { CountoModule } from 'angular2-counto';
 
 import 'hammerjs';
 
@@ -58,7 +58,7 @@ import {InlineEditorComponent} from './components/inline-editor/inline-editor.co
 import {
     MarkdownInlineEditorComponent
 } from './components/markdown-inline-editor/markdown-inline-editor.component';
-import {BadgeComponent, BadgeListComponent} from "./components/badge/badge-component";
+import {BadgeComponent, BadgeListComponent} from './components/badge/badge-component';
 import {ConfirmDialogComponent} from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import {MonacoEditorLoader} from './services/monaco-editor-loader';
 import {LogoLoadingComponent} from './components/guard/logo-loading.component';
@@ -69,10 +69,10 @@ import {
     ToIgnoredDiffSummaryPipe,
     ToPathPipe
 } from './components/analystic/analytics.component';
-import {ToasterModule} from "angular2-toaster";
-import {PanelComponent} from "./components/panel/panel-component";
-import {HasContentsPipe, EmptyContentsPipe} from "./utils/regexp";
-import {TrialsTableComponent} from "./components/trials-table/trials-table.component";
+import {ToasterModule} from 'angular2-toaster';
+import {PanelComponent} from './components/panel/panel-component';
+import {HasContentsPipe, EmptyContentsPipe} from './utils/regexp';
+import {TrialsTableComponent} from './components/trials-table/trials-table.component';
 
 const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -114,7 +114,7 @@ const appRoutes: Routes = [
         BrowserModule,
         BrowserAnimationsModule,
         CountoModule,
-        ToasterModule,
+        ToasterModule.forRoot(),
         RouterModule.forRoot(appRoutes),
         FormsModule,
         ReactiveFormsModule,
