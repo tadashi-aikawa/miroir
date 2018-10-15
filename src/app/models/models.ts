@@ -26,8 +26,9 @@ export class DynamoRow {
     retry_hash?: string;
     checklist?: string;
     check_status: CheckStatus;
-    tags: Set<string>;
-
+    tags?: {
+        values: string[];
+    };
     deleting?: boolean;
     deleteErrorMessage?: string;
     downloading?: boolean;
