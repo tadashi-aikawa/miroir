@@ -1,5 +1,7 @@
 - [Getting started](index.md)
+- [MQL](mql.md)
 - Releases
+  - [0.24.0](releases/0.24.0.md)
   - [0.23.0](releases/0.23.0.md)
   - [0.22.0](releases/0.22.0.md)
   - [0.21.0](releases/0.21.0.md)
