@@ -1,6 +1,7 @@
 import CheckStatus from '../constants/check-status';
 import * as _ from 'lodash'
 import {LazyGetter} from "typescript-lazy-get-decorator"
+import {DateTime} from 'luxon'
 
 export class DynamoResult {
     Count: number;
@@ -34,6 +35,11 @@ export class DynamoRow {
     downloading?: boolean;
     downloadErrorMessage?: string;
     updatingErrorMessage?: string;
+
+    @LazyGetter()
+    get localizedBeginTime(): DateTime {
+        return DateTime.fromISO(this.begin_time)
+    }
 }
 
 export class PropertyDiffs {
@@ -184,7 +190,7 @@ export class Trial {
             this.one.byte, this.other.byte,
             this.one.type, this.other.type,
             this.one.content_type, this.other.content_type,
-            this.request_time,
+            this.localizedRequestTime.toISO({includeOffset: false}),
         ].join("\t");
     }
 
@@ -198,6 +204,10 @@ export class Trial {
 
     get responseSecDiff(): number {
         return Math.round((this.other.response_sec - this.one.response_sec) * 100) / 100;
+    }
+
+    get localizedRequestTime(): DateTime {
+        return DateTime.fromISO(this.request_time)
     }
 }
 
