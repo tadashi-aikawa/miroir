@@ -1,6 +1,6 @@
 {
   "name": "miroir",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
@@ -30,6 +30,7 @@
     "@types/highcharts": "^5.0.31",
     "@types/js-yaml": "^3.11.2",
     "@types/lodash": "^4.14.117",
+    "@types/luxon": "^1.4.0",
     "ag-grid": "^18.1.2",
     "ag-grid-angular": "^18.0.1",
     "angular-2-local-storage": "^2.0.0",
@@ -51,6 +52,7 @@
     "js-yaml": "^3.12.0",
     "lodash": "^4.17.11",
     "lodash-decorators": "^6.0.0",
+    "luxon": "^1.4.4",
     "monaco-editor": "^0.14.3",
     "ng-select": "^1.0.0",
     "ng2-expansion-panels": "^0.0.6",

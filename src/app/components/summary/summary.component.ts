@@ -95,7 +95,7 @@ const formulaMappings: Dictionary<(target: number, value: number) => boolean> = 
 };
 
 const statusFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.check_status, x, false, true);
-const dateFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.begin_time, x);
+const dateFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.localizedBeginTime.toISO(), x);
 const titleFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.title, x, false, false);
 const tagsFilter = (x: string, row: DynamoRow): boolean => !!row.tags && row.tags.values.some(y => matchRegExp(y, x, false, false));
 const sameFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.same_count, Number(x.slice(1)));
@@ -343,11 +343,10 @@ export class SummaryComponent implements OnInit {
             this.service.findSummary(keyword)
                 .then((r: DynamoResult) => {
                     this.searchingSummary = false;
-                    // TODO
-                    // FIXME: remove `.replace(/\//g, '-')` after a while (May?)
-                    this.rows = r.Items.sort(
-                        (a, b) => b.begin_time.replace(/\//g, '-') > a.begin_time.replace(/\//g, '-') ? 1 : -1
-                    );
+                    this.rows = r.Items.map(x => Object.assign(new DynamoRow(), x))
+                        .sort(
+                            (a: DynamoRow, b: DynamoRow) => b.localizedBeginTime > a.localizedBeginTime ? 1 : -1
+                        );
                     this.updateDisplayedAndFilteredRows(10);
                     resolve(this.rows);
                 })
@@ -510,7 +509,7 @@ export class SummaryComponent implements OnInit {
                             otherType: t.other.type,
                             oneContentType: t.one.content_type,
                             otherContentType: t.other.content_type,
-                            requestTime: t.request_time,
+                            requestTime: t.localizedRequestTime.toISO({includeOffset: false}),
                             attention: analysis ? toAttention(t) : '???',
                             checkedAlready: analysis ?
                                 (c ? _(c.checkedAlready).reject(x => x.isEmpty()).map(x => x.title).value() : []) :
