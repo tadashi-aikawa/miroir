@@ -1,31 +1,13 @@
-import {ActivatedRoute, Params} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {animate, style, transition, trigger} from '@angular/animations';
-import {
-    AccessPoint,
-    Change,
-    DynamoResult,
-    DynamoRow,
-    EditorConfig,
-    IgnoreCase,
-    Report,
-    Row,
-    Summary,
-    Trial
-} from '../../models/models';
+import {AccessPoint, Change, DynamoResult, DynamoRow, EditorConfig, IgnoreCase, Report, Row, Summary, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {
-    MatAutocompleteSelectedEvent,
-    MatDialog,
-    MatDialogRef,
-    MatSidenav,
-    MatSnackBar,
-    PageEvent
-} from '@angular/material';
+import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
-import { Debounce } from 'lodash-decorators';
 import {Dictionary} from 'lodash';
+import {Debounce} from 'lodash-decorators';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 import {SettingsService} from '../../services/settings-service';
@@ -184,17 +166,15 @@ export class SummaryComponent implements OnInit {
     @ViewChild('analytics') analytics: AnalyticsComponent;
 
     word = '';
-    filterWord = '';
+    mql = '';
 
     searchingSummary: boolean;
     searchErrorMessage: string;
     rows: DynamoRow[];
     filteredRows: DynamoRow[] = [];
     displayedRows: DynamoRow[];
-    settings: any;
     errorMessages: string[];
 
-    displayedCardNumber = 10;
     previousFilteredRowsCount = 0;
 
 
@@ -287,7 +267,7 @@ export class SummaryComponent implements OnInit {
                 this.word = ps.searchWord;
 
                 if (qs.mql) {
-                    this.filterWord = qs.mql
+                    this.mql = qs.mql
                 }
 
                 this.searchReport(ps.searchWord)
@@ -305,7 +285,7 @@ export class SummaryComponent implements OnInit {
                         }
 
                         this.showReport(targetRow.hashkey, this.settingsService.alwaysIntelligentAnalytics)
-                            .then((r: Report) => {
+                            .then(() => {
                                 setTimeout(() => {
                                     if (qs.trialFilter) {
                                         this.trialsTable.setFilters(JSON.parse(qs.trialFilter))
@@ -376,7 +356,7 @@ export class SummaryComponent implements OnInit {
     updateDisplayedAndFilteredRows(displayedNumber: number) {
         this.previousFilteredRowsCount = this.filteredRows.length;
         this.filteredRows = this.rows.filter(
-            x => this.filterWord.split(' ').every(t => !t || cardFilter(t, x))
+            x => this.mql.split(' ').every(t => !t || cardFilter(t, x))
         );
         this.displayedRows =  _.take(
             this.filteredRows,
@@ -399,7 +379,7 @@ export class SummaryComponent implements OnInit {
 
         row.updatingErrorMessage = undefined;
         this.service.updateStatus(key, value)
-            .then(_ => {
+            .then(() => {
                 this.toasterService.pop('success', `Succeeded to update status to '${value}'`);
             })
             .catch(err => {
@@ -421,11 +401,11 @@ export class SummaryComponent implements OnInit {
                     this.service.updateReportTitle(this.activeReport.key, title.current)
                 ]);
             })
-            .then(none => {
+            .then(() => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).title = title.current;
                 this.toasterService.pop('success', `Succeeded to update title`);
             })
-            .catch(err => {
+            .catch(() => {
                 this.toasterService.pop('error', 'Failed to update title');
             });
     }
@@ -450,9 +430,9 @@ export class SummaryComponent implements OnInit {
                 return Promise.all([
                     this.service.updateSummaryDescription(this.activeReport.key, description.current),
                     this.service.updateReportDescription(this.activeReport.key, description.current)
-                ]).catch(err => Promise.reject('Unexpected error occured'));
+                ]).catch(() => Promise.reject('Unexpected error occured'));
             })
-            .then(none => {
+            .then(() => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).description = description.current;
                 this.toasterService.pop('success', `Succeeded to update description`);
             })
@@ -468,7 +448,7 @@ export class SummaryComponent implements OnInit {
     }
 
     showReport(key: string, analysis = false): Promise<Report> {
-        return new Promise<Report>((resolve, reject) => {
+        return new Promise<Report>((resolve) => {
             this.loadingReportKey = key;
             this.errorMessages = undefined;
             this.service.fetchReport(key)
@@ -592,7 +572,7 @@ export class SummaryComponent implements OnInit {
                         row.deleting = true;
 
                         this.service.removeTrials(s3KeysToRemove)
-                            .then(p => this.service.removeSummary(key))
+                            .then(() => this.service.removeSummary(key))
                             .then(() => {
                                 // HACK: OOOOOOOOHHHHNOOOOOOOO
                                 this.rows = this.rows.filter((r: DynamoRow) => r.hashkey !== key);
@@ -648,7 +628,7 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.activeIndex = String(index);
         dialogRef.componentInstance.trials = trials || this.displayedTrials;
         dialogRef.componentInstance.ignores = this.ignores;
-        dialogRef.afterClosed().subscribe(_ => this.initKeyBindings());
+        dialogRef.afterClosed().subscribe(() => this.initKeyBindings());
     }
 
     afterChangeTab(index: number): void {
@@ -711,7 +691,7 @@ export class SummaryComponent implements OnInit {
             `table=${this.service.table}`,
             `bucket=${this.service.bucket}`,
             `prefix=${this.service.prefix}`,
-            `mql=${this.filterWord}`,
+            `mql=${this.mql}`,
             `trialFilter=${JSON.stringify(this.trialsTable.getFilters())}`,
             `trialSort=${JSON.stringify(this.trialsTable.getSorts())}`
         ].join('&')
