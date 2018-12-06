@@ -1,43 +1,25 @@
-import {ActivatedRoute, Params} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {animate, style, transition, trigger} from '@angular/animations';
-import {
-    AccessPoint,
-    Change,
-    DynamoResult,
-    DynamoRow,
-    EditorConfig,
-    IgnoreCase,
-    Report,
-    Row,
-    Summary,
-    Trial
-} from '../../models/models';
+import {AccessPoint, Change, DynamoResult, DynamoRow, EditorConfig, IgnoreCase, Report, Row, Summary, Trial} from '../../models/models';
 import {AwsService} from '../../services/aws-service';
 import {Component, ElementRef, Input, OnInit, Optional, ViewChild} from '@angular/core';
-import {
-    MatAutocompleteSelectedEvent,
-    MatDialog,
-    MatDialogRef,
-    MatSidenav,
-    MatSnackBar,
-    PageEvent
-} from '@angular/material';
+import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
-import { Debounce } from 'lodash-decorators';
 import {Dictionary} from 'lodash';
+import {Debounce} from 'lodash-decorators';
 import {DetailDialogComponent} from '../detail-dialog/detail-dialog.component';
 import CheckStatus, {CheckStatuses} from '../../constants/check-status';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {Clipboard} from 'ts-clipboard';
 import {BodyOutputType, ToasterService} from 'angular2-toaster';
-import {RowData, TrialsTableComponent} from "../trials-table/trials-table.component";
-import {AnalyticsComponent} from "../analystic/analytics.component";
+import {RowData, TrialsTableComponent} from '../trials-table/trials-table.component';
+import {AnalyticsComponent} from '../analystic/analytics.component';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
-import {matchRegExp} from "../../utils/regexp";
-import {FormControl} from "@angular/forms";
-import {Observable} from "rxjs/Observable";
+import {matchRegExp} from '../../utils/regexp';
+import {FormControl} from '@angular/forms';
+import {Observable} from 'rxjs/Observable';
 
 interface KeyBindings {
     reformat_table: string;
@@ -98,9 +80,9 @@ const statusFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.che
 const dateFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.localizedBeginTime.toISO(), x);
 const titleFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.title, x, false, false);
 const tagsFilter = (x: string, row: DynamoRow): boolean => !!row.tags && row.tags.values.some(y => matchRegExp(y, x, false, false));
-const sameFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.same_count, Number(x.slice(1)));
-const differentFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.different_count, Number(x.slice(1)));
-const failureFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.failure_count, Number(x.slice(1)));
+const sameFilter = (x: string, row: DynamoRow): boolean => formulaMappings[x[0]](row.same_count, Number(x.slice(1)));
+const differentFilter = (x: string, row: DynamoRow): boolean => formulaMappings[x[0]](row.different_count, Number(x.slice(1)));
+const failureFilter = (x: string, row: DynamoRow): boolean => formulaMappings[x[0]](row.failure_count, Number(x.slice(1)));
 
 class CardFilter {
     name: string;
@@ -176,7 +158,7 @@ const cardFilter = (word: string, row: DynamoRow): boolean => {
 })
 export class SummaryComponent implements OnInit {
 
-    @Input() cheatSheet: boolean = false;
+    @Input() cheatSheet = false;
 
     @ViewChild('sidenav') sideNav: MatSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
@@ -184,17 +166,15 @@ export class SummaryComponent implements OnInit {
     @ViewChild('analytics') analytics: AnalyticsComponent;
 
     word = '';
-    filterWord = '';
+    mql = '';
 
     searchingSummary: boolean;
     searchErrorMessage: string;
     rows: DynamoRow[];
     filteredRows: DynamoRow[] = [];
     displayedRows: DynamoRow[];
-    settings: any;
     errorMessages: string[];
 
-    displayedCardNumber = 10;
     previousFilteredRowsCount = 0;
 
 
@@ -260,7 +240,7 @@ export class SummaryComponent implements OnInit {
             new Hotkey(keyMode.copy_displayed_trials_as_tsv, () => {
                 Clipboard.copy([
                     Trial.toTsvHeader(), ...this.displayedTrials.map(x => x.toTsvRecord())
-                ].join("\n"));
+                ].join('\n'));
                 this.toasterService.pop(
                     'success', `Succeeded to copy ${this.displayedTrials.length} records as TSV`
                 );
@@ -284,8 +264,12 @@ export class SummaryComponent implements OnInit {
                 if (!ps.searchWord) {
                     return
                 }
-
                 this.word = ps.searchWord;
+
+                if (qs.mql) {
+                    this.mql = qs.mql
+                }
+
                 this.searchReport(ps.searchWord)
                     .then(rows => {
                         if (!ps.hashKey) {
@@ -301,7 +285,7 @@ export class SummaryComponent implements OnInit {
                         }
 
                         this.showReport(targetRow.hashkey, this.settingsService.alwaysIntelligentAnalytics)
-                            .then((r: Report) => {
+                            .then(() => {
                                 setTimeout(() => {
                                     if (qs.trialFilter) {
                                         this.trialsTable.setFilters(JSON.parse(qs.trialFilter))
@@ -372,7 +356,7 @@ export class SummaryComponent implements OnInit {
     updateDisplayedAndFilteredRows(displayedNumber: number) {
         this.previousFilteredRowsCount = this.filteredRows.length;
         this.filteredRows = this.rows.filter(
-            x => this.filterWord.split(' ').every(t => !t || cardFilter(t, x))
+            x => this.mql.split(' ').every(t => !t || cardFilter(t, x))
         );
         this.displayedRows =  _.take(
             this.filteredRows,
@@ -395,7 +379,7 @@ export class SummaryComponent implements OnInit {
 
         row.updatingErrorMessage = undefined;
         this.service.updateStatus(key, value)
-            .then(_ => {
+            .then(() => {
                 this.toasterService.pop('success', `Succeeded to update status to '${value}'`);
             })
             .catch(err => {
@@ -417,11 +401,11 @@ export class SummaryComponent implements OnInit {
                     this.service.updateReportTitle(this.activeReport.key, title.current)
                 ]);
             })
-            .then(none => {
+            .then(() => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).title = title.current;
                 this.toasterService.pop('success', `Succeeded to update title`);
             })
-            .catch(err => {
+            .catch(() => {
                 this.toasterService.pop('error', 'Failed to update title');
             });
     }
@@ -446,9 +430,9 @@ export class SummaryComponent implements OnInit {
                 return Promise.all([
                     this.service.updateSummaryDescription(this.activeReport.key, description.current),
                     this.service.updateReportDescription(this.activeReport.key, description.current)
-                ]).catch(err => Promise.reject('Unexpected error occured'));
+                ]).catch(() => Promise.reject('Unexpected error occured'));
             })
-            .then(none => {
+            .then(() => {
                 this.rows.find((r: DynamoRow) => r.hashkey === this.activeReport.key).description = description.current;
                 this.toasterService.pop('success', `Succeeded to update description`);
             })
@@ -464,7 +448,7 @@ export class SummaryComponent implements OnInit {
     }
 
     showReport(key: string, analysis = false): Promise<Report> {
-        return new Promise<Report>((resolve, reject) => {
+        return new Promise<Report>((resolve) => {
             this.loadingReportKey = key;
             this.errorMessages = undefined;
             this.service.fetchReport(key)
@@ -588,7 +572,7 @@ export class SummaryComponent implements OnInit {
                         row.deleting = true;
 
                         this.service.removeTrials(s3KeysToRemove)
-                            .then(p => this.service.removeSummary(key))
+                            .then(() => this.service.removeSummary(key))
                             .then(() => {
                                 // HACK: OOOOOOOOHHHHNOOOOOOOO
                                 this.rows = this.rows.filter((r: DynamoRow) => r.hashkey !== key);
@@ -644,7 +628,7 @@ export class SummaryComponent implements OnInit {
         dialogRef.componentInstance.activeIndex = String(index);
         dialogRef.componentInstance.trials = trials || this.displayedTrials;
         dialogRef.componentInstance.ignores = this.ignores;
-        dialogRef.afterClosed().subscribe(_ => this.initKeyBindings());
+        dialogRef.afterClosed().subscribe(() => this.initKeyBindings());
     }
 
     afterChangeTab(index: number): void {
@@ -701,7 +685,21 @@ export class SummaryComponent implements OnInit {
     }
 
     copyActiveReportLink() {
-        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key.slice(0, 7)}/${this.activeReport.key.slice(0, 7)}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}&trialFilter=${JSON.stringify(this.trialsTable.getFilters())}&trialSort=${JSON.stringify(this.trialsTable.getSorts())}`;
+        const path = `${location.pathname}#/report/${this.word}/${this.activeReport.key.slice(0, 7)}`
+
+        const trialFilter = JSON.stringify(this.trialsTable.getFilters())
+        const trialSort = JSON.stringify(this.trialsTable.getSorts())
+        const query = [
+            `region=${this.service.region}`,
+            `table=${this.service.table}`,
+            `bucket=${this.service.bucket}`,
+            `prefix=${this.service.prefix}`,
+            `mql=${this.mql}`,
+            trialFilter !== '{}' ? `trialFilter=${trialFilter}` : null,
+            trialSort !== '[]' ? `trialSort=${trialSort}` : null,
+        ].filter(x => x).join('&')
+        const url = `${location.origin}${path}?${query}`
+
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this report url`, url);
     }
