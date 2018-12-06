@@ -686,15 +686,18 @@ export class SummaryComponent implements OnInit {
 
     copyActiveReportLink() {
         const path = `${location.pathname}#/report/${this.word}/${this.activeReport.key.slice(0, 7)}`
+
+        const trialFilter = JSON.stringify(this.trialsTable.getFilters())
+        const trialSort = JSON.stringify(this.trialsTable.getSorts())
         const query = [
             `region=${this.service.region}`,
             `table=${this.service.table}`,
             `bucket=${this.service.bucket}`,
             `prefix=${this.service.prefix}`,
             `mql=${this.mql}`,
-            `trialFilter=${JSON.stringify(this.trialsTable.getFilters())}`,
-            `trialSort=${JSON.stringify(this.trialsTable.getSorts())}`
-        ].join('&')
+            trialFilter !== '{}' ? `trialFilter=${trialFilter}` : null,
+            trialSort !== '[]' ? `trialSort=${trialSort}` : null,
+        ].filter(x => x).join('&')
         const url = `${location.origin}${path}?${query}`
 
         Clipboard.copy(url);
