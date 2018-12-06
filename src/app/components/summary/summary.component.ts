@@ -32,12 +32,12 @@ import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready} from '../../utils/diffs';
 import {Clipboard} from 'ts-clipboard';
 import {BodyOutputType, ToasterService} from 'angular2-toaster';
-import {RowData, TrialsTableComponent} from "../trials-table/trials-table.component";
-import {AnalyticsComponent} from "../analystic/analytics.component";
+import {RowData, TrialsTableComponent} from '../trials-table/trials-table.component';
+import {AnalyticsComponent} from '../analystic/analytics.component';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
-import {matchRegExp} from "../../utils/regexp";
-import {FormControl} from "@angular/forms";
-import {Observable} from "rxjs/Observable";
+import {matchRegExp} from '../../utils/regexp';
+import {FormControl} from '@angular/forms';
+import {Observable} from 'rxjs/Observable';
 
 interface KeyBindings {
     reformat_table: string;
@@ -98,9 +98,9 @@ const statusFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.che
 const dateFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.localizedBeginTime.toISO(), x);
 const titleFilter = (x: string, row: DynamoRow): boolean => matchRegExp(row.title, x, false, false);
 const tagsFilter = (x: string, row: DynamoRow): boolean => !!row.tags && row.tags.values.some(y => matchRegExp(y, x, false, false));
-const sameFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.same_count, Number(x.slice(1)));
-const differentFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.different_count, Number(x.slice(1)));
-const failureFilter = (x: string, row: DynamoRow) : boolean => formulaMappings[x[0]](row.failure_count, Number(x.slice(1)));
+const sameFilter = (x: string, row: DynamoRow): boolean => formulaMappings[x[0]](row.same_count, Number(x.slice(1)));
+const differentFilter = (x: string, row: DynamoRow): boolean => formulaMappings[x[0]](row.different_count, Number(x.slice(1)));
+const failureFilter = (x: string, row: DynamoRow): boolean => formulaMappings[x[0]](row.failure_count, Number(x.slice(1)));
 
 class CardFilter {
     name: string;
@@ -176,7 +176,7 @@ const cardFilter = (word: string, row: DynamoRow): boolean => {
 })
 export class SummaryComponent implements OnInit {
 
-    @Input() cheatSheet: boolean = false;
+    @Input() cheatSheet = false;
 
     @ViewChild('sidenav') sideNav: MatSidenav;
     @ViewChild('keyWord') keyWord: ElementRef;
@@ -260,7 +260,7 @@ export class SummaryComponent implements OnInit {
             new Hotkey(keyMode.copy_displayed_trials_as_tsv, () => {
                 Clipboard.copy([
                     Trial.toTsvHeader(), ...this.displayedTrials.map(x => x.toTsvRecord())
-                ].join("\n"));
+                ].join('\n'));
                 this.toasterService.pop(
                     'success', `Succeeded to copy ${this.displayedTrials.length} records as TSV`
                 );
@@ -284,8 +284,12 @@ export class SummaryComponent implements OnInit {
                 if (!ps.searchWord) {
                     return
                 }
-
                 this.word = ps.searchWord;
+
+                if (qs.mql) {
+                    this.filterWord = qs.mql
+                }
+
                 this.searchReport(ps.searchWord)
                     .then(rows => {
                         if (!ps.hashKey) {
@@ -701,7 +705,18 @@ export class SummaryComponent implements OnInit {
     }
 
     copyActiveReportLink() {
-        const url = `${location.origin}${location.pathname}#/report/${this.activeReport.key.slice(0, 7)}/${this.activeReport.key.slice(0, 7)}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}&trialFilter=${JSON.stringify(this.trialsTable.getFilters())}&trialSort=${JSON.stringify(this.trialsTable.getSorts())}`;
+        const path = `${location.pathname}#/report/${this.activeReport.key.slice(0, 7)}/${this.activeReport.key.slice(0, 7)}`
+        const query = [
+            `region=${this.service.region}`,
+            `table=${this.service.table}`,
+            `bucket=${this.service.bucket}`,
+            `prefix=${this.service.prefix}`,
+            `mql=${this.filterWord}`,
+            `trialFilter=${JSON.stringify(this.trialsTable.getFilters())}`,
+            `trialSort=${JSON.stringify(this.trialsTable.getSorts())}`
+        ].join('&')
+        const url = `${location.origin}${path}?${query}`
+
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this report url`, url);
     }
