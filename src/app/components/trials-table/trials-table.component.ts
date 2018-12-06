@@ -13,6 +13,7 @@ export interface RowData {
     queries: string;
     encodedQueries: string;
     status: string;
+    tags: string[];
     oneByte: number;
     otherByte: number;
     oneSec: number;
@@ -85,6 +86,11 @@ export class TrialsTableComponent {
                 {
                     headerName: "status",
                     field: "status",
+                },
+                {
+                    headerName: 'tags',
+                    field: 'tags',
+                    cellClass: 'tag',
                 },
                 {
                     headerName: "Intelligent Analytics",

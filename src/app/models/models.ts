@@ -1,6 +1,6 @@
 import CheckStatus from '../constants/check-status';
 import * as _ from 'lodash'
-import {LazyGetter} from "typescript-lazy-get-decorator"
+import {LazyGetter} from 'typescript-lazy-get-decorator'
 import {DateTime} from 'luxon'
 
 export class DynamoResult {
@@ -161,6 +161,7 @@ export class Trial {
     path: string;
     request_time: string;
     status: string;
+    tags: string[]
     diff_keys?: DiffKeys;
 
     propertyDiffsByCognition?: PropertyDiffsByCognition;
@@ -173,6 +174,7 @@ export class Trial {
     static toTsvHeader(): string {
         return [
             "Seq", "Name", "Status", "Path", "QueryString", "OriginQueryString",
+            "tags",
             "[One] Status code", "[Other] Status code",
             "[One] Response sec", "[Other] Response sec",
             "[One] Byte", "[Other] Byte",
@@ -185,6 +187,7 @@ export class Trial {
     toTsvRecord(): string {
         return [
             this.seq, this.name, this.status, this.path, this.queryString, this.originQueryString,
+            this.tags,
             this.one.status_code, this.other.status_code,
             this.one.response_sec, this.other.response_sec,
             this.one.byte, this.other.byte,

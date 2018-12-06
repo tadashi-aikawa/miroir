@@ -35,3 +35,10 @@
     2px -2px 1px #F00,
     -2px -2px 1px #F00;
 }
+
+::ng-deep .tag {
+    color: rgb(0, 7, 167);
+    font-size: 50%;
+    word-break: keep-all;
+    margin: 1px;
+}

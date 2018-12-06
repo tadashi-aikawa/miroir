@@ -479,6 +479,7 @@ export class SummaryComponent implements OnInit {
                             name: t.name,
                             path: t.path,
                             status: t.status,
+                            tags: t.tags,
                             queriesNum: Object.keys(t.queries).length,
                             queries: t.queryString,
                             encodedQueries: t.originQueryString,
