@@ -12,7 +12,7 @@ import {animate, style, transition, trigger} from '@angular/animations';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {MatDialogRef, MatSnackBar} from '@angular/material';
-import {IOption} from 'ng-select';
+import {NgSelectModule, NgOption} from '@ng-select/ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import * as _ from 'lodash';
 import {Dictionary} from 'lodash';
@@ -20,9 +20,9 @@ import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready, toLodashPath} from '../../utils/diffs';
 import {ToasterService} from 'angular2-toaster';
-import {matchRegExp} from "../../utils/regexp";
-import {Memoize} from "lodash-decorators";
-import {regexpComparator} from "../../utils/filters";
+import {matchRegExp} from '../../utils/regexp';
+import {Memoize} from 'lodash-decorators';
+import {regexpComparator} from '../../utils/filters';
 
 
 interface KeyBindings {
@@ -179,7 +179,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() ignores: IgnoreCase[] = [];
     @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
-    @Input() cheatSheet: boolean = false;
+    @Input() cheatSheet = false;
 
     // Toggles
     @Input() fullscreen = false;
@@ -205,7 +205,7 @@ export class DetailDialogComponent implements OnInit {
     targetPropertyValue: Pair<string>;
 
     editorLanguage: Pair<string>;
-    options: IOption[];
+    options: NgOption[];
     isLoading: boolean;
     errorMessage: string;
     diffViewConfig: DiffViewConfig;
@@ -225,14 +225,14 @@ export class DetailDialogComponent implements OnInit {
 
     queryColumnDefs = [
         {
-            headerName: "Key",
-            field: "key",
+            headerName: 'Key',
+            field: 'key',
             width: 200,
             pinned: 'left',
         },
         {
-            headerName: "Value",
-            field: "value",
+            headerName: 'Value',
+            field: 'value',
             width: 600,
         },
     ];
@@ -355,6 +355,7 @@ export class DetailDialogComponent implements OnInit {
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
             label: `${t.seq}. ${t.name} (${t.path})`,
+            tags: t.tags,
             value: String(i)
         }));
 
@@ -409,7 +410,7 @@ export class DetailDialogComponent implements OnInit {
         // Diff viewer
         this.isLoading = true;
         if (trial.hasResponse()) {
-            if (trial.one.type === "octet-stream" || trial.other.type === "octet-stream") {
+            if (trial.one.type === 'octet-stream' || trial.other.type === 'octet-stream') {
                 this.errorMessage = undefined;
                 // We must initialize diffView after set config.
                 // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
@@ -465,7 +466,7 @@ export class DetailDialogComponent implements OnInit {
             setTimeout(() => {
                 this.isLoading = false;
                 this.targetPropertyValue = undefined;
-                this.originalEditorBody = {one: 'No file', other: 'No file',};
+                this.originalEditorBody = {one: 'No file', other: 'No file', };
                 this.editorLanguage = {one: 'text', other: 'text'};
                 this.expectedEncoding = {one: 'None', other: 'None'};
                 this.updateDiffEditorBodies()
@@ -601,7 +602,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     judgeDiffColor(property: string): string {
-        return this.targetPropertyValue && this.targetProperty === property ? "red" : "black";
+        return this.targetPropertyValue && this.targetProperty === property ? 'red' : 'black';
     }
 }
 

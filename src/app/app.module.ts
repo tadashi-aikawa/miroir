@@ -28,7 +28,7 @@ import {
     MatToolbarModule,
 } from '@angular/material';
 import {LocalStorageModule} from 'angular-2-local-storage';
-import {SelectModule} from 'ng-select';
+import { NgSelectModule } from '@ng-select/ng-select';
 import {HotkeyModule} from 'angular2-hotkeys';
 import {Ng2HighchartsModule} from 'ng2-highcharts';
 import {ExpansionPanelsModule} from 'ng2-expansion-panels';
@@ -119,7 +119,7 @@ const appRoutes: Routes = [
         FormsModule,
         ReactiveFormsModule,
         HttpModule,
-        SelectModule,
+        NgSelectModule, FormsModule,
         CommonModule,
         Ng2HighchartsModule,
         ExpansionPanelsModule,
