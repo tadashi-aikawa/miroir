@@ -705,7 +705,7 @@ export class SummaryComponent implements OnInit {
     }
 
     copyActiveReportLink() {
-        const path = `${location.pathname}#/report/${this.activeReport.key.slice(0, 7)}/${this.activeReport.key.slice(0, 7)}`
+        const path = `${location.pathname}#/report/${this.word}/${this.activeReport.key.slice(0, 7)}`
         const query = [
             `region=${this.service.region}`,
             `table=${this.service.table}`,
