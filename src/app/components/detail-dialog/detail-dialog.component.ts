@@ -25,6 +25,8 @@ import {Memoize} from 'lodash-decorators';
 import {regexpComparator} from '../../utils/filters';
 
 
+const DIFF_VIEW_BYTE_LIMIT = 20 * 1024 * 1024
+
 interface KeyBindings {
     toggle_fullscreen: string;
     move_to_next_diff: string;
@@ -406,25 +408,31 @@ export class DetailDialogComponent implements OnInit {
         );
     }
 
+    private showRejectMessageOnDiffViewer(message: string): void {
+        this.errorMessage = undefined
+        // We must initialize diffView after set config.
+        // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
+        setTimeout(() => {
+            this.isLoading = false
+            this.targetPropertyValue = undefined
+            this.originalEditorBody = {
+                one: message,
+                other: message,
+            };
+            this.editorLanguage = {one: 'text', other: 'text'}
+            this.expectedEncoding = {one: 'None', other: 'None'}
+            this.updateDiffEditorBodies()
+        }, 100)
+    }
+
     showTrial(trial: Trial): void {
         // Diff viewer
         this.isLoading = true;
         if (trial.hasResponse()) {
             if (trial.one.type === 'octet-stream' || trial.other.type === 'octet-stream') {
-                this.errorMessage = undefined;
-                // We must initialize diffView after set config.
-                // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
-                setTimeout(() => {
-                    this.isLoading = false;
-                    this.targetPropertyValue = undefined;
-                    this.originalEditorBody = {
-                        one: 'Binary is not supported to show',
-                        other: 'Binary is not supported to show',
-                    };
-                    this.editorLanguage = {one: 'text', other: 'text'};
-                    this.expectedEncoding = {one: 'None', other: 'None'};
-                    this.updateDiffEditorBodies()
-                }, 100);
+                this.showRejectMessageOnDiffViewer('(^_^;) Binary is not supported to show')
+            } else if (trial.one.byte > DIFF_VIEW_BYTE_LIMIT || trial.other.byte > DIFF_VIEW_BYTE_LIMIT) {
+                this.showRejectMessageOnDiffViewer('(´Д｀) Either size of response is over 20MB so not to show')
             } else {
                 const fetchFile = (file: string) => this.service.fetchFile(this.reportKey, file);
 
