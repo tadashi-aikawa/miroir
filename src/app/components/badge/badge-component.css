@@ -55,6 +55,10 @@
     background-color: #f44336;
 }
 
+.badge-info {
+    background-color: rgba(94, 123, 71, 0.82)
+}
+
 .badge-disabled {
     color: black;
     background-color: #e1e1e1;

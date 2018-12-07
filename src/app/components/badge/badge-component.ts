@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 
-type BadgeKind = 'fine' | 'warning' | 'danger' | 'disabled' | 'primary';
+type BadgeKind = 'fine' | 'warning' | 'danger' | 'disabled' | 'primary' | 'info';
 type BadgeSize = 'normal' | 'small' | 'tiny' | 'minimum';
 type BadgeCursor = 'default' | 'pointer';
 

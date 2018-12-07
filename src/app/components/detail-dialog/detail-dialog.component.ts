@@ -12,7 +12,7 @@ import {animate, style, transition, trigger} from '@angular/animations';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {MatDialogRef, MatSnackBar} from '@angular/material';
-import {IOption} from 'ng-select';
+import {NgSelectModule, NgOption} from '@ng-select/ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import * as _ from 'lodash';
 import {Dictionary} from 'lodash';
@@ -20,10 +20,12 @@ import {Clipboard} from 'ts-clipboard';
 import {SettingsService} from '../../services/settings-service';
 import {createPropertyDiffs, toCheckedAlready, toLodashPath} from '../../utils/diffs';
 import {ToasterService} from 'angular2-toaster';
-import {matchRegExp} from "../../utils/regexp";
-import {Memoize} from "lodash-decorators";
-import {regexpComparator} from "../../utils/filters";
+import {matchRegExp} from '../../utils/regexp';
+import {Memoize} from 'lodash-decorators';
+import {regexpComparator} from '../../utils/filters';
 
+
+const DIFF_VIEW_SKIP_TAG = 'hide_body'
 
 interface KeyBindings {
     toggle_fullscreen: string;
@@ -179,7 +181,7 @@ export class DetailDialogComponent implements OnInit {
     @Input() ignores: IgnoreCase[] = [];
     @Input() checkedAlready: IgnoreCase[] = [];
     @Input() activeTabIndex: string;
-    @Input() cheatSheet: boolean = false;
+    @Input() cheatSheet = false;
 
     // Toggles
     @Input() fullscreen = false;
@@ -205,7 +207,7 @@ export class DetailDialogComponent implements OnInit {
     targetPropertyValue: Pair<string>;
 
     editorLanguage: Pair<string>;
-    options: IOption[];
+    options: NgOption[];
     isLoading: boolean;
     errorMessage: string;
     diffViewConfig: DiffViewConfig;
@@ -225,14 +227,14 @@ export class DetailDialogComponent implements OnInit {
 
     queryColumnDefs = [
         {
-            headerName: "Key",
-            field: "key",
+            headerName: 'Key',
+            field: 'key',
             width: 200,
             pinned: 'left',
         },
         {
-            headerName: "Value",
-            field: "value",
+            headerName: 'Value',
+            field: 'value',
             width: 600,
         },
     ];
@@ -355,6 +357,7 @@ export class DetailDialogComponent implements OnInit {
         // value is index of trial
         this.options = this.trials.map((t, i) => ({
             label: `${t.seq}. ${t.name} (${t.path})`,
+            tags: t.tags,
             value: String(i)
         }));
 
@@ -405,25 +408,31 @@ export class DetailDialogComponent implements OnInit {
         );
     }
 
+    private showRejectMessageOnDiffViewer(message: string): void {
+        this.errorMessage = undefined
+        // We must initialize diffView after set config.
+        // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
+        setTimeout(() => {
+            this.isLoading = false
+            this.targetPropertyValue = undefined
+            this.originalEditorBody = {
+                one: message,
+                other: message,
+            };
+            this.editorLanguage = {one: 'text', other: 'text'}
+            this.expectedEncoding = {one: 'None', other: 'None'}
+            this.updateDiffEditorBodies()
+        }, 100)
+    }
+
     showTrial(trial: Trial): void {
         // Diff viewer
         this.isLoading = true;
         if (trial.hasResponse()) {
-            if (trial.one.type === "octet-stream" || trial.other.type === "octet-stream") {
-                this.errorMessage = undefined;
-                // We must initialize diffView after set config.
-                // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
-                setTimeout(() => {
-                    this.isLoading = false;
-                    this.targetPropertyValue = undefined;
-                    this.originalEditorBody = {
-                        one: 'Binary is not supported to show',
-                        other: 'Binary is not supported to show',
-                    };
-                    this.editorLanguage = {one: 'text', other: 'text'};
-                    this.expectedEncoding = {one: 'None', other: 'None'};
-                    this.updateDiffEditorBodies()
-                }, 100);
+            if (trial.one.type === 'octet-stream' || trial.other.type === 'octet-stream') {
+                this.showRejectMessageOnDiffViewer('(^_^;) Binary is not supported to show')
+            } else if (_.includes(trial.tags, DIFF_VIEW_SKIP_TAG)) {
+                this.showRejectMessageOnDiffViewer(`(´Д｀) There is ${DIFF_VIEW_SKIP_TAG} tag so not to show body`)
             } else {
                 const fetchFile = (file: string) => this.service.fetchFile(this.reportKey, file);
 
@@ -465,7 +474,7 @@ export class DetailDialogComponent implements OnInit {
             setTimeout(() => {
                 this.isLoading = false;
                 this.targetPropertyValue = undefined;
-                this.originalEditorBody = {one: 'No file', other: 'No file',};
+                this.originalEditorBody = {one: 'No file', other: 'No file', };
                 this.editorLanguage = {one: 'text', other: 'text'};
                 this.expectedEncoding = {one: 'None', other: 'None'};
                 this.updateDiffEditorBodies()
@@ -558,7 +567,16 @@ export class DetailDialogComponent implements OnInit {
     }
 
     copyActiveTrialLink() {
-        const url = `${location.origin}${location.pathname}#/report/${this.reportKey.slice(0, 7)}/${this.reportKey.slice(0, 7)}/${this.trial.seq}?region=${this.service.region}&table=${this.service.table}&bucket=${this.service.bucket}&prefix=${this.service.prefix}`;
+        const path = `${location.pathname}#/report/${this.reportKey.slice(0, 7)}/${this.reportKey.slice(0, 7)}/${this.trial.seq}`
+
+        const query = [
+            `region=${this.service.region}`,
+            `table=${this.service.table}`,
+            `bucket=${this.service.bucket}`,
+            `prefix=${this.service.prefix}`,
+        ].join('&')
+        const url = `${location.origin}${path}?${query}`
+
         Clipboard.copy(url);
         this.toasterService.pop('success', `Copied this trial url`, url);
     }
@@ -592,7 +610,7 @@ export class DetailDialogComponent implements OnInit {
     }
 
     judgeDiffColor(property: string): string {
-        return this.targetPropertyValue && this.targetProperty === property ? "red" : "black";
+        return this.targetPropertyValue && this.targetProperty === property ? 'red' : 'black';
     }
 }
 

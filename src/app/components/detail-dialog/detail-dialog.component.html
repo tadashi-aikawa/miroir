@@ -19,19 +19,24 @@
 </div>
 
 <div *ngIf="!fullscreen">
-    <div style="display: flex;">
         <ng-select #selector
-                   [options]="options"
+                   [items]="options"
+                   [virtualScroll]="true"
+                   [clearable]="false"
+                   bindValue="value"
+                   bindLabel="label"
                    [(ngModel)]="activeIndex"
-                   [ngStyle]="{
-                    'z-index': '99',
-                    'font-size': '1.2rem'
-                }"
-                   [className]="'smart-padding-without-left'"
-                   (selected)="showTrial(trial)"
+                   (change)="showTrial(trial)"
         >
+            <ng-template ng-label-tmp let-item="item">
+                <b>{{ item.label }}</b>
+                <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
+            </ng-template>
+            <ng-template ng-option-tmp let-item="item">
+                <b>{{ item.label }}</b>
+                <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
+            </ng-template>
         </ng-select>
-    </div>
     <div class="pain2" style="padding-right: calc(66px + 15px);">
         <div class="smart-padding-xsmall">
             <app-panel [url]="trial.one.url" [title]="oneAccessPoint.name" titleFont="small">
@@ -250,7 +255,7 @@
                         <expansion-panel-description-hidden>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”>
+                                <a *ngIf="pd.link" href={{pd.link}} target="_blank">
                                     <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
                                 </a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
@@ -259,7 +264,7 @@
                         <expansion-panel-description-toggled>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”>
+                                <a *ngIf="pd.link" href={{pd.link}} target="_blank">
                                     <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
                                 </a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
@@ -312,7 +317,7 @@
                         <expansion-panel-description-hidden>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”>
+                                <a *ngIf="pd.link" href={{pd.link}} target="_blank">
                                     <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
                                 </a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
@@ -321,7 +326,7 @@
                         <expansion-panel-description-toggled>
                             <div class="center-vertical">
                                 <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target=”_blank”>
+                                <a *ngIf="pd.link" href={{pd.link}} target="_blank">
                                     <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
                                 </a>
                                 <span class="comment" [innerHTML]="pd.title"></span>
