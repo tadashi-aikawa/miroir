@@ -225,3 +225,13 @@ div.mat-sidenav-content div div ng2-smart-table table tbody tr.ng2-smart-row.sel
 .property-snackbar {
     white-space: pre-line;
 }
+
+.smart-link {
+    color: darkslateblue;
+    text-decoration: none;
+}
+
+.smart-link:visited {
+    color: darkslateblue;
+    text-decoration: none;
+}
