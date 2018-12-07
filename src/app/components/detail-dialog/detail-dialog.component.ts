@@ -25,7 +25,7 @@ import {Memoize} from 'lodash-decorators';
 import {regexpComparator} from '../../utils/filters';
 
 
-const DIFF_VIEW_BYTE_LIMIT = 20 * 1024 * 1024
+const DIFF_VIEW_SKIP_TAG = 'hide_body'
 
 interface KeyBindings {
     toggle_fullscreen: string;
@@ -431,8 +431,8 @@ export class DetailDialogComponent implements OnInit {
         if (trial.hasResponse()) {
             if (trial.one.type === 'octet-stream' || trial.other.type === 'octet-stream') {
                 this.showRejectMessageOnDiffViewer('(^_^;) Binary is not supported to show')
-            } else if (trial.one.byte > DIFF_VIEW_BYTE_LIMIT || trial.other.byte > DIFF_VIEW_BYTE_LIMIT) {
-                this.showRejectMessageOnDiffViewer('(´Д｀) Either size of response is over 20MB so not to show')
+            } else if (_.includes(trial.tags, DIFF_VIEW_SKIP_TAG)) {
+                this.showRejectMessageOnDiffViewer(`(´Д｀) There is ${DIFF_VIEW_SKIP_TAG} tag so not to show body`)
             } else {
                 const fetchFile = (file: string) => this.service.fetchFile(this.reportKey, file);
 
