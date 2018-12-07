@@ -3,6 +3,7 @@
         <img src="assets/miroir-inverse.png" width="30px"/>
         <div class="navbar-title">Miroir</div>
         <div class="navbar-version">{{version}}</div>
+
         <span class="remaining-space"></span>
 
         <div class="navbar-region center-vertical {{ hasErrorSettings() ? 'region-danger' : 'region-fine' }}">
@@ -11,6 +12,27 @@
         </div>
 
         <span style="width: 15px;"></span>
+        <button mat-icon-button [matMenuTriggerFor]="docMenu">
+            <mat-icon>library_books</mat-icon>
+        </button>
+        <mat-menu #docMenu="matMenu">
+            <button mat-menu-item>
+                <a class="smart-link" href="https://tadashi-aikawa.github.io/miroir/#/" target="_blank">
+                    <div class="center-vertical">
+                        <img src="assets/miroir.png" height="30px" style="padding: 3px;"/>
+                        <span>Miroir</span>
+                    </div>
+                </a>
+            </button>
+            <button mat-menu-item>
+                <a class="smart-link" href="https://tadashi-aikawa.github.io/jumeaux/" target="_blank">
+                    <div class="center-vertical">
+                        <img src="https://github.com/tadashi-aikawa/jumeaux/raw/master/logo.png?raw=true" height="30px" style="padding: 3px;"/>
+                        <span>Jumeaux</span>
+                    </div>
+                </a>
+            </button>
+        </mat-menu>
         <button mat-mini-fab color="primary" (click)="sidenav.open()">
             <mat-icon>settings</mat-icon>
         </button>
