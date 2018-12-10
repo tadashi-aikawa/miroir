@@ -517,7 +517,9 @@ export class AwsService {
 
         // Nothing to do without login again
         this.logout();
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login'], {
+            skipLocationChange: true,
+        });
         return false;
     }
 }
