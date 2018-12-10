@@ -33,7 +33,9 @@ export class LoginComponent implements OnInit {
         this.awsService.login(this.accessKeyId, this.secretAccessKey, this.useLocalStack, this.localStackEndpoint)
             .then(() => {
                 this.authenticating = false;
-                this.router.navigateByUrl(this.returnUrl);
+                this.router.navigateByUrl(this.returnUrl, {
+                    replaceUrl: true
+                });
             })
             .catch(err => {
                 this.authenticating = false;
