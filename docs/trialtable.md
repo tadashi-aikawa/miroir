@@ -7,8 +7,8 @@ Trial table
 カラムの仕様
 ------------
 
-|  大項目  |        中項目         |    カラム名    |                 説明                  | 正規表現 |  デフォルト絞り込み   | デフォルト表示 |
-| -------- | --------------------- | -------------- | ------------------------------------- | -------- | --------------------- | -------------- |
+| 大項目   | 中項目                | カラム名       | 説明                                  | 正規表現 | デフォルト絞り込み    | デフォルト表示 |
+|----------|-----------------------|----------------|---------------------------------------|----------|-----------------------|----------------|
 |          |                       | seq            | 実行順                                | O        | Contains              | O              |
 |          |                       | name           | 名称                                  | O        | Contains              | O              |
 | Result   |                       | status         | ステータス                            | O        | Contains              | O              |
@@ -31,7 +31,7 @@ Trial table
 | Response | Type                  | other          | otherのレスポンスタイプ               | O        | Contains              | O              |
 | Response | ContentType           | one            | oneのcontent-type                     | O        | Contains              | x              |
 | Response | ContentType           | other          | otherのcontent-type                   | O        | Contains              | x              |
-| Response |                       | requestTime    | リクエスト日時                        | O        | Contains              | O              |
+|          |                       | requestTime    | リクエスト日時                        | O        | Contains              | O              |
 
 
 レコード種別
