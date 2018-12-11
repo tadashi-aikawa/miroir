@@ -46,6 +46,7 @@ export class TrialsTableComponent {
 
     width: string;
     rowClassRules = {
+        // tslint:disable-next-line:max-line-length
         'report-table-record-attention': 'data.attention === "Appears unknown!!" || (data.status === "different" && data.attention === "???")',
         'report-table-record-both-failure': 'data.attention === "Both failure!!"',
         'report-table-record-no-diff-keys': 'data.attention === "No diff keys!!"',
@@ -70,22 +71,22 @@ export class TrialsTableComponent {
 
     columnDefs = [
         {
-            headerName: "seq",
-            field: "seq",
+            headerName: 'seq',
+            field: 'seq',
             pinned: 'left',
         },
         {
-            headerName: "name",
-            field: "name",
+            headerName: 'name',
+            field: 'name',
             pinned: 'left',
         },
         {
-            headerName: "Result",
+            headerName: 'Result',
             pinned: 'left',
             children: [
                 {
-                    headerName: "status",
-                    field: "status",
+                    headerName: 'status',
+                    field: 'status',
                 },
                 {
                     headerName: 'tags',
@@ -93,40 +94,40 @@ export class TrialsTableComponent {
                     cellClass: 'tag',
                 },
                 {
-                    headerName: "Intelligent Analytics",
+                    headerName: 'Intelligent Analytics',
                     children: [
-                        {headerName: "attention", field: "attention"},
-                        {headerName: "checkedAlready", field: "checkedAlready", columnGroupShow: "open"},
-                        {headerName: "ignored", field: "ignored", columnGroupShow: "open"},
+                        {headerName: 'attention', field: 'attention'},
+                        {headerName: 'checkedAlready', field: 'checkedAlready', columnGroupShow: 'open'},
+                        {headerName: 'ignored', field: 'ignored', columnGroupShow: 'open'},
                     ]
                 },
             ]
         },
         {
-            headerName: "Request",
+            headerName: 'Request',
             children: [
                 {
-                    headerName: "path",
-                    field: "path",
+                    headerName: 'path',
+                    field: 'path',
                 },
                 {
-                    headerName: "queries",
-                    columnGroupShow: "open",
+                    headerName: 'queries',
+                    columnGroupShow: 'open',
                     children: [
                         {
-                            headerName: "number",
-                            field: "queriesNum",
-                            columnGroupShow: "closed",
+                            headerName: 'number',
+                            field: 'queriesNum',
+                            columnGroupShow: 'closed',
                         },
                         {
-                            headerName: "detail",
-                            field: "queries",
-                            columnGroupShow: "open",
+                            headerName: 'detail',
+                            field: 'queries',
+                            columnGroupShow: 'open',
                         },
                         {
-                            headerName: "encoded",
-                            field: "encodedQueries",
-                            columnGroupShow: "open",
+                            headerName: 'encoded',
+                            field: 'encodedQueries',
+                            columnGroupShow: 'open',
                             filterParams: {
                                 newRowsAction: 'keep',
                                 textCustomComparator: null
@@ -137,104 +138,104 @@ export class TrialsTableComponent {
             ]
         },
         {
-            headerName: "Response",
+            headerName: 'Response',
             children: [
                 {
-                    headerName: "Status",
+                    headerName: 'Status',
                     children: [
                         {
-                            headerName: "one",
-                            field: "oneStatus",
+                            headerName: 'one',
+                            field: 'oneStatus',
                             cellClassRules: this.responseStatusCellClassRules,
                         },
                         {
-                            headerName: "other",
-                            field: "otherStatus",
+                            headerName: 'other',
+                            field: 'otherStatus',
                             cellClassRules: this.responseStatusCellClassRules,
                         },
                     ]
                 },
                 {
-                    headerName: "Sec",
+                    headerName: 'Sec',
                     children: [
                         {
-                            headerName: "one",
-                            field: "oneSec",
+                            headerName: 'one',
+                            field: 'oneSec',
                             filter: 'agNumberColumnFilter',
                             filterParams: {
                                 newRowsAction: 'keep',
-                                defaultOption: "greaterThanOrEqual"
+                                defaultOption: 'greaterThanOrEqual'
                             }
                         },
                         {
-                            headerName: "other",
-                            field: "otherSec",
+                            headerName: 'other',
+                            field: 'otherSec',
                             filter: 'agNumberColumnFilter',
                             filterParams: {
                                 newRowsAction: 'keep',
-                                defaultOption: "greaterThanOrEqual"
+                                defaultOption: 'greaterThanOrEqual'
                             }
                         },
                         {
-                            headerName: "diff",
-                            field: "diffSec",
+                            headerName: 'diff',
+                            field: 'diffSec',
                             filter: 'agNumberColumnFilter',
                             filterParams: {
                                 newRowsAction: 'keep',
-                                defaultOption: "greaterThanOrEqual"
+                                defaultOption: 'greaterThanOrEqual'
                             }
                         },
                     ]
                 },
                 {
-                    headerName: "Byte",
+                    headerName: 'Byte',
                     children: [
                         {
-                            headerName: "one",
-                            field: "oneByte",
+                            headerName: 'one',
+                            field: 'oneByte',
                             filter: 'agNumberColumnFilter',
                             filterParams: {
                                 newRowsAction: 'keep',
-                                defaultOption: "greaterThanOrEqual"
+                                defaultOption: 'greaterThanOrEqual'
                             }
                         },
                         {
-                            headerName: "other",
-                            field: "otherByte",
+                            headerName: 'other',
+                            field: 'otherByte',
                             filter: 'agNumberColumnFilter',
                             filterParams: {
                                 newRowsAction: 'keep',
-                                defaultOption: "greaterThanOrEqual"
+                                defaultOption: 'greaterThanOrEqual'
                             }
                         },
                     ]
                 },
                 {
-                    headerName: "Type",
+                    headerName: 'Type',
                     children: [
-                        {headerName: "one", field: "oneType"},
-                        {headerName: "other", field: "otherType"},
+                        {headerName: 'one', field: 'oneType'},
+                        {headerName: 'other', field: 'otherType'},
                     ]
                 },
                 {
-                    headerName: "ContentType",
-                    columnGroupShow: "open",
+                    headerName: 'ContentType',
+                    columnGroupShow: 'open',
                     children: [
                         {
-                            headerName: "one",
-                            field: "oneContentType",
+                            headerName: 'one',
+                            field: 'oneContentType',
                         },
                         {
-                            headerName: "other",
-                            field: "otherContentType",
+                            headerName: 'other',
+                            field: 'otherContentType',
                         },
                     ]
                 },
             ]
         },
         {
-            headerName: "requestTime",
-            field: "requestTime",
+            headerName: 'requestTime',
+            field: 'requestTime',
             pinned: 'right',
         },
     ];
