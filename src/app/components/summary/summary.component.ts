@@ -695,9 +695,9 @@ export class SummaryComponent implements OnInit {
             `table=${this.service.table}`,
             `bucket=${this.service.bucket}`,
             `prefix=${this.service.prefix}`,
-            `mql=${this.mql}`,
-            trialFilter !== '{}' ? `trialFilter=${trialFilter}` : null,
-            trialSort !== '[]' ? `trialSort=${trialSort}` : null,
+            `mql=${encodeURI(this.mql)}`,
+            trialFilter !== '{}' ? `trialFilter=${encodeURI(trialFilter)}` : null,
+            trialSort !== '[]' ? `trialSort=${encodeURI(trialSort)}` : null,
         ].filter(x => x).join('&')
         const url = `${location.origin}${path}?${query}`
 
