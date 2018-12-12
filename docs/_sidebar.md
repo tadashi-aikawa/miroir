@@ -3,6 +3,7 @@
 - [Trial table](trialtable.md)
 - Releases
   - 0.26.x
+    - [0.26.2](releases/0.26.2.md)
     - [0.26.1](releases/0.26.1.md)
     - [0.26.0](releases/0.26.0.md)
   - [0.25.0](releases/0.25.0.md)
