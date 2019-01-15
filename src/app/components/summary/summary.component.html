@@ -245,6 +245,9 @@
                     <app-panel [title]="activeReport.summary.one.name" class="smart-padding-small">
                         <small><a [href]="activeReport.summary.one.host">{{activeReport.summary.one.host}}</a></small>
                         <div>
+                            <span class="path-label" *ngIf="activeReport.summary.one.path">
+                                path ┃ {{activeReport.summary.one.path.before}} → {{activeReport.summary.one.path.after}}
+                            </span>
                             <span class="overwritten-query-label" *ngFor="let v of activeReport.summary.one.queriesOverwritten">
                                 + {{v}}
                             </span>
@@ -256,6 +259,9 @@
                     <app-panel [title]="activeReport.summary.other.name" class="smart-padding-small">
                         <small><a [href]="activeReport.summary.other.host">{{activeReport.summary.other.host}}</a></small>
                         <div>
+                            <span class="path-label" *ngIf="activeReport.summary.other.path">
+                                path ┃ {{activeReport.summary.other.path.before}} → {{activeReport.summary.other.path.after}}
+                            </span>
                             <span class="overwritten-query-label" *ngFor="let v of activeReport.summary.other.queriesOverwritten">
                                 + {{v}}
                             </span>

@@ -66,12 +66,22 @@
     text-shadow: 5px 5px 3px rgba(0,0,0,0.2);
 }
 
+.path-label {
+    color: whitesmoke;
+    background-color: #6e81b7;
+    font-size: 75%;
+    border-radius: 15px;
+    padding: 1px 5px 1px 5px;
+    margin: 0 1px;
+}
+
 .overwritten-query-label {
     color: whitesmoke;
     background-color: #71b771;
     font-size: 75%;
     border-radius: 15px;
     padding: 1px 5px 1px 5px;
+    margin: 0 1px;
 }
 
 .removed-query-label {
@@ -80,6 +90,7 @@
     font-size: 75%;
     border-radius: 15px;
     padding: 1px 5px 1px 5px;
+    margin: 0 1px;
 }
 
 .diff-button {
