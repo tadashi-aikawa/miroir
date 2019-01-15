@@ -19,24 +19,25 @@
 </div>
 
 <div *ngIf="!fullscreen">
-        <ng-select #selector
-                   [items]="options"
-                   [virtualScroll]="true"
-                   [clearable]="false"
-                   bindValue="value"
-                   bindLabel="label"
-                   [(ngModel)]="activeIndex"
-                   (change)="showTrial(trial)"
-        >
-            <ng-template ng-label-tmp let-item="item">
-                <b>{{ item.label }}</b>
-                <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
-            </ng-template>
-            <ng-template ng-option-tmp let-item="item">
-                <b>{{ item.label }}</b>
-                <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
-            </ng-template>
-        </ng-select>
+    <ng-select #selector
+               tabindex="0"
+               [items]="options"
+               [virtualScroll]="true"
+               [clearable]="false"
+               bindValue="value"
+               bindLabel="label"
+               [(ngModel)]="activeIndex"
+               (change)="showTrial(trial)"
+    >
+        <ng-template ng-label-tmp let-item="item">
+            <b>{{ item.label }}</b>
+            <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
+        </ng-template>
+        <ng-template ng-option-tmp let-item="item">
+            <b>{{ item.label }}</b>
+            <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
+        </ng-template>
+    </ng-select>
     <div class="pain2" style="padding-right: calc(66px + 15px);">
         <div class="smart-padding-xsmall">
             <app-panel [url]="trial.one.url" [title]="oneAccessPoint.name" titleFont="small">
@@ -86,7 +87,8 @@
 <div *ngIf="!isLoading && !targetPropertyValue" class="origin-queries" [@diff-property-value]>
     {{trial.queryString}}
 </div>
-<div class="diff-property-overlay" style="padding-right: calc(66px + 15px);" *ngIf="!isLoading && targetPropertyValue" [@diff-property-value]>
+<div class="diff-property-overlay" style="padding-right: calc(66px + 15px);" *ngIf="!isLoading && targetPropertyValue"
+     [@diff-property-value]>
     <div style="justify-self: right; align-self: center;">
         <pre>{{ targetPropertyValue.one }}</pre>
     </div>
@@ -127,13 +129,18 @@
             </div>
             <div style="padding-top: 40px; padding-left: 10px;">
                 <div>
-                    <mat-button-toggle [checked]="unifiedDiff" (change)="changeDiffType($event.source.checked)">
+                    <mat-button-toggle
+                        [checked]="unifiedDiff"
+                        (change)="changeDiffType($event.source.checked)"
+                    >
                         <mat-icon title="Toggl diff kind">view_agenda</mat-icon>
                     </mat-button-toggle>
                 </div>
                 <div>
-                    <mat-button-toggle [checked]="isIgnoredDiffHidden"
-                                       (change)="changeHideIgnoredDiff($event.source.checked)">
+                    <mat-button-toggle
+                        [checked]="isIgnoredDiffHidden"
+                        (change)="changeHideIgnoredDiff($event.source.checked)"
+                    >
                         <mat-icon style="color: green;"
                                   title="Toggl ignored properties visibility">
                             visibility_off
@@ -141,8 +148,10 @@
                     </mat-button-toggle>
                 </div>
                 <div>
-                    <mat-button-toggle [checked]="isCheckedAlreadyDiffHidden"
-                                       (change)="changeHideCheckedAlreadyDiff($event.source.checked)">
+                    <mat-button-toggle
+                        [checked]="isCheckedAlreadyDiffHidden"
+                        (change)="changeHideCheckedAlreadyDiff($event.source.checked)"
+                    >
                         <mat-icon style="color: red;"
                                   title="Toggl checked already properties visibility">
                             visibility_off
@@ -150,8 +159,10 @@
                     </mat-button-toggle>
                 </div>
                 <div>
-                    <mat-button-toggle [checked]="isLineFilterEnabled"
-                                       (change)="changeLineFilterEnabled($event.source.checked)">
+                    <mat-button-toggle
+                        [checked]="isLineFilterEnabled"
+                        (change)="changeLineFilterEnabled($event.source.checked)"
+                    >
                         <mat-icon title="Toggl line filter">
                             filter
                         </mat-icon>
@@ -223,7 +234,7 @@
                             </div>
                             <div *ngFor="let p of propertyDiffsByCognition.unknown.removed" class="center-vertical">
                                 <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
-                                    <mat-icon class="removed" >remove</mat-icon>
+                                    <mat-icon class="removed">remove</mat-icon>
                                 </button>
                                 <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
                             </div>
