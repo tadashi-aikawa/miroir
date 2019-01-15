@@ -218,6 +218,7 @@ export class DetailDialogComponent implements OnInit {
     queryDefaultColDef = {
         filterParams: {
             textCustomComparator: regexpComparator,
+            newRowsAction: 'keep',
             debounceMs: 200
         },
         floatingFilterComponentParams: {
