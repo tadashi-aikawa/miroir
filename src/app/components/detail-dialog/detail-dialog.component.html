@@ -48,7 +48,10 @@
                     <span class="label">{{trial.one.response_sec}} s</span>
                     <span class="label">{{trial.one.status_code}}</span>
                 </div>
-                <div class="center">
+                <div class="center smart-padding-xsmall">
+                    <span class="path-label" *ngIf="oneAccessPoint.path">
+                        path ┃ {{oneAccessPoint.path.before}} → {{oneAccessPoint.path.after}}
+                    </span>
                     <span class="overwritten-query-label" *ngFor="let v of oneAccessPoint.queriesOverwritten">
                         + {{v}}
                     </span>
@@ -67,7 +70,10 @@
                     <span class="label">{{trial.other.response_sec}} s</span>
                     <span class="label">{{trial.other.status_code}}</span>
                 </div>
-                <div class="center">
+                <div class="center smart-padding-xsmall">
+                    <span class="path-label" *ngIf="otherAccessPoint.path">
+                        path ┃ {{otherAccessPoint.path.before}} → {{otherAccessPoint.path.after}}
+                    </span>
                     <span class="overwritten-query-label" *ngFor="let v of otherAccessPoint.queriesOverwritten">
                         + {{v}}
                     </span>
