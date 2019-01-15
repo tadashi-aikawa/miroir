@@ -178,12 +178,22 @@ mat-select {
     color: rgb(86, 120, 226);
 }
 
+.path-label {
+    color: whitesmoke;
+    background-color: #6e81b7;
+    font-size: 75%;
+    border-radius: 15px;
+    padding: 1px 5px 1px 5px;
+    margin: 0 1px;
+}
+
 .overwritten-query-label {
     color: whitesmoke;
     background-color: #71b771;
     font-size: 75%;
     border-radius: 15px;
     padding: 1px 5px 1px 5px;
+    margin: 0 1px;
 }
 
 .removed-query-label {
@@ -192,4 +202,5 @@ mat-select {
     font-size: 75%;
     border-radius: 15px;
     padding: 1px 5px 1px 5px;
+    margin: 0 1px;
 }

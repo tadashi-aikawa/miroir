@@ -116,6 +116,11 @@ export class Summary {
     };
 }
 
+export class PathReplace {
+    before: string
+    after: string
+}
+
 export class QueryCustomization {
     overwrite?: {[key: string]: string[]}
     remove?: string[]
@@ -125,6 +130,7 @@ export class AccessPoint {
     name: string;
     host: string;
     proxy?: String;
+    path?: PathReplace
     query?: QueryCustomization
 
     @LazyGetter()
