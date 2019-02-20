@@ -197,7 +197,7 @@
     </mat-tab>
     <mat-tab label="Property diffs">
         <div style="display: flex; justify-content: space-between;">
-            <div *ngIf="trial.diff_keys" style="flex: 1;" [style.height]="diffViewerHeight" class="scrollable-y">
+            <div *ngIf="trial.diff_keys || trial.diffs_by_cognition" style="flex: 1;" [style.height]="diffViewerHeight" class="scrollable-y">
                 <h2 class="center-vertical">
                     <mat-icon>report_problem</mat-icon>&nbsp;Unknown!!
                 </h2>
@@ -367,7 +367,7 @@
                     </expansion-panel>
                 </expansion-panels-container>
             </div>
-            <div *ngIf="!trial.diff_keys" style="flex: 1;">
+            <div *ngIf="!trial.diff_keys && !trial.diffs_by_cognition" style="flex: 1;">
                 <div class="center-horizontal" style="height: 50%;">
                     <div class="error-message" style="padding-top: 20px;">
                         ┌────────────────────┐<br/>
