@@ -169,6 +169,7 @@ export class Trial {
     status: string;
     tags: string[]
     diff_keys?: DiffKeys;
+    diffs_by_cognition?: {[key: string]: DiffKeys}
 
     propertyDiffsByCognition?: PropertyDiffsByCognition;
     attention?: string;

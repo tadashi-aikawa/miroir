@@ -57,7 +57,7 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
 
 
 const toAttention = (t: Trial): string => {
-    if ((!t.diff_keys) && t.status === 'different') {
+    if ((!t.diff_keys && !t.diffs_by_cognition) && t.status === 'different') {
         return 'No diff keys!!';
     }
     if (t.propertyDiffsByCognition && !t.propertyDiffsByCognition.unknown.isEmpty()) {
