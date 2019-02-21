@@ -4,6 +4,7 @@ import {
     CheckPoint, Condition, DiffKeys, IgnoreCase, PropertyDiffs, PropertyDiffsByCognition,
     Trial
 } from '../models/models';
+import {ignore} from 'selenium-webdriver/testing'
 
 const isDiffKeysEmpty = (diffKeys: DiffKeys): boolean =>
     diffKeys.added.length === 0 &&
@@ -58,19 +59,36 @@ function createPropertyDiff(ignore: IgnoreCase, path: string, name: string, diff
 }
 
 function createPropertyDiffs(trial: Trial, ignores: IgnoreCase[], checkedAlready: IgnoreCase[]): PropertyDiffsByCognition {
-    if (!trial.diff_keys) {
+    if (!trial.diff_keys && !trial.diffs_by_cognition) {
         return undefined;
     }
 
-    const ignoredDiffs: PropertyDiffs[] = ignores.map(
-        x => createPropertyDiff(x, trial.path, trial.name, trial.diff_keys)
-    );
+    let ignoredDiffs: PropertyDiffs[]
+    let diffsWithoutIgnored: DiffKeys
+    if (trial.diffs_by_cognition) {
+        const toPropertyDiffs = (val, key) => Object.assign(
+            new PropertyDiffs(),
+            { title: key, added: val.added, changed: val.changed, removed: val.removed, }
+        )
 
-    const diffsWithoutIgnored: DiffKeys = Object.assign(new DiffKeys(), {
-        added: trial.diff_keys.added.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.added), x)),
-        changed: trial.diff_keys.changed.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.changed), x)),
-        removed: trial.diff_keys.removed.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.removed), x)),
-    });
+        ignoredDiffs = _(trial.diffs_by_cognition)
+            .map(toPropertyDiffs)
+            .filter( x => x.title !== 'unknown' )
+            .value()
+        diffsWithoutIgnored = trial.diffs_by_cognition.unknown || Object.assign(new DiffKeys(), {
+            added: [], changed: [], removed: [],
+        })
+    } else {
+        // FIXME: Old operation... erase soon if judgement/ignore_properties is removed
+        ignoredDiffs = ignores.map(
+            x => createPropertyDiff(x, trial.path, trial.name, trial.diff_keys)
+        );
+        diffsWithoutIgnored = Object.assign(new DiffKeys(), {
+            added: trial.diff_keys.added.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.added), x)),
+            changed: trial.diff_keys.changed.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.changed), x)),
+            removed: trial.diff_keys.removed.filter(x => !_.includes(_.flatMap(ignoredDiffs, y => y.removed), x)),
+        });
+    }
 
     const checkedAlreadyDiffs: PropertyDiffs[] = checkedAlready.map(
         x => createPropertyDiff(x, trial.path, trial.name, diffsWithoutIgnored)
