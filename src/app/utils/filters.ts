@@ -5,13 +5,13 @@ export function regexpComparator (filter: string, gridValue: any, regExp: string
     case 'notContains':
         return !gridValue.match(new RegExp(regExp));
     case 'equals':
-        return !!gridValue.match(new RegExp(`^${regExp}$`));
+        return !!gridValue.match(new RegExp(`^(${regExp})$`));
     case 'notEqual':
-        return !gridValue.match(new RegExp(`^${regExp}$`));
+        return !gridValue.match(new RegExp(`^(${regExp})$`));
     case 'startsWith':
-        return !!gridValue.match(new RegExp(`^${regExp}`));
+        return !!gridValue.match(new RegExp(`^(${regExp})`));
     case 'endsWith':
-        return !!gridValue.match(new RegExp(`${regExp}$`));
+        return !!gridValue.match(new RegExp(`(${regExp})$`));
     default:
         // should never happen
         console.warn('invalid filter type ' + filter);

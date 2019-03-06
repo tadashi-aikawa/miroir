@@ -12,7 +12,7 @@ const isDiffKeysEmpty = (diffKeys: DiffKeys): boolean =>
     diffKeys.removed.length === 0;
 
 function matchRegExp(pattern: string, target: string): boolean {
-    return new RegExp(`^${pattern}$`).test(target);
+    return new RegExp(`^(${pattern})$`).test(target);
 }
 
 function toLodashPath(property: string): string {
