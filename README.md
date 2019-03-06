@@ -78,16 +78,3 @@ Then access to `http://localhost:8888/miroir`
 $ make deploy-s3 BUCKET=your-miroir-bucket
 ```
 
-
-Other
------
-
-### Dependencies without package.json
-
-```
-"monaco-editor": "^0.10.1",
-```
-
-Migrate to `package.json` when following issue is closed.
-
-[Support for module\.js or commonjs? · Issue \#40 · Microsoft/monaco\-editor](https://github.com/Microsoft/monaco-editor/issues/40)
