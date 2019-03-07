@@ -64,7 +64,7 @@ release:  ## Release
 	npm version $(version)
 
 	@echo '3. Push'
-	git push
+	git push --tags
 
 	@echo 'Success All!!'
 	@echo 'Create a pull request and merge to master!!'
