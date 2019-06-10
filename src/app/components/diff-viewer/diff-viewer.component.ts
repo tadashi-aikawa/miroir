@@ -44,7 +44,7 @@ export class DiffViewerComponent implements AfterViewInit, OnDestroy, OnChanges 
     diffEditor: any;
     diffNavigator: any;
 
-    @ViewChild('view') view: ElementRef;
+    @ViewChild('view', { static: true }) view: ElementRef;
 
     private _updateLayout: Function;
 

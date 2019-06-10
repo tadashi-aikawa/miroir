@@ -159,8 +159,8 @@ export class ToAttentionPipe implements PipeTransform {
     transform(trials: Trial[]): DiffSummary[] {
         return _(trials)
             .filter((t: Trial) => !!t.attention)
-            .groupBy<Trial>((t: Trial) => t.attention)
-            .mapValues<Dictionary<Trial[]>, DiffSummary>((xs: Trial[]) => ({
+            .groupBy((t: Trial) => t.attention)
+            .mapValues<DiffSummary>((xs: Trial[]) => ({
                 title: xs[0].attention,
                 count: xs.length,
                 trials: xs,
@@ -189,7 +189,7 @@ export class ToCheckedAlreadyDiffSummaryPipe implements PipeTransform {
                 )
             )
             .groupBy((pd: DiffSummaryWip) => pd.title)
-            .mapValues<Dictionary<DiffSummaryWip[]>, DiffSummary>(xs => ({
+            .mapValues<DiffSummary>(xs => ({
                 title: xs[0].title,
                 image: xs[0].image,
                 link: xs[0].link,
@@ -218,7 +218,7 @@ export class ToIgnoredDiffSummaryPipe implements PipeTransform {
                 })
             ))
             .groupBy((xs: DiffSummaryWip) => xs.title)
-            .mapValues<Dictionary<DiffSummaryWip[]>, DiffSummary>(xs => ({
+            .mapValues<DiffSummary>(xs => ({
                 title: xs[0].title,
                 image: xs[0].image,
                 link: xs[0].link,
@@ -234,13 +234,13 @@ export class ToIgnoredDiffSummaryPipe implements PipeTransform {
 export class ToPathPipe implements PipeTransform {
     transform(trials: Trial[]): PathSummary[] {
         return _(trials)
-            .groupBy<Trial>((t: Trial) => t.path)
-            .mapValues<Dictionary<Trial[]>, PathSummary>((xs: Trial[]) => ({
+            .groupBy((t: Trial) => t.path)
+            .mapValues<PathSummary>((xs: Trial[]) => ({
                 title: xs[0].path,
                 count: xs.length,
                 status: _(xs)
-                    .groupBy<Trial>((x: Trial) => x.status)
-                    .mapValues<Dictionary<Trial[]>, number>((x: Trial[]) => x.length)
+                    .groupBy((x: Trial) => x.status)
+                    .mapValues<number>((x: Trial[]) => x.length)
                     .value() as { same: number, different: number, failure: number },
                 trials: xs,
             }))

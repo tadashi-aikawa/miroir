@@ -4,10 +4,13 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "paths": {
+      "core-js/es7/reflect": ["../node_modules/core-js/proposals/reflect-metadata"],
+      "core-js/es6/*": ["../node_modules/core-js/es/*"]
+    },
     "lib": [
-      "es2016",
-      "dom",
-      "es2015.promise"
+      "es2017",
+      "dom"
     ],
     "mapRoot": "./",
     "module": "es2015",

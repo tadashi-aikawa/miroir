@@ -49,15 +49,15 @@ import {hasContents} from 'app/utils/regexp';
                 <hr/>
                 <div class="smart-padding-left-small">
                     <mat-icon class="action-icon-large hvr-buzz-out"
-                             style="font-size: 22px; margin-left: 10px;"
-                             title="Save (Ctrl+Enter)"
-                             (click)="update()">
+                              style="font-size: 22px; margin-left: 10px;"
+                              title="Save (Ctrl+Enter)"
+                              (click)="update()">
                         check
                     </mat-icon>
                     <mat-icon class="action-icon-large hvr-buzz-out"
-                             style="font-size: 22px; margin-left: 10px;"
-                             title="Cancel (ESC)"
-                             (click)="cancel()">
+                              style="font-size: 22px; margin-left: 10px;"
+                              title="Cancel (ESC)"
+                              (click)="cancel()">
                         cancel
                     </mat-icon>
                 </div>
@@ -73,7 +73,7 @@ export class MarkdownInlineEditorComponent {
     editing = false;
     previousValue: string;
 
-    @ViewChild(MatTextareaAutosize) autosize;
+    @ViewChild(MatTextareaAutosize, {static: true}) autosize;
 
     constructor(private _dialog: MatDialog) {
     }

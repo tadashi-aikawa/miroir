@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import {Row, Trial} from '../../models/models';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {regexpComparator} from '../../utils/filters';
-import {Column} from 'ag-grid';
+import {Column} from 'ag-grid-community';
 
 export interface RowData {
     trial: Trial;

@@ -191,9 +191,9 @@ export class DetailDialogComponent implements OnInit {
     @Input() isLineFilterEnabled: boolean = this.settingsService.isLineFilterEnabled;
     @Input() isLineFilterNegative: boolean = this.settingsService.isLineFilterNegative;
 
-    @ViewChild('selector') selector;
-    @ViewChild('diffView') diffView;
-    @ViewChild('editor') editor;
+    @ViewChild('selector', { static: true }) selector;
+    @ViewChild('diffView', { static: true }) diffView;
+    @ViewChild('editor', { static: true }) editor;
 
     tableQueryRowData: QueryRowData[];
     propertyDiffsByCognition: PropertyDiffsByCognition;

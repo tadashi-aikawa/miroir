@@ -124,7 +124,7 @@ const appRoutes: Routes = [
         Ng2HighchartsModule,
         ExpansionPanelsModule,
         HotkeyModule.forRoot({disableCheatSheet: true}),
-        LocalStorageModule.withConfig({
+        LocalStorageModule.forRoot({
             prefix: 'miroir',
             storageType: 'localStorage'
         }),

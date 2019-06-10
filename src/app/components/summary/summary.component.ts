@@ -160,10 +160,10 @@ export class SummaryComponent implements OnInit {
 
     @Input() cheatSheet = false;
 
-    @ViewChild('sidenav') sideNav: MatSidenav;
-    @ViewChild('keyWord') keyWord: ElementRef;
-    @ViewChild('trialsTable') trialsTable: TrialsTableComponent;
-    @ViewChild('analytics') analytics: AnalyticsComponent;
+    @ViewChild('sidenav', {static: true}) sideNav: MatSidenav;
+    @ViewChild('keyWord', {static: true}) keyWord: ElementRef;
+    @ViewChild('trialsTable', {static: true}) trialsTable: TrialsTableComponent;
+    @ViewChild('analytics', {static: true}) analytics: AnalyticsComponent;
 
     word = '';
     mql = '';
@@ -301,7 +301,7 @@ export class SummaryComponent implements OnInit {
                                 }, 500);
 
                             });
-                });
+                    });
             });
         });
 
@@ -358,7 +358,7 @@ export class SummaryComponent implements OnInit {
         this.filteredRows = this.rows.filter(
             x => this.mql.split(' ').every(t => !t || cardFilter(t, x))
         );
-        this.displayedRows =  _.take(
+        this.displayedRows = _.take(
             this.filteredRows,
             _.min([displayedNumber, this.filteredRows.length])
         );
