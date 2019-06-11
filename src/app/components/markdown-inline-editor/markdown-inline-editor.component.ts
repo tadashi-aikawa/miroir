@@ -1,9 +1,9 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {animate, style, transition, trigger} from '@angular/animations';
-import {MatDialog, MatTextareaAutosize} from '@angular/material';
+import {MatDialog} from '@angular/material';
 import {Change} from 'app/models/models';
 import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/confirm-dialog.component';
-import {hasContents} from 'app/utils/regexp';
+import {CdkTextareaAutosize} from '@angular/cdk/text-field'
 
 @Component({
     selector: 'app-markdown-inline-editor',
@@ -44,7 +44,7 @@ import {hasContents} from 'app/utils/regexp';
 
             <mat-form-field *ngIf="editing" [@feed] class="balloon-right" style="flex: 1">
                 <div class="smart-padding-xsmall">
-                    <textarea id="edit-area" matInput matTextareaAutosize [(ngModel)]="value"></textarea>
+                    <textarea id="edit-area" matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" [(ngModel)]="value"></textarea>
                 </div>
                 <hr/>
                 <div class="smart-padding-left-small">
@@ -73,7 +73,7 @@ export class MarkdownInlineEditorComponent {
     editing = false;
     previousValue: string;
 
-    @ViewChild(MatTextareaAutosize, {static: true}) autosize;
+    @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
     constructor(private _dialog: MatDialog) {
     }
