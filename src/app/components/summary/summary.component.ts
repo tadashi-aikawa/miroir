@@ -154,7 +154,7 @@ const cardFilter = (word: string, row: DynamoRow): boolean => {
                 ])
             ]
         )
-    ],
+    ]
 })
 export class SummaryComponent implements OnInit {
 
@@ -162,7 +162,7 @@ export class SummaryComponent implements OnInit {
 
     @ViewChild('sidenav', {static: true}) sideNav: MatSidenav;
     @ViewChild('keyWord', {static: true}) keyWord: ElementRef;
-    @ViewChild('trialsTable', {static: true}) trialsTable: TrialsTableComponent;
+    @ViewChild('trialsTable', {static: false}) trialsTable: TrialsTableComponent;
     @ViewChild('analytics', {static: true}) analytics: AnalyticsComponent;
 
     word = '';
