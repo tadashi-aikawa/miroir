@@ -29,7 +29,6 @@
             <div *ngIf="rows">
                 <mat-form-field class="filter-word-form">
                     <input matInput title="ex. simple st:!closed"
-                           [(ngModel)]="mql"
                            (keyup)="onReportFilterUpdated()"
                            [formControl]="mqlControl"
                            [matAutocomplete]="auto">

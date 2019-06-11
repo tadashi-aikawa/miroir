@@ -166,7 +166,6 @@ export class SummaryComponent implements OnInit {
     @ViewChild('analytics', {static: true}) analytics: AnalyticsComponent;
 
     word = '';
-    mql = '';
 
     searchingSummary: boolean;
     searchErrorMessage: string;
@@ -251,6 +250,8 @@ export class SummaryComponent implements OnInit {
 
     ngOnInit(): void {
         this.initKeyBindings();
+        this.mqlControl.setValue('')
+
         setTimeout(() => {
             this.sideNav.open().then(() => {
                 setTimeout(() => this.keyWord.nativeElement.click(), 100);
@@ -267,7 +268,7 @@ export class SummaryComponent implements OnInit {
                 this.word = ps.searchWord;
 
                 if (qs.mql) {
-                    this.mql = qs.mql
+                    this.mqlControl.setValue(qs.mql)
                 }
 
                 this.searchReport(ps.searchWord)
@@ -356,7 +357,7 @@ export class SummaryComponent implements OnInit {
     updateDisplayedAndFilteredRows(displayedNumber: number) {
         this.previousFilteredRowsCount = this.filteredRows.length;
         this.filteredRows = this.rows.filter(
-            x => this.mql.split(' ').every(t => !t || cardFilter(t, x))
+            x => this.mqlControl.value.split(' ').every(t => !t || cardFilter(t, x))
         );
         this.displayedRows = _.take(
             this.filteredRows,
@@ -695,7 +696,7 @@ export class SummaryComponent implements OnInit {
             `table=${this.service.table}`,
             `bucket=${this.service.bucket}`,
             `prefix=${this.service.prefix}`,
-            `mql=${encodeURI(this.mql)}`,
+            `mql=${encodeURI(this.mqlControl.value)}`,
             trialFilter !== '{}' ? `trialFilter=${encodeURI(trialFilter)}` : null,
             trialSort !== '[]' ? `trialSort=${encodeURI(trialSort)}` : null,
         ].filter(x => x).join('&')
