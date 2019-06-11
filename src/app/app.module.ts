@@ -28,23 +28,19 @@ import {
     MatToolbarModule,
 } from '@angular/material';
 import {LocalStorageModule} from 'angular-2-local-storage';
-import { NgSelectModule } from '@ng-select/ng-select';
+import {NgSelectModule} from '@ng-select/ng-select';
 import {HotkeyModule} from 'angular2-hotkeys';
 import {Ng2HighchartsModule} from 'ng2-highcharts';
 import {ExpansionPanelsModule} from 'ng2-expansion-panels';
 import {MarkdownModule} from 'angular2-markdown';
 import {AgGridModule} from 'ag-grid-angular';
-import { CountoModule } from 'angular2-counto';
+import {CountoModule} from 'angular2-counto';
 
 import 'hammerjs';
 
 import {AppComponent} from './app.component';
 import {RootComponent} from './components/root/root.component';
-import {
-    DeleteConfirmDialogComponent,
-    EditorDialogComponent,
-    SummaryComponent,
-} from './components/summary/summary.component';
+import {DeleteConfirmDialogComponent, EditorDialogComponent, SummaryComponent,} from './components/summary/summary.component';
 import {DiffViewerComponent} from './components/diff-viewer/diff-viewer.component';
 import {ResponseTimeChartComponent} from './components/response-time-chart/response-time-chart.component';
 import {CommonModule, HashLocationStrategy, LocationStrategy} from '@angular/common';
@@ -55,9 +51,7 @@ import {SettingsService} from './services/settings-service';
 import {AuthGuard} from './components/guard/auth.guard';
 import {LoginComponent} from './components/login/login.component';
 import {InlineEditorComponent} from './components/inline-editor/inline-editor.component';
-import {
-    MarkdownInlineEditorComponent
-} from './components/markdown-inline-editor/markdown-inline-editor.component';
+import {MarkdownInlineEditorComponent} from './components/markdown-inline-editor/markdown-inline-editor.component';
 import {BadgeComponent, BadgeListComponent} from './components/badge/badge-component';
 import {ConfirmDialogComponent} from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import {MonacoEditorLoader} from './services/monaco-editor-loader';
@@ -71,7 +65,7 @@ import {
 } from './components/analystic/analytics.component';
 import {ToasterModule} from 'angular2-toaster';
 import {PanelComponent} from './components/panel/panel-component';
-import {HasContentsPipe, EmptyContentsPipe} from './utils/regexp';
+import {EmptyContentsPipe, HasContentsPipe} from './utils/regexp';
 import {TrialsTableComponent} from './components/trials-table/trials-table.component';
 
 const appRoutes: Routes = [

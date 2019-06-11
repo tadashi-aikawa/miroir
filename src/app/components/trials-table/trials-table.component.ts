@@ -66,7 +66,10 @@ export class TrialsTableComponent {
         },
         floatingFilterComponentParams: {
             debounceMs: 200,
-        }
+        },
+        sortable: true,
+        resizable: true,
+        filter: true,
     };
 
     columnDefs = [

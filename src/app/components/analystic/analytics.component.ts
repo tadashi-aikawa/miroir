@@ -1,8 +1,7 @@
 import {Memoize} from 'lodash-decorators';
 import {PropertyDiffs, Row, Summary, Trial} from '../../models/models';
-import {Component, Input, Pipe, PipeTransform, Output, EventEmitter, SimpleChanges, OnChanges} from '@angular/core';
+import {Component, EventEmitter, Input, Output, Pipe, PipeTransform} from '@angular/core';
 import * as _ from 'lodash';
-import {Dictionary} from 'lodash';
 
 @Component({
     selector: 'app-analytics',
@@ -44,11 +43,15 @@ export class AnalyticsComponent {
         {
             headerName: "Title",
             field: "title",
+            sortable: true,
+            resizable: true,
             width: 175,
         },
         {
             headerName: "Count",
             field: "count",
+            sortable: true,
+            resizable: true,
             width: 100,
         },
     ];
@@ -57,11 +60,15 @@ export class AnalyticsComponent {
         {
             headerName: "Title",
             field: "title",
+            sortable: true,
+            resizable: true,
             width: 350,
         },
         {
             headerName: "Count",
             field: "count",
+            sortable: true,
+            resizable: true,
             width: 100,
         },
     ];
@@ -70,11 +77,15 @@ export class AnalyticsComponent {
         {
             headerName: "Title",
             field: "title",
+            sortable: true,
+            resizable: true,
             width: 350,
         },
         {
             headerName: "Count",
             field: "count",
+            sortable: true,
+            resizable: true,
             width: 100,
         },
     ];
@@ -83,22 +94,37 @@ export class AnalyticsComponent {
         {
             headerName: "Path",
             field: "title",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
         {
             headerName: "Count",
             field: "count",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
         {
             headerName: "Same",
             field: "status.same",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
         {
             headerName: "Different",
             field: "status.different",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
         {
             headerName: "Failure",
             field: "status.failure",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
     ];
 
