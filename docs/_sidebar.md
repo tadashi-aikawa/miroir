@@ -2,6 +2,7 @@
 - [MQL](mql.md)
 - [Trial table](trialtable.md)
 - Releases
+  - [0.29.0](releases/0.29.0.md)
   - 0.28.x
     - [0.28.1](releases/0.28.1.md)
     - [0.28.0](releases/0.28.0.md)
