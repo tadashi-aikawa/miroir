@@ -54,7 +54,6 @@
     "lodash-decorators": "^6.0.1",
     "luxon": "^1.16.0",
     "monaco-editor": "^0.17.0",
-    "ng2-expansion-panels": "^0.0.6",
     "ng2-highcharts": "^1.2.0",
     "rxjs": "^6.5.2",
     "rxjs-compat": "^6.5.2",
