@@ -17,6 +17,10 @@ mat-sidenav {
     width: 400px;
 }
 
+mat-form-field {
+    width: 100%;
+}
+
 .navbar-title {
     padding: 10px;
     font-family: cursive;
