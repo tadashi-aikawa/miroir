@@ -5,7 +5,7 @@
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
-    "dev": "ng serve --host 0.0.0.0 --poll 1000",
+    "dev": "ng serve",
     "docs": "docsify serve docs",
     "test": "ng test",
     "lint": "ng lint",
