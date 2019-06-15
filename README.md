@@ -43,6 +43,8 @@ Then access to `http://localhost:4200/`
 Release
 -------
 
+**Window is OK!! Good :+1:**
+
 Before release, you need to `Confirm that your branch name equals release version`
 
 1. `make add-release` for createing `docs/releases/*.md`
