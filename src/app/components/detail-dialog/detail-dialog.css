@@ -2,10 +2,6 @@
     width: 200px;
 }
 
-:host >>> div.expansion-panel__content {
-    margin-left: 10px;
-}
-
 .smart-padding-without-left {
     padding-top: 5px;
 }
@@ -28,7 +24,7 @@
 
 .count-word {
     color: gray;
-    font-size:75%;
+    font-size: 75%;
 }
 
 .property-diffs {
@@ -63,7 +59,7 @@
     border-radius: 15px;
     padding: 1px 5px 1px 5px;
     border: 1px outset;
-    text-shadow: 5px 5px 3px rgba(0,0,0,0.2);
+    text-shadow: 5px 5px 3px rgba(0, 0, 0, 0.2);
 }
 
 .path-label {
@@ -106,3 +102,7 @@
     opacity: 0.65;
 }
 
+.diffs-expansion-panel {
+    padding: 5px;
+    margin: 5px 20px;
+}

@@ -194,175 +194,160 @@
     </mat-tab>
     <mat-tab label="Property diffs">
         <div style="display: flex; justify-content: space-between;">
-            <div *ngIf="trial.diff_keys || trial.diffs_by_cognition" style="flex: 1;" [style.height]="diffViewerHeight" class="scrollable-y">
+            <div *ngIf="trial.diff_keys || trial.diffs_by_cognition" style="flex: 1;" [style.height]="diffViewerHeight"
+                 class="scrollable-y">
                 <h2 class="center-vertical">
                     <mat-icon>report_problem</mat-icon>&nbsp;Unknown!!
                 </h2>
 
-                <expansion-panels-container *ngIf="!propertyDiffsByCognition.unknown.isEmpty()">
-                    <expansion-panel>
-                        <expansion-panel-title style="display: flex;">
-                            <div class="center-horizontal little-horizontal-padding">
-                                <mat-icon class="added">add</mat-icon>
-                                <span class="diff-type-number">{{propertyDiffsByCognition.unknown.added.length}}</span>
-                            </div>
-                            <div class="center-horizontal little-horizontal-padding">
-                                <mat-icon class="changed">autorenew</mat-icon>
-                                <span
-                                    class="diff-type-number">{{propertyDiffsByCognition.unknown.changed.length}}</span>
-                            </div>
-                            <div class="center-horizontal little-horizontal-padding">
-                                <mat-icon class="removed">removed</mat-icon>
-                                <span
-                                    class="diff-type-number">{{propertyDiffsByCognition.unknown.removed.length}}</span>
-                            </div>
-                        </expansion-panel-title>
-                        <expansion-panel-description-hidden>{{propertyDiffsByCognition.unknown.title}}
-                        </expansion-panel-description-hidden>
-                        <expansion-panel-description-toggled>{{propertyDiffsByCognition.unknown.title}}
-                        </expansion-panel-description-toggled>
-
-                        <expansion-panel-content>
-                            <div *ngFor="let p of propertyDiffsByCognition.unknown.added" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                <mat-accordion *ngIf="!propertyDiffsByCognition.unknown.isEmpty()">
+                    <mat-expansion-panel class="diffs-expansion-panel">
+                        <mat-expansion-panel-header style="display: flex;">
+                            <mat-panel-title>
+                                <div class="center-horizontal little-horizontal-padding">
                                     <mat-icon class="added">add</mat-icon>
-                                </button>
-                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                            </div>
-                            <div *ngFor="let p of propertyDiffsByCognition.unknown.changed" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                                    <span
+                                        class="diff-type-number">{{propertyDiffsByCognition.unknown.added.length}}</span>
+                                </div>
+                                <div class="center-horizontal little-horizontal-padding">
                                     <mat-icon class="changed">autorenew</mat-icon>
-                                </button>
-                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                            </div>
-                            <div *ngFor="let p of propertyDiffsByCognition.unknown.removed" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
-                                    <mat-icon class="removed">remove</mat-icon>
-                                </button>
-                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                            </div>
-                        </expansion-panel-content>
-                    </expansion-panel>
-                </expansion-panels-container>
+                                    <span
+                                        class="diff-type-number">{{propertyDiffsByCognition.unknown.changed.length}}</span>
+                                </div>
+                                <div class="center-horizontal little-horizontal-padding">
+                                    <mat-icon class="removed">removed</mat-icon>
+                                    <span
+                                        class="diff-type-number">{{propertyDiffsByCognition.unknown.removed.length}}</span>
+                                </div>
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                {{propertyDiffsByCognition.unknown.title}}
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div *ngFor="let p of propertyDiffsByCognition.unknown.added" class="center-vertical">
+                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                                <mat-icon class="added">add</mat-icon>
+                            </button>
+                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
+                        </div>
+                        <div *ngFor="let p of propertyDiffsByCognition.unknown.changed" class="center-vertical">
+                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                                <mat-icon class="changed">autorenew</mat-icon>
+                            </button>
+                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
+                        </div>
+                        <div *ngFor="let p of propertyDiffsByCognition.unknown.removed" class="center-vertical">
+                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                                <mat-icon class="removed">remove</mat-icon>
+                            </button>
+                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
 
 
                 <h2 class="center-vertical">
                     <mat-icon>thumb_up</mat-icon>&nbsp;Checked already
                 </h2>
 
-                <expansion-panels-container>
-                    <expansion-panel *ngFor="let pd of propertyDiffsByCognition.getNonEmptyCheckedAlready()">
-                        <expansion-panel-title style="display: flex;">
-                            <div class="center-horizontal little-horizontal-padding">
-                                <mat-icon class="added">add</mat-icon>
-                                <span class="diff-type-number">{{pd.added.length}}</span>
-                            </div>
-                            <div class="center-horizontal little-horizontal-padding">
-                                <mat-icon class="changed">autorenew</mat-icon>
-                                <span class="diff-type-number">{{pd.changed.length}}</span>
-                            </div>
-                            <div class="center-horizontal little-horizontal-padding">
-                                <mat-icon class="removed">removed</mat-icon>
-                                <span class="diff-type-number">{{pd.removed.length}}</span>
-                            </div>
-                        </expansion-panel-title>
-                        <expansion-panel-description-hidden>
-                            <div class="center-vertical">
-                                <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target="_blank">
-                                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
-                                </a>
-                                <span class="comment" [innerHTML]="pd.title"></span>
-                            </div>
-                        </expansion-panel-description-hidden>
-                        <expansion-panel-description-toggled>
-                            <div class="center-vertical">
-                                <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target="_blank">
-                                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
-                                </a>
-                                <span class="comment" [innerHTML]="pd.title"></span>
-                            </div>
-                        </expansion-panel-description-toggled>
-
-                        <expansion-panel-content>
-                            <div *ngFor="let p of pd.added" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                <mat-accordion multi>
+                    <mat-expansion-panel *ngFor="let pd of propertyDiffsByCognition.getNonEmptyCheckedAlready()"
+                                         class="diffs-expansion-panel">
+                        <mat-expansion-panel-header style="display: flex;">
+                            <mat-panel-title>
+                                <div class="center-horizontal little-horizontal-padding">
                                     <mat-icon class="added">add</mat-icon>
-                                </button>
-                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                            </div>
-                            <div *ngFor="let p of pd.changed" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                                    <span class="diff-type-number">{{pd.added.length}}</span>
+                                </div>
+                                <div class="center-horizontal little-horizontal-padding">
                                     <mat-icon class="changed">autorenew</mat-icon>
-                                </button>
-                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                            </div>
-                            <div *ngFor="let p of pd.removed" class="center-vertical">
-                                <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
-                                    <mat-icon class="removed">remove</mat-icon>
-                                </button>
-                                <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                            </div>
-                        </expansion-panel-content>
-                    </expansion-panel>
-                </expansion-panels-container>
+                                    <span class="diff-type-number">{{pd.changed.length}}</span>
+                                </div>
+                                <div class="center-horizontal little-horizontal-padding">
+                                    <mat-icon class="removed">removed</mat-icon>
+                                    <span class="diff-type-number">{{pd.removed.length}}</span>
+                                </div>
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                <div class="center-vertical">
+                                    <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
+                                    <a *ngIf="pd.link" href={{pd.link}} target="_blank">
+                                        <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                                    </a>
+                                    <span class="comment" [innerHTML]="pd.title"></span>
+                                </div>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div *ngFor="let p of pd.added" class="center-vertical">
+                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                                <mat-icon class="added">add</mat-icon>
+                            </button>
+                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
+                        </div>
+                        <div *ngFor="let p of pd.changed" class="center-vertical">
+                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                                <mat-icon class="changed">autorenew</mat-icon>
+                            </button>
+                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
+                        </div>
+                        <div *ngFor="let p of pd.removed" class="center-vertical">
+                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                                <mat-icon class="removed">remove</mat-icon>
+                            </button>
+                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
 
                 <h2 class="center-vertical">
                     <mat-icon>visibility_off</mat-icon>&nbsp;Ignored
                 </h2>
 
-                <expansion-panels-container>
-                    <expansion-panel *ngFor="let pd of propertyDiffsByCognition.getNonEmptyIgnored()">
-                        <expansion-panel-title style="display: flex;">
-                            <div class="center-horizontal little-horizontal-padding">
-                                <mat-icon class="added">add</mat-icon>
-                                <span class="diff-type-number">{{pd.added.length}}</span>
-                            </div>
-                            <div class="center-horizontal little-horizontal-padding">
-                                <mat-icon class="changed">autorenew</mat-icon>
-                                <span class="diff-type-number">{{pd.changed.length}}</span>
-                            </div>
-                            <div class="center-horizontal little-horizontal-padding">
-                                <mat-icon class="removed">removed</mat-icon>
-                                <span class="diff-type-number">{{pd.removed.length}}</span>
-                            </div>
-                        </expansion-panel-title>
-                        <expansion-panel-description-hidden>
-                            <div class="center-vertical">
-                                <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target="_blank">
-                                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
-                                </a>
-                                <span class="comment" [innerHTML]="pd.title"></span>
-                            </div>
-                        </expansion-panel-description-hidden>
-                        <expansion-panel-description-toggled>
-                            <div class="center-vertical">
-                                <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                <a *ngIf="pd.link" href={{pd.link}} target="_blank">
-                                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
-                                </a>
-                                <span class="comment" [innerHTML]="pd.title"></span>
-                            </div>
-                        </expansion-panel-description-toggled>
+                <mat-accordion>
+                    <mat-expansion-panel *ngFor="let pd of propertyDiffsByCognition.getNonEmptyIgnored()"
+                                         class="diffs-expansion-panel">
+                        <mat-expansion-panel-header style="display: flex;">
+                            <mat-panel-title>
+                                <div class="center-horizontal little-horizontal-padding">
+                                    <mat-icon class="added">add</mat-icon>
+                                    <span class="diff-type-number">{{pd.added.length}}</span>
+                                </div>
+                                <div class="center-horizontal little-horizontal-padding">
+                                    <mat-icon class="changed">autorenew</mat-icon>
+                                    <span class="diff-type-number">{{pd.changed.length}}</span>
+                                </div>
+                                <div class="center-horizontal little-horizontal-padding">
+                                    <mat-icon class="removed">removed</mat-icon>
+                                    <span class="diff-type-number">{{pd.removed.length}}</span>
+                                </div>
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                <div class="center-vertical">
+                                    <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
+                                    <a *ngIf="pd.link" href={{pd.link}} target="_blank">
+                                        <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                                    </a>
+                                    <span class="comment" [innerHTML]="pd.title"></span>
+                                </div>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
 
-                        <expansion-panel-content>
-                            <div *ngFor="let p of pd.added" class="center-vertical">
-                                <mat-icon class="added">add</mat-icon>
-                                <span class="property-diffs">{{p}}</span>
-                            </div>
-                            <div *ngFor="let p of pd.changed" class="center-vertical">
-                                <mat-icon class="changed">autorenew</mat-icon>
-                                <span class="property-diffs">{{p}}</span>
-                            </div>
-                            <div *ngFor="let p of pd.removed" class="center-vertical">
-                                <mat-icon class="removed">remove</mat-icon>
-                                <span class="property-diffs">{{p}}</span>
-                            </div>
-                        </expansion-panel-content>
-                    </expansion-panel>
-                </expansion-panels-container>
+                        <div *ngFor="let p of pd.added" class="center-vertical">
+                            <mat-icon class="added">add</mat-icon>
+                            <span class="property-diffs">{{p}}</span>
+                        </div>
+                        <div *ngFor="let p of pd.changed" class="center-vertical">
+                            <mat-icon class="changed">autorenew</mat-icon>
+                            <span class="property-diffs">{{p}}</span>
+                        </div>
+                        <div *ngFor="let p of pd.removed" class="center-vertical">
+                            <mat-icon class="removed">remove</mat-icon>
+                            <span class="property-diffs">{{p}}</span>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
             </div>
             <div *ngIf="!trial.diff_keys && !trial.diffs_by_cognition" style="flex: 1;">
                 <div class="center-horizontal" style="height: 50%;">
