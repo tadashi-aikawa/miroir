@@ -3,18 +3,18 @@ import {EditorConfig} from '../../models/models';
 import {MonacoEditorLoader} from '../../services/monaco-editor-loader';
 
 declare const monaco: any;
-declare const require: any;
 
 @Component({
     selector: 'app-editor',
-    template: `<div #view class="monaco-editor" [style.height]="height"></div>`,
+    template: `
+        <div #view class="monaco-editor" [style.height]="height"></div>`,
 })
 export class EditorComponent implements AfterViewInit, OnDestroy, OnChanges {
     @Input() config: EditorConfig;
     @Input() height: string;
     editor: any;
 
-    @ViewChild('view') view: ElementRef;
+    @ViewChild('view', {static: true}) view: ElementRef;
 
     private _updateLayout: Function;
 
@@ -37,7 +37,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy, OnChanges {
                 theme: this.config.theme,
                 minimap: this.config.minimap,
             });
-             (<any>window).addEventListener('resize', this._updateLayout);
+            (<any>window).addEventListener('resize', this._updateLayout);
 
             this.editor.setModel(
                 monaco.editor.createModel(this.config.content, this.config.contentType)

@@ -16,7 +16,7 @@
         <app-logo-loading></app-logo-loading>
     </div>
     <mat-sidenav-container style="flex: 1">
-        <mat-sidenav #sidenav mode="side" align="start" class="scrollable-y">
+        <mat-sidenav #sidenav mode="side" align="start" class="scrollable-y" autoFocus disableClose>
             <mat-form-field class="search-word-form">
                 <input matInput #keyWord title="Free word search"
                        [(ngModel)]="word" (keyup.enter)="onSearchReports(word)">
@@ -29,7 +29,6 @@
             <div *ngIf="rows">
                 <mat-form-field class="filter-word-form">
                     <input matInput title="ex. simple st:!closed"
-                           [(ngModel)]="mql"
                            (keyup)="onReportFilterUpdated()"
                            [formControl]="mqlControl"
                            [matAutocomplete]="auto">
