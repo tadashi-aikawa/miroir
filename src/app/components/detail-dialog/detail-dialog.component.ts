@@ -12,7 +12,7 @@ import {animate, style, transition, trigger} from '@angular/animations';
 import {AwsService} from '../../services/aws-service';
 import {Component, Input, OnInit, Optional, ViewChild} from '@angular/core';
 import {MatDialogRef, MatSnackBar} from '@angular/material';
-import {NgSelectModule, NgOption} from '@ng-select/ng-select';
+import {NgOption} from '@ng-select/ng-select';
 import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import * as _ from 'lodash';
 import {Dictionary} from 'lodash';
@@ -191,9 +191,9 @@ export class DetailDialogComponent implements OnInit {
     @Input() isLineFilterEnabled: boolean = this.settingsService.isLineFilterEnabled;
     @Input() isLineFilterNegative: boolean = this.settingsService.isLineFilterNegative;
 
-    @ViewChild('selector') selector;
-    @ViewChild('diffView') diffView;
-    @ViewChild('editor') editor;
+    @ViewChild('selector', { static: true }) selector;
+    @ViewChild('diffView', { static: true }) diffView;
+    @ViewChild('editor', { static: true }) editor;
 
     tableQueryRowData: QueryRowData[];
     propertyDiffsByCognition: PropertyDiffsByCognition;
@@ -223,7 +223,10 @@ export class DetailDialogComponent implements OnInit {
         },
         floatingFilterComponentParams: {
             debounceMs: 200
-        }
+        },
+        sortable: true,
+        resizable: true,
+        filter: true,
     };
 
     queryColumnDefs = [

@@ -154,19 +154,18 @@ const cardFilter = (word: string, row: DynamoRow): boolean => {
                 ])
             ]
         )
-    ],
+    ]
 })
 export class SummaryComponent implements OnInit {
 
     @Input() cheatSheet = false;
 
-    @ViewChild('sidenav') sideNav: MatSidenav;
-    @ViewChild('keyWord') keyWord: ElementRef;
-    @ViewChild('trialsTable') trialsTable: TrialsTableComponent;
-    @ViewChild('analytics') analytics: AnalyticsComponent;
+    @ViewChild('sidenav', {static: true}) sideNav: MatSidenav;
+    @ViewChild('keyWord', {static: true}) keyWord: ElementRef;
+    @ViewChild('trialsTable', {static: false}) trialsTable: TrialsTableComponent;
+    @ViewChild('analytics', {static: true}) analytics: AnalyticsComponent;
 
     word = '';
-    mql = '';
 
     searchingSummary: boolean;
     searchErrorMessage: string;
@@ -251,6 +250,8 @@ export class SummaryComponent implements OnInit {
 
     ngOnInit(): void {
         this.initKeyBindings();
+        this.mqlControl.setValue('')
+
         setTimeout(() => {
             this.sideNav.open().then(() => {
                 setTimeout(() => this.keyWord.nativeElement.click(), 100);
@@ -267,7 +268,7 @@ export class SummaryComponent implements OnInit {
                 this.word = ps.searchWord;
 
                 if (qs.mql) {
-                    this.mql = qs.mql
+                    this.mqlControl.setValue(qs.mql)
                 }
 
                 this.searchReport(ps.searchWord)
@@ -301,7 +302,7 @@ export class SummaryComponent implements OnInit {
                                 }, 500);
 
                             });
-                });
+                    });
             });
         });
 
@@ -356,9 +357,9 @@ export class SummaryComponent implements OnInit {
     updateDisplayedAndFilteredRows(displayedNumber: number) {
         this.previousFilteredRowsCount = this.filteredRows.length;
         this.filteredRows = this.rows.filter(
-            x => this.mql.split(' ').every(t => !t || cardFilter(t, x))
+            x => this.mqlControl.value.split(' ').every(t => !t || cardFilter(t, x))
         );
-        this.displayedRows =  _.take(
+        this.displayedRows = _.take(
             this.filteredRows,
             _.min([displayedNumber, this.filteredRows.length])
         );
@@ -695,7 +696,7 @@ export class SummaryComponent implements OnInit {
             `table=${this.service.table}`,
             `bucket=${this.service.bucket}`,
             `prefix=${this.service.prefix}`,
-            `mql=${encodeURI(this.mql)}`,
+            `mql=${encodeURI(this.mqlControl.value)}`,
             trialFilter !== '{}' ? `trialFilter=${encodeURI(trialFilter)}` : null,
             trialSort !== '[]' ? `trialSort=${encodeURI(trialSort)}` : null,
         ].filter(x => x).join('&')

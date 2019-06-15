@@ -261,11 +261,12 @@ export class AwsService {
                 {Key: `${this.dataPrefix}/${key}/${zipName}`, Bucket: this.bucket},
                 (err, data) => err ? reject(err.message) : resolve({
                     name: zipName,
-                    body: new Blob([data.Body])
+                    body: new Blob([data.Body as BlobPart]),
                 })
             );
         });
     }
+
 
     async removeTrials(s3Keys: string[]): Promise<void> {
         if (!await this.checkCredentialsExpiredAndTreat()) {

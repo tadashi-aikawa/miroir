@@ -29,6 +29,8 @@ mat-sidenav-container {
 
 .summary-card-title {
     width: 220px;
+    font-size: 14px;
+    padding: 7px 0 3px 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -41,7 +43,7 @@ mat-sidenav-container {
     box-shadow:2px 2px 5px;
     border:0 solid #000;
     display: block;
-    width: 260px;
+    width: 275px;
 }
 
 .summary-card:hover {

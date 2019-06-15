@@ -1,8 +1,7 @@
 import {Memoize} from 'lodash-decorators';
 import {PropertyDiffs, Row, Summary, Trial} from '../../models/models';
-import {Component, Input, Pipe, PipeTransform, Output, EventEmitter, SimpleChanges, OnChanges} from '@angular/core';
+import {Component, EventEmitter, Input, Output, Pipe, PipeTransform} from '@angular/core';
 import * as _ from 'lodash';
-import {Dictionary} from 'lodash';
 
 @Component({
     selector: 'app-analytics',
@@ -44,11 +43,15 @@ export class AnalyticsComponent {
         {
             headerName: "Title",
             field: "title",
+            sortable: true,
+            resizable: true,
             width: 175,
         },
         {
             headerName: "Count",
             field: "count",
+            sortable: true,
+            resizable: true,
             width: 100,
         },
     ];
@@ -57,11 +60,15 @@ export class AnalyticsComponent {
         {
             headerName: "Title",
             field: "title",
+            sortable: true,
+            resizable: true,
             width: 350,
         },
         {
             headerName: "Count",
             field: "count",
+            sortable: true,
+            resizable: true,
             width: 100,
         },
     ];
@@ -70,11 +77,15 @@ export class AnalyticsComponent {
         {
             headerName: "Title",
             field: "title",
+            sortable: true,
+            resizable: true,
             width: 350,
         },
         {
             headerName: "Count",
             field: "count",
+            sortable: true,
+            resizable: true,
             width: 100,
         },
     ];
@@ -83,22 +94,37 @@ export class AnalyticsComponent {
         {
             headerName: "Path",
             field: "title",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
         {
             headerName: "Count",
             field: "count",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
         {
             headerName: "Same",
             field: "status.same",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
         {
             headerName: "Different",
             field: "status.different",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
         {
             headerName: "Failure",
             field: "status.failure",
+            filter: true,
+            sortable: true,
+            resizable: true,
         },
     ];
 
@@ -159,8 +185,8 @@ export class ToAttentionPipe implements PipeTransform {
     transform(trials: Trial[]): DiffSummary[] {
         return _(trials)
             .filter((t: Trial) => !!t.attention)
-            .groupBy<Trial>((t: Trial) => t.attention)
-            .mapValues<Dictionary<Trial[]>, DiffSummary>((xs: Trial[]) => ({
+            .groupBy((t: Trial) => t.attention)
+            .mapValues<DiffSummary>((xs: Trial[]) => ({
                 title: xs[0].attention,
                 count: xs.length,
                 trials: xs,
@@ -189,7 +215,7 @@ export class ToCheckedAlreadyDiffSummaryPipe implements PipeTransform {
                 )
             )
             .groupBy((pd: DiffSummaryWip) => pd.title)
-            .mapValues<Dictionary<DiffSummaryWip[]>, DiffSummary>(xs => ({
+            .mapValues<DiffSummary>(xs => ({
                 title: xs[0].title,
                 image: xs[0].image,
                 link: xs[0].link,
@@ -218,7 +244,7 @@ export class ToIgnoredDiffSummaryPipe implements PipeTransform {
                 })
             ))
             .groupBy((xs: DiffSummaryWip) => xs.title)
-            .mapValues<Dictionary<DiffSummaryWip[]>, DiffSummary>(xs => ({
+            .mapValues<DiffSummary>(xs => ({
                 title: xs[0].title,
                 image: xs[0].image,
                 link: xs[0].link,
@@ -234,13 +260,13 @@ export class ToIgnoredDiffSummaryPipe implements PipeTransform {
 export class ToPathPipe implements PipeTransform {
     transform(trials: Trial[]): PathSummary[] {
         return _(trials)
-            .groupBy<Trial>((t: Trial) => t.path)
-            .mapValues<Dictionary<Trial[]>, PathSummary>((xs: Trial[]) => ({
+            .groupBy((t: Trial) => t.path)
+            .mapValues<PathSummary>((xs: Trial[]) => ({
                 title: xs[0].path,
                 count: xs.length,
                 status: _(xs)
-                    .groupBy<Trial>((x: Trial) => x.status)
-                    .mapValues<Dictionary<Trial[]>, number>((x: Trial[]) => x.length)
+                    .groupBy((x: Trial) => x.status)
+                    .mapValues<number>((x: Trial[]) => x.length)
                     .value() as { same: number, different: number, failure: number },
                 trials: xs,
             }))

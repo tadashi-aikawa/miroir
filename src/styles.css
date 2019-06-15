@@ -1,9 +1,9 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import '~angular2-toaster/toaster.css';
-@import "~ag-grid/dist/styles/ag-grid.css";
-@import "~ag-grid/dist/styles/ag-theme-balham.css";
-@import "~ag-grid/dist/styles/ag-theme-material.css";
+@import "~ag-grid-community/dist/styles/ag-grid.css";
+@import "~ag-grid-community/dist/styles/ag-theme-balham.css";
+@import "~ag-grid-community/dist/styles/ag-theme-material.css";
 
 .remaining-space {
     flex: 1 1 auto;

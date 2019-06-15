@@ -1,13 +1,13 @@
 import {Summary, Trial} from '../../models/models';
 import {AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import * as _ from 'lodash';
-import {Marker, Options} from 'highcharts';
+import {SeriesSplineDataMarkerOptions, Options} from 'highcharts';
 import * as Maths from '../../utils/maths';
 
 
-const statusToMarker = (status: number): Marker => {
+const statusToMarker = (status: number): SeriesSplineDataMarkerOptions => {
     const statusHead: number = Math.floor(status / 100);
-    const createMarker = (color: string): Marker =>
+    const createMarker = (color: string): SeriesSplineDataMarkerOptions =>
         ({enabled: true, fillColor: color, lineColor: 'gray', lineWidth: 1, radius: 4});
 
     return statusHead === 5 ? createMarker('red') :
@@ -65,7 +65,7 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
                 },
                 plotLines: [
                     {
-                        dashStyle: 'dot',
+                        dashStyle: 'Dot',
                         color: 'rgba(100,100,255,0.5)',
                         value: oneAverage,
                         width: 2,
@@ -79,7 +79,7 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
                         }
                     },
                     {
-                        dashStyle: 'dot',
+                        dashStyle: 'Dot',
                         color: 'rgba(255,100,100,0.5)',
                         value: otherAverage,
                         width: 2,

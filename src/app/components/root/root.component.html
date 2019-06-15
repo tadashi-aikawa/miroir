@@ -27,7 +27,8 @@
             <button mat-menu-item>
                 <a class="smart-link" href="https://tadashi-aikawa.github.io/jumeaux/" target="_blank">
                     <div class="center-vertical">
-                        <img src="https://github.com/tadashi-aikawa/jumeaux/raw/master/logo.png?raw=true" height="30px" style="padding: 3px;"/>
+                        <img src="https://github.com/tadashi-aikawa/jumeaux/raw/master/logo.png?raw=true" height="30px"
+                             style="padding: 3px;"/>
                         <span>Jumeaux</span>
                     </div>
                 </a>
@@ -88,8 +89,8 @@
 
         <mat-divider style="margin: 15px 0;"></mat-divider>
 
-        <div class="center-vertical">
-            Use intelligent analytics always.
+        <div class="center-horizontal">
+            <div>Use intelligent analytics always.</div>
             <mat-slide-toggle [(ngModel)]="alwaysIntelligentAnalytics" class="smart-padding-left-small">
             </mat-slide-toggle>
         </div>
@@ -97,17 +98,21 @@
         <mat-divider style="margin: 15px 0;"></mat-divider>
 
         <mat-form-field>
-          <mat-select placeholder="Key binding mode" [(ngModel)]="keyMode" (selectionChange)="update();">
-            <mat-option *ngFor="let keyMode of KEY_MODES" [value]="keyMode">
-              {{ keyMode }}
-            </mat-option>
-          </mat-select>
+            <mat-select placeholder="Key binding mode" [(ngModel)]="keyMode" (selectionChange)="update();">
+                <mat-option *ngFor="let keyMode of KEY_MODES" [value]="keyMode">
+                    {{ keyMode }}
+                </mat-option>
+            </mat-select>
         </mat-form-field>
 
-        <button mat-button routerLink="/login" style="margin-top: 20px;">
-            <mat-icon class="mat-24">exit_to_app</mat-icon>
-            <span>Log-out</span>
-        </button>
+        <mat-divider style="margin: 15px 0;"></mat-divider>
+
+        <div class="center-horizontal">
+            <button mat-button routerLink="/login" style="margin-top: 20px;">
+                <mat-icon class="mat-24">exit_to_app</mat-icon>
+                <span>Log-out</span>
+            </button>
+        </div>
     </mat-sidenav>
 
     <app-summary></app-summary>

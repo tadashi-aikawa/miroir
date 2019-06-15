@@ -23,6 +23,7 @@ export class DynamoRow {
     other_host: string;
     begin_time: string;
     end_time: string;
+    elapsed_sec: number;
     with_zip: boolean;
     retry_hash?: string;
     checklist?: string;
