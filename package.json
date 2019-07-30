@@ -79,6 +79,7 @@
     "karma-jasmine": "^2.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
     "ng2-completer": "^3.0.2",
+    "prettier": "^1.18.2",
     "protractor": "^5.4.2",
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
