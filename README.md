@@ -34,11 +34,16 @@ $ npm install
 ### Development server
 
 ```
-$ npm run dev
+$ make dev
 ```
 
 Then access to `http://localhost:4200/`
 
+### Serve documentation
+
+```
+$ make serve-docs
+```
 
 Release
 -------
