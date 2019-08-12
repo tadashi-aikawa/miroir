@@ -1,5 +1,6 @@
 import CheckStatus from '../constants/check-status';
 import * as _ from 'lodash';
+import { Dictionary } from 'lodash';
 import { LazyGetter } from 'typescript-lazy-get-decorator';
 import { DateTime } from 'luxon';
 
@@ -162,7 +163,7 @@ export class Trial {
   name: string;
   headers: any;
   queries: any;
-  form?: Object;
+  form?: Dictionary<string[]>;
   json?: Object;
   one: ResponseSummary;
   other: ResponseSummary;

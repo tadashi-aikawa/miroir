@@ -193,9 +193,11 @@ export class DetailDialogComponent implements OnInit {
 
   @ViewChild('selector', { static: true }) selector;
   @ViewChild('diffView', { static: true }) diffView;
+  @ViewChild('jsonParametersEditor', { static: false }) jsonParametersEditor;
   @ViewChild('editor', { static: true }) editor;
 
   tableQueryRowData: QueryRowData[];
+  tableFormParametersRowData: QueryRowData[];
   propertyDiffsByCognition: PropertyDiffsByCognition;
   expectedEncoding: Pair<string> = new Pair();
 
@@ -210,7 +212,9 @@ export class DetailDialogComponent implements OnInit {
   options: NgOption[];
   isLoading: boolean;
   errorMessage: string;
+
   diffViewConfig: DiffViewConfig;
+  jsonParametersEditorConfig: EditorConfig;
   editorConfig: EditorConfig;
   displayedQueries: { key: string; value: string }[];
   filteredWord: string;
@@ -568,7 +572,7 @@ export class DetailDialogComponent implements OnInit {
       }, 100);
     }
 
-    // Query parameters
+    // Parameters
     this.displayedQueries = Object.keys(trial.queries).map(k => ({ key: k, value: trial.queries[k].join(', ') }));
     this.tableQueryRowData = this.displayedQueries.map(
       t =>
@@ -577,6 +581,22 @@ export class DetailDialogComponent implements OnInit {
           value: t.value,
         },
     );
+    if (this.trial.form) {
+      this.tableFormParametersRowData = Object.keys(this.trial.form).map(
+        k =>
+          <QueryRowData>{
+            key: k,
+            value: this.trial.form[k].join(', '),
+          },
+      );
+    }
+    if (this.trial.json) {
+      this.jsonParametersEditorConfig = {
+        content: JSON.stringify(this.trial.json, null, 4),
+        contentType: 'json',
+        readOnly: true,
+      };
+    }
 
     // Property diffs
     this.propertyDiffsByCognition = createPropertyDiffs(trial, this.ignores, this.checkedAlready);
@@ -639,7 +659,9 @@ export class DetailDialogComponent implements OnInit {
     if (index === 0 && this.diffView) {
       this.diffView.updateView();
     }
-
+    if (index === 1 && this.jsonParametersEditor) {
+      this.jsonParametersEditor.updateView();
+    }
     if (index === 2 && this.editor) {
       this.editor.updateView();
     }
