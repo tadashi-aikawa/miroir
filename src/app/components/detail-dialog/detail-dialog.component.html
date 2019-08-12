@@ -1,384 +1,400 @@
 <div class="center-vertical">
-    <mat-icon class="action-icon hvr-buzz-out smart-padding-xsmall-right"
-              title="Copy this trial url"
-              (click)="copyActiveTrialLink()"
-    >
-        link
-    </mat-icon>
-    <div class="count-word">
-        <span>{{activeIndexNum + 1}} / {{options.length}}</span>
-        <span> ... </span>
-        <span>{{reportTitle}}</span>
-    </div>
-    <mat-icon class="action-icon hvr-buzz-out"
-              style="margin-left: auto;"
-              title="[w] Close dialog"
-              (click)="closeDialog()">
-        close
-    </mat-icon>
+  <mat-icon
+    class="action-icon hvr-buzz-out smart-padding-xsmall-right"
+    title="Copy this trial url"
+    (click)="copyActiveTrialLink()"
+  >
+    link
+  </mat-icon>
+  <div class="count-word">
+    <span>{{ activeIndexNum + 1 }} / {{ options.length }}</span>
+    <span> ... </span>
+    <span>{{ reportTitle }}</span>
+  </div>
+  <mat-icon
+    class="action-icon hvr-buzz-out"
+    style="margin-left: auto;"
+    title="[w] Close dialog"
+    (click)="closeDialog()"
+  >
+    close
+  </mat-icon>
 </div>
 
 <div *ngIf="!fullscreen">
-    <ng-select #selector
-               tabindex="0"
-               [items]="options"
-               [virtualScroll]="true"
-               [clearable]="false"
-               bindValue="value"
-               bindLabel="label"
-               [(ngModel)]="activeIndex"
-               (change)="showTrial(trial)"
-    >
-        <ng-template ng-label-tmp let-item="item">
-            <b>{{ item.label }}</b>
-            <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
-        </ng-template>
-        <ng-template ng-option-tmp let-item="item">
-            <b>{{ item.label }}</b>
-            <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
-        </ng-template>
-    </ng-select>
-    <div class="pain2" style="padding-right: calc(66px + 15px);">
-        <div class="smart-padding-xsmall">
-            <app-panel [url]="trial.one.url" [title]="oneAccessPoint.name" titleFont="small">
-                <div class="center">
-                    <span class="label">{{expectedEncoding.one}}</span>
-                    <span class="label">{{trial.one.content_type}}</span>
-                    <span class="label">{{trial.one.byte}} b</span>
-                    <span class="label">{{trial.one.response_sec}} s</span>
-                    <span class="label">{{trial.one.status_code}}</span>
-                </div>
-                <div class="center smart-padding-xsmall">
-                    <span class="path-label" *ngIf="oneAccessPoint.path">
-                        path ┃ {{oneAccessPoint.path.before}} → {{oneAccessPoint.path.after}}
-                    </span>
-                    <span class="overwritten-query-label" *ngFor="let v of oneAccessPoint.queriesOverwritten">
-                        + {{v}}
-                    </span>
-                    <span class="removed-query-label" *ngFor="let v of oneAccessPoint.queriesRemoved">
-                        x {{v}}
-                    </span>
-                </div>
-            </app-panel>
+  <ng-select
+    #selector
+    tabindex="0"
+    [items]="options"
+    [virtualScroll]="true"
+    [clearable]="false"
+    bindValue="value"
+    bindLabel="label"
+    [(ngModel)]="activeIndex"
+    (change)="showTrial(trial)"
+  >
+    <ng-template ng-label-tmp let-item="item">
+      <b>{{ item.label }}</b>
+      <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
+    </ng-template>
+    <ng-template ng-option-tmp let-item="item">
+      <b>{{ item.label }}</b>
+      <app-badge kind="info" size="minimum" *ngFor="let t of item.tags">{{ t }}</app-badge>
+    </ng-template>
+  </ng-select>
+  <div class="pain2" style="padding-right: calc(66px + 15px);">
+    <div class="smart-padding-xsmall">
+      <app-panel [url]="trial.one.url" [title]="oneAccessPoint.name" titleFont="small">
+        <div class="center">
+          <span class="label">{{ expectedEncoding.one }}</span>
+          <span class="label">{{ trial.one.content_type }}</span>
+          <span class="label">{{ trial.one.byte }} b</span>
+          <span class="label">{{ trial.one.response_sec }} s</span>
+          <span class="label">{{ trial.one.status_code }}</span>
         </div>
-        <div class="smart-padding-xsmall">
-            <app-panel [url]="trial.other.url" [title]="otherAccessPoint.name" titleFont="small">
-                <div class="center">
-                    <span class="label">{{expectedEncoding.other}}</span>
-                    <span class="label">{{trial.other.content_type}}</span>
-                    <span class="label">{{trial.other.byte}} b</span>
-                    <span class="label">{{trial.other.response_sec}} s</span>
-                    <span class="label">{{trial.other.status_code}}</span>
-                </div>
-                <div class="center smart-padding-xsmall">
-                    <span class="path-label" *ngIf="otherAccessPoint.path">
-                        path ┃ {{otherAccessPoint.path.before}} → {{otherAccessPoint.path.after}}
-                    </span>
-                    <span class="overwritten-query-label" *ngFor="let v of otherAccessPoint.queriesOverwritten">
-                        + {{v}}
-                    </span>
-                    <span class="removed-query-label" *ngFor="let v of otherAccessPoint.queriesRemoved">
-                        x {{v}}
-                    </span>
-                </div>
-            </app-panel>
+        <div class="center smart-padding-xsmall">
+          <span class="path-label" *ngIf="oneAccessPoint.path">
+            path ┃ {{ oneAccessPoint.path.before }} → {{ oneAccessPoint.path.after }}
+          </span>
+          <span class="overwritten-query-label" *ngFor="let v of oneAccessPoint.queriesOverwritten"> + {{ v }} </span>
+          <span class="removed-query-label" *ngFor="let v of oneAccessPoint.queriesRemoved"> x {{ v }} </span>
         </div>
+      </app-panel>
     </div>
+    <div class="smart-padding-xsmall">
+      <app-panel [url]="trial.other.url" [title]="otherAccessPoint.name" titleFont="small">
+        <div class="center">
+          <span class="label">{{ expectedEncoding.other }}</span>
+          <span class="label">{{ trial.other.content_type }}</span>
+          <span class="label">{{ trial.other.byte }} b</span>
+          <span class="label">{{ trial.other.response_sec }} s</span>
+          <span class="label">{{ trial.other.status_code }}</span>
+        </div>
+        <div class="center smart-padding-xsmall">
+          <span class="path-label" *ngIf="otherAccessPoint.path">
+            path ┃ {{ otherAccessPoint.path.before }} → {{ otherAccessPoint.path.after }}
+          </span>
+          <span class="overwritten-query-label" *ngFor="let v of otherAccessPoint.queriesOverwritten"> + {{ v }} </span>
+          <span class="removed-query-label" *ngFor="let v of otherAccessPoint.queriesRemoved"> x {{ v }} </span>
+        </div>
+      </app-panel>
+    </div>
+  </div>
 </div>
 
-<hr/>
+<hr />
 <div *ngIf="isLoading" style="width: 90%; padding-left: 10px;" [@diff-property-value]>
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
 <div *ngIf="!isLoading && !targetPropertyValue" class="origin-queries" [@diff-property-value]>
-    {{trial.queryString}}
+  {{ trial.queryString }}
 </div>
-<div class="diff-property-overlay" style="padding-right: calc(66px + 15px);" *ngIf="!isLoading && targetPropertyValue"
-     [@diff-property-value]>
-    <div style="justify-self: right; align-self: center;">
-        <pre>{{ targetPropertyValue.one }}</pre>
-    </div>
-    <div style="justify-self: center; align-self: center;">
-        <pre>-------></pre>
-    </div>
-    <div style="justify-self: left; align-self: center;">
-        <pre>{{ targetPropertyValue.other }}</pre>
-    </div>
+<div
+  class="diff-property-overlay"
+  style="padding-right: calc(66px + 15px);"
+  *ngIf="!isLoading && targetPropertyValue"
+  [@diff-property-value]
+>
+  <div style="justify-self: right; align-self: center;">
+    <pre>{{ targetPropertyValue.one }}</pre>
+  </div>
+  <div style="justify-self: center; align-self: center;">
+    <pre>-------></pre>
+  </div>
+  <div style="justify-self: left; align-self: center;">
+    <pre>{{ targetPropertyValue.other }}</pre>
+  </div>
 </div>
-<hr/>
+<hr />
 <mat-tab-group [selectedIndex]="activeTabIndex" (selectedIndexChange)="afterChangeTab($event)">
-    <mat-tab label="Diff viewer">
-        <div style="display: flex;">
-            <div style="flex: 1;">
-                <div *ngIf="isLineFilterEnabled">
-                    <mat-button-toggle [checked]="isLineFilterNegative"
-                                       (change)="changeLineFilterNegative($event.source.checked)">
-                        Not
-                    </mat-button-toggle>
-                    <mat-form-field>
-                        <input matInput
-                               placeholder="Filtered word"
-                               [(ngModel)]="filteredWord"
-                               (keyup.enter)="changeFilteredWord()"
-                        >
-                    </mat-form-field>
-                </div>
-                <div *ngIf="errorMessage">
-                    <span class="error-message">{{errorMessage}}</span>
-                </div>
-
-                <app-diff-viewer #diffView
-                                 [config]="diffViewConfig"
-                                 [height]="diffViewerHeight"
-                >
-                </app-diff-viewer>
-            </div>
-            <div style="padding-top: 40px; padding-left: 10px;">
-                <div>
-                    <mat-button-toggle
-                        [checked]="unifiedDiff"
-                        (change)="changeDiffType($event.source.checked)"
-                    >
-                        <mat-icon title="Toggl diff kind">view_agenda</mat-icon>
-                    </mat-button-toggle>
-                </div>
-                <div>
-                    <mat-button-toggle
-                        [checked]="isIgnoredDiffHidden"
-                        (change)="changeHideIgnoredDiff($event.source.checked)"
-                    >
-                        <mat-icon style="color: green;"
-                                  title="Toggl ignored properties visibility">
-                            visibility_off
-                        </mat-icon>
-                    </mat-button-toggle>
-                </div>
-                <div>
-                    <mat-button-toggle
-                        [checked]="isCheckedAlreadyDiffHidden"
-                        (change)="changeHideCheckedAlreadyDiff($event.source.checked)"
-                    >
-                        <mat-icon style="color: red;"
-                                  title="Toggl checked already properties visibility">
-                            visibility_off
-                        </mat-icon>
-                    </mat-button-toggle>
-                </div>
-                <div>
-                    <mat-button-toggle
-                        [checked]="isLineFilterEnabled"
-                        (change)="changeLineFilterEnabled($event.source.checked)"
-                    >
-                        <mat-icon title="Toggl line filter">
-                            filter
-                        </mat-icon>
-                    </mat-button-toggle>
-                </div>
-            </div>
+  <mat-tab label="Diff viewer">
+    <div style="display: flex;">
+      <div style="flex: 1;">
+        <div *ngIf="isLineFilterEnabled">
+          <mat-button-toggle
+            [checked]="isLineFilterNegative"
+            (change)="changeLineFilterNegative($event.source.checked)"
+          >
+            Not
+          </mat-button-toggle>
+          <mat-form-field>
+            <input
+              matInput
+              placeholder="Filtered word"
+              [(ngModel)]="filteredWord"
+              (keyup.enter)="changeFilteredWord()"
+            />
+          </mat-form-field>
         </div>
-    </mat-tab>
-    <mat-tab label="Query parameters">
-        <div class="smart-padding">
-            <ag-grid-angular
-                #agGrid
-                style="width: 100%; height: 500px;"
-                class="ag-theme-material"
-                animateRows
-                floatingFilter
-                [rowData]="tableQueryRowData"
-                [defaultColDef]="queryDefaultColDef"
-                [columnDefs]="queryColumnDefs"
-            >
-            </ag-grid-angular>
+        <div *ngIf="errorMessage">
+          <span class="error-message">{{ errorMessage }}</span>
         </div>
-    </mat-tab>
-    <mat-tab label="Property diffs">
-        <div style="display: flex; justify-content: space-between;">
-            <div *ngIf="trial.diff_keys || trial.diffs_by_cognition" style="flex: 1;" [style.height]="diffViewerHeight"
-                 class="scrollable-y">
-                <h2 class="center-vertical">
-                    <mat-icon>report_problem</mat-icon>&nbsp;Unknown!!
-                </h2>
 
-                <mat-accordion *ngIf="!propertyDiffsByCognition.unknown.isEmpty()">
-                    <mat-expansion-panel class="diffs-expansion-panel">
-                        <mat-expansion-panel-header style="display: flex;">
-                            <mat-panel-title>
-                                <div class="center-horizontal little-horizontal-padding">
-                                    <mat-icon class="added">add</mat-icon>
-                                    <span
-                                        class="diff-type-number">{{propertyDiffsByCognition.unknown.added.length}}</span>
-                                </div>
-                                <div class="center-horizontal little-horizontal-padding">
-                                    <mat-icon class="changed">autorenew</mat-icon>
-                                    <span
-                                        class="diff-type-number">{{propertyDiffsByCognition.unknown.changed.length}}</span>
-                                </div>
-                                <div class="center-horizontal little-horizontal-padding">
-                                    <mat-icon class="removed">removed</mat-icon>
-                                    <span
-                                        class="diff-type-number">{{propertyDiffsByCognition.unknown.removed.length}}</span>
-                                </div>
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                {{propertyDiffsByCognition.unknown.title}}
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
+        <app-diff-viewer #diffView [config]="diffViewConfig" [height]="diffViewerHeight"> </app-diff-viewer>
+      </div>
+      <div style="padding-top: 40px; padding-left: 10px;">
+        <div>
+          <mat-button-toggle [checked]="unifiedDiff" (change)="changeDiffType($event.source.checked)">
+            <mat-icon title="Toggl diff kind">view_agenda</mat-icon>
+          </mat-button-toggle>
+        </div>
+        <div>
+          <mat-button-toggle [checked]="isIgnoredDiffHidden" (change)="changeHideIgnoredDiff($event.source.checked)">
+            <mat-icon style="color: green;" title="Toggl ignored properties visibility">
+              visibility_off
+            </mat-icon>
+          </mat-button-toggle>
+        </div>
+        <div>
+          <mat-button-toggle
+            [checked]="isCheckedAlreadyDiffHidden"
+            (change)="changeHideCheckedAlreadyDiff($event.source.checked)"
+          >
+            <mat-icon style="color: red;" title="Toggl checked already properties visibility">
+              visibility_off
+            </mat-icon>
+          </mat-button-toggle>
+        </div>
+        <div>
+          <mat-button-toggle [checked]="isLineFilterEnabled" (change)="changeLineFilterEnabled($event.source.checked)">
+            <mat-icon title="Toggl line filter">
+              filter
+            </mat-icon>
+          </mat-button-toggle>
+        </div>
+      </div>
+    </div>
+  </mat-tab>
+  <mat-tab label="Parameters">
+    <div style="display: flex;">
+      <div class="smart-padding">
+        <h3>Queries</h3>
+        <ag-grid-angular
+          style="width: calc(90vw / 2); height: 500px;"
+          class="ag-theme-material"
+          animateRows
+          floatingFilter
+          [rowData]="tableQueryRowData"
+          [defaultColDef]="queryDefaultColDef"
+          [columnDefs]="queryColumnDefs"
+        >
+        </ag-grid-angular>
+      </div>
+      <div *ngIf="trial.form" class="smart-padding" style="width: calc(95vw / 2)">
+        <h3>Form parameters</h3>
+        <ag-grid-angular
+          style="width: calc(90vw / 2); height: 500px;"
+          class="ag-theme-material"
+          animateRows
+          floatingFilter
+          [rowData]="tableFormParametersRowData"
+          [defaultColDef]="queryDefaultColDef"
+          [columnDefs]="queryColumnDefs"
+        >
+        </ag-grid-angular>
+      </div>
+      <div *ngIf="trial.json" class="smart-padding" style="width: calc(95vw / 2)">
+        <h3>Json parameters</h3>
+        <app-editor
+          #jsonParametersEditor
+          [config]="jsonParametersEditorConfig"
+          height="{{ fullscreen ? 'calc(95vh - 245px)' : 'calc(95vh - 375px)' }}"
+        >
+        </app-editor>
+      </div>
+    </div>
+  </mat-tab>
+  <mat-tab label="Property diffs">
+    <div style="display: flex; justify-content: space-between;">
+      <div
+        *ngIf="trial.diff_keys || trial.diffs_by_cognition"
+        style="flex: 1;"
+        [style.height]="diffViewerHeight"
+        class="scrollable-y"
+      >
+        <h2 class="center-vertical"><mat-icon>report_problem</mat-icon>&nbsp;Unknown!!</h2>
 
-                        <div *ngFor="let p of propertyDiffsByCognition.unknown.added" class="center-vertical">
-                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
-                                <mat-icon class="added">add</mat-icon>
-                            </button>
-                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                        </div>
-                        <div *ngFor="let p of propertyDiffsByCognition.unknown.changed" class="center-vertical">
-                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
-                                <mat-icon class="changed">autorenew</mat-icon>
-                            </button>
-                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                        </div>
-                        <div *ngFor="let p of propertyDiffsByCognition.unknown.removed" class="center-vertical">
-                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
-                                <mat-icon class="removed">remove</mat-icon>
-                            </button>
-                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                        </div>
-                    </mat-expansion-panel>
-                </mat-accordion>
-
-
-                <h2 class="center-vertical">
-                    <mat-icon>thumb_up</mat-icon>&nbsp;Checked already
-                </h2>
-
-                <mat-accordion multi>
-                    <mat-expansion-panel *ngFor="let pd of propertyDiffsByCognition.getNonEmptyCheckedAlready()"
-                                         class="diffs-expansion-panel">
-                        <mat-expansion-panel-header style="display: flex;">
-                            <mat-panel-title>
-                                <div class="center-horizontal little-horizontal-padding">
-                                    <mat-icon class="added">add</mat-icon>
-                                    <span class="diff-type-number">{{pd.added.length}}</span>
-                                </div>
-                                <div class="center-horizontal little-horizontal-padding">
-                                    <mat-icon class="changed">autorenew</mat-icon>
-                                    <span class="diff-type-number">{{pd.changed.length}}</span>
-                                </div>
-                                <div class="center-horizontal little-horizontal-padding">
-                                    <mat-icon class="removed">removed</mat-icon>
-                                    <span class="diff-type-number">{{pd.removed.length}}</span>
-                                </div>
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                <div class="center-vertical">
-                                    <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                    <a *ngIf="pd.link" href={{pd.link}} target="_blank">
-                                        <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
-                                    </a>
-                                    <span class="comment" [innerHTML]="pd.title"></span>
-                                </div>
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
-
-                        <div *ngFor="let p of pd.added" class="center-vertical">
-                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
-                                <mat-icon class="added">add</mat-icon>
-                            </button>
-                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                        </div>
-                        <div *ngFor="let p of pd.changed" class="center-vertical">
-                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
-                                <mat-icon class="changed">autorenew</mat-icon>
-                            </button>
-                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                        </div>
-                        <div *ngFor="let p of pd.removed" class="center-vertical">
-                            <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
-                                <mat-icon class="removed">remove</mat-icon>
-                            </button>
-                            <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{p}}</span>
-                        </div>
-                    </mat-expansion-panel>
-                </mat-accordion>
-
-                <h2 class="center-vertical">
-                    <mat-icon>visibility_off</mat-icon>&nbsp;Ignored
-                </h2>
-
-                <mat-accordion>
-                    <mat-expansion-panel *ngFor="let pd of propertyDiffsByCognition.getNonEmptyIgnored()"
-                                         class="diffs-expansion-panel">
-                        <mat-expansion-panel-header style="display: flex;">
-                            <mat-panel-title>
-                                <div class="center-horizontal little-horizontal-padding">
-                                    <mat-icon class="added">add</mat-icon>
-                                    <span class="diff-type-number">{{pd.added.length}}</span>
-                                </div>
-                                <div class="center-horizontal little-horizontal-padding">
-                                    <mat-icon class="changed">autorenew</mat-icon>
-                                    <span class="diff-type-number">{{pd.changed.length}}</span>
-                                </div>
-                                <div class="center-horizontal little-horizontal-padding">
-                                    <mat-icon class="removed">removed</mat-icon>
-                                    <span class="diff-type-number">{{pd.removed.length}}</span>
-                                </div>
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                <div class="center-vertical">
-                                    <img *ngIf="pd.image" src={{pd.image}} width="32px"/>
-                                    <a *ngIf="pd.link" href={{pd.link}} target="_blank">
-                                        <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
-                                    </a>
-                                    <span class="comment" [innerHTML]="pd.title"></span>
-                                </div>
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
-
-                        <div *ngFor="let p of pd.added" class="center-vertical">
-                            <mat-icon class="added">add</mat-icon>
-                            <span class="property-diffs">{{p}}</span>
-                        </div>
-                        <div *ngFor="let p of pd.changed" class="center-vertical">
-                            <mat-icon class="changed">autorenew</mat-icon>
-                            <span class="property-diffs">{{p}}</span>
-                        </div>
-                        <div *ngFor="let p of pd.removed" class="center-vertical">
-                            <mat-icon class="removed">remove</mat-icon>
-                            <span class="property-diffs">{{p}}</span>
-                        </div>
-                    </mat-expansion-panel>
-                </mat-accordion>
-            </div>
-            <div *ngIf="!trial.diff_keys && !trial.diffs_by_cognition" style="flex: 1;">
-                <div class="center-horizontal" style="height: 50%;">
-                    <div class="error-message" style="padding-top: 20px;">
-                        ┌────────────────────┐<br/>
-                        ｜ Oops.. I can't understand properties.. <br/>
-                        └──────────────v─────-┘
-                    </div>
-                    <div style="padding-top: 5px;">
-                        <mat-icon class="icon-very-large error-message">hot_tub</mat-icon>
-                    </div>
+        <mat-accordion *ngIf="!propertyDiffsByCognition.unknown.isEmpty()">
+          <mat-expansion-panel class="diffs-expansion-panel">
+            <mat-expansion-panel-header style="display: flex;">
+              <mat-panel-title>
+                <div class="center-horizontal little-horizontal-padding">
+                  <mat-icon class="added">add</mat-icon>
+                  <span class="diff-type-number">{{ propertyDiffsByCognition.unknown.added.length }}</span>
                 </div>
+                <div class="center-horizontal little-horizontal-padding">
+                  <mat-icon class="changed">autorenew</mat-icon>
+                  <span class="diff-type-number">{{ propertyDiffsByCognition.unknown.changed.length }}</span>
+                </div>
+                <div class="center-horizontal little-horizontal-padding">
+                  <mat-icon class="removed">removed</mat-icon>
+                  <span class="diff-type-number">{{ propertyDiffsByCognition.unknown.removed.length }}</span>
+                </div>
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ propertyDiffsByCognition.unknown.title }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div *ngFor="let p of propertyDiffsByCognition.unknown.added" class="center-vertical">
+              <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                <mat-icon class="added">add</mat-icon>
+              </button>
+              <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{ p }}</span>
             </div>
-            <div style="width: calc(95vw / 2)">
-                <button mat-raised-button color="primary" (click)="updateEditorConfig()" style="margin: 10px;">
-                    Save following settings on your browser (Local storage)
-                </button>
-                <app-editor #editor
-                            [config]="editorConfig"
-                            height="{{fullscreen ? 'calc(95vh - 245px)' : 'calc(95vh - 375px)'}}"
-                >
-                </app-editor>
+            <div *ngFor="let p of propertyDiffsByCognition.unknown.changed" class="center-vertical">
+              <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                <mat-icon class="changed">autorenew</mat-icon>
+              </button>
+              <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{ p }}</span>
             </div>
+            <div *ngFor="let p of propertyDiffsByCognition.unknown.removed" class="center-vertical">
+              <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                <mat-icon class="removed">remove</mat-icon>
+              </button>
+              <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{ p }}</span>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+
+        <h2 class="center-vertical"><mat-icon>thumb_up</mat-icon>&nbsp;Checked already</h2>
+
+        <mat-accordion multi>
+          <mat-expansion-panel
+            *ngFor="let pd of propertyDiffsByCognition.getNonEmptyCheckedAlready()"
+            class="diffs-expansion-panel"
+          >
+            <mat-expansion-panel-header style="display: flex;">
+              <mat-panel-title>
+                <div class="center-horizontal little-horizontal-padding">
+                  <mat-icon class="added">add</mat-icon>
+                  <span class="diff-type-number">{{ pd.added.length }}</span>
+                </div>
+                <div class="center-horizontal little-horizontal-padding">
+                  <mat-icon class="changed">autorenew</mat-icon>
+                  <span class="diff-type-number">{{ pd.changed.length }}</span>
+                </div>
+                <div class="center-horizontal little-horizontal-padding">
+                  <mat-icon class="removed">removed</mat-icon>
+                  <span class="diff-type-number">{{ pd.removed.length }}</span>
+                </div>
+              </mat-panel-title>
+              <mat-panel-description>
+                <div class="center-vertical">
+                  <img *ngIf="pd.image" src="{{ pd.image }}" width="32px" />
+                  <a *ngIf="pd.link" href="{{ pd.link }}" target="_blank">
+                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                  </a>
+                  <span class="comment" [innerHTML]="pd.title"></span>
+                </div>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div *ngFor="let p of pd.added" class="center-vertical">
+              <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                <mat-icon class="added">add</mat-icon>
+              </button>
+              <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{ p }}</span>
+            </div>
+            <div *ngFor="let p of pd.changed" class="center-vertical">
+              <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                <mat-icon class="changed">autorenew</mat-icon>
+              </button>
+              <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{ p }}</span>
+            </div>
+            <div *ngFor="let p of pd.removed" class="center-vertical">
+              <button mat-button class="diff-button" (click)="showTargetPropertyValue(p)">
+                <mat-icon class="removed">remove</mat-icon>
+              </button>
+              <span class="property-diffs" [style.color]="judgeDiffColor(p)">{{ p }}</span>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+
+        <h2 class="center-vertical"><mat-icon>visibility_off</mat-icon>&nbsp;Ignored</h2>
+
+        <mat-accordion>
+          <mat-expansion-panel
+            *ngFor="let pd of propertyDiffsByCognition.getNonEmptyIgnored()"
+            class="diffs-expansion-panel"
+          >
+            <mat-expansion-panel-header style="display: flex;">
+              <mat-panel-title>
+                <div class="center-horizontal little-horizontal-padding">
+                  <mat-icon class="added">add</mat-icon>
+                  <span class="diff-type-number">{{ pd.added.length }}</span>
+                </div>
+                <div class="center-horizontal little-horizontal-padding">
+                  <mat-icon class="changed">autorenew</mat-icon>
+                  <span class="diff-type-number">{{ pd.changed.length }}</span>
+                </div>
+                <div class="center-horizontal little-horizontal-padding">
+                  <mat-icon class="removed">removed</mat-icon>
+                  <span class="diff-type-number">{{ pd.removed.length }}</span>
+                </div>
+              </mat-panel-title>
+              <mat-panel-description>
+                <div class="center-vertical">
+                  <img *ngIf="pd.image" src="{{ pd.image }}" width="32px" />
+                  <a *ngIf="pd.link" href="{{ pd.link }}" target="_blank">
+                    <mat-icon class="icon-large hvr-buzz-out">open_in_browser</mat-icon>
+                  </a>
+                  <span class="comment" [innerHTML]="pd.title"></span>
+                </div>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div *ngFor="let p of pd.added" class="center-vertical">
+              <mat-icon class="added">add</mat-icon>
+              <span class="property-diffs">{{ p }}</span>
+            </div>
+            <div *ngFor="let p of pd.changed" class="center-vertical">
+              <mat-icon class="changed">autorenew</mat-icon>
+              <span class="property-diffs">{{ p }}</span>
+            </div>
+            <div *ngFor="let p of pd.removed" class="center-vertical">
+              <mat-icon class="removed">remove</mat-icon>
+              <span class="property-diffs">{{ p }}</span>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+      <div *ngIf="!trial.diff_keys && !trial.diffs_by_cognition" style="flex: 1;">
+        <div class="center-horizontal" style="height: 50%;">
+          <div class="error-message" style="padding-top: 20px;">
+            ┌────────────────────┐<br />
+            ｜ Oops.. I can't understand properties.. <br />
+            └──────────────v─────-┘
+          </div>
+          <div style="padding-top: 5px;">
+            <mat-icon class="icon-very-large error-message">hot_tub</mat-icon>
+          </div>
         </div>
-    </mat-tab>
+      </div>
+      <div style="width: calc(95vw / 2)">
+        <div class="center-vertical">
+          <button mat-raised-button color="primary" (click)="updateEditorConfig()" style="margin: 10px;">
+            Save following settings on your browser (Local storage)
+          </button>
+          <a class="smart-link" href="https://tadashi-aikawa.github.io/miroir/#/checkyaml" target="_blank">
+            <mat-icon title="Open documentation">help</mat-icon>
+          </a>
+        </div>
+        <app-editor
+          #editor
+          [config]="editorConfig"
+          height="{{ fullscreen ? 'calc(95vh - 245px)' : 'calc(95vh - 375px)' }}"
+        >
+        </app-editor>
+      </div>
+    </div>
+  </mat-tab>
 </mat-tab-group>
 <div *ngIf="cheatSheet" class="cheat-sheet" style="overflow-y: scroll;">
-    <div style="height: 90%; width: 90%; padding: 50px;">
-        <div *ngFor="let k of _hotkeysService.hotkeys">
-            <span class="keyboard">{{k.combo}}</span> <span>{{k.description}}</span>
-        </div>
-        <div style="height: 50px;"></div>
+  <div style="height: 90%; width: 90%; padding: 50px;">
+    <div *ngFor="let k of _hotkeysService.hotkeys">
+      <span class="keyboard">{{ k.combo }}</span> <span>{{ k.description }}</span>
     </div>
+    <div style="height: 50px;"></div>
+  </div>
 </div>

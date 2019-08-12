@@ -1,4 +1,4 @@
-x.y.z   :calendar: `yyyy/MM/dd` 
+x.y.z   `📅 yyyy/MM/dd` 
 ===============================
 
 ## Breaking changes

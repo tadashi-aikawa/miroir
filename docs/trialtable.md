@@ -7,8 +7,8 @@ Trial table
 カラムの仕様
 ------------
 
-| 大項目   | 中項目                | カラム名       | 説明                                  | 正規表現 | デフォルト絞り込み    | デフォルト表示 |
-|----------|-----------------------|----------------|---------------------------------------|----------|-----------------------|----------------|
+|  大項目  |        中項目         |    カラム名    |                 説明                  | 正規表現 |  デフォルト絞り込み   | デフォルト表示 |
+| -------- | --------------------- | -------------- | ------------------------------------- | -------- | --------------------- | -------------- |
 |          |                       | seq            | 実行順                                | O        | Contains              | O              |
 |          |                       | name           | 名称                                  | O        | Contains              | O              |
 | Result   |                       | status         | ステータス                            | O        | Contains              | O              |
@@ -16,6 +16,7 @@ Trial table
 | Result   | Intelligent Analytics | attention      | 要注意情報                            | O        | Contains              | O              |
 | Result   | Intelligent Analytics | checkedAlready | 既に確認済み差分情報                  | O        | Contains              | X              |
 | Result   | Intelligent Analytics | ignored        | 無視してよい差分情報                  | O        | Contains              | X              |
+| Request  |                       | method         | HTTPメソッド(POST/GET)                | O        | Contains              | O              |
 | Request  |                       | path           | URLのpath                             | O        | Contains              | O              |
 | Request  | queries               | number         | クエリのパラメータ数                  | O        | Contains              | X              |
 | Request  | queries               | detail         | クエリ詳細                            | O        | Contains              | X              |

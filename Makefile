@@ -25,6 +25,11 @@ init: ## Initialize for build and package
 	@docker build -t tadashi-aikawa/miroir .
 	@echo 'End $@'
 
+dev: ## Run for development
+	@echo 'Start $@'
+	@npm run dev
+	@echo 'End $@'
+
 serve-docs: ## Initialize for build and package
 	@echo 'Start $@'
 	@npm run docs
@@ -87,4 +92,3 @@ deploy-s3: _clean-deploy-s3 ## Deploy by docker (Set: BUCKET and Requirements di
 	@echo 'Start $@'
 	@aws s3 cp --acl private `pwd`/dist/ s3://$(BUCKET)/ --recursive
 	@echo 'End $@'
-
