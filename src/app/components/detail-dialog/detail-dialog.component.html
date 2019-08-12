@@ -372,9 +372,14 @@
         </div>
       </div>
       <div style="width: calc(95vw / 2)">
-        <button mat-raised-button color="primary" (click)="updateEditorConfig()" style="margin: 10px;">
-          Save following settings on your browser (Local storage)
-        </button>
+        <div class="center-vertical">
+          <button mat-raised-button color="primary" (click)="updateEditorConfig()" style="margin: 10px;">
+            Save following settings on your browser (Local storage)
+          </button>
+          <a class="smart-link" href="https://tadashi-aikawa.github.io/miroir/#/checkyaml" target="_blank">
+            <mat-icon title="Open documentation">help</mat-icon>
+          </a>
+        </div>
         <app-editor
           #editor
           [config]="editorConfig"

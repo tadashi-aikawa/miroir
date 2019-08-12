@@ -1,6 +1,7 @@
 - [Getting started](index.md)
 - [MQL](mql.md)
 - [Trial table](trialtable.md)
+- [Check YAML](checkyaml.md)
 - Releases
   - [0.29.0](releases/0.29.0.md)
   - 0.28.x
@@ -56,4 +57,3 @@
     - [0.3.0](releases/0.3.0.md)
   - [0.2.0](releases/0.2.0.md)
   - [0.1.0](releases/0.1.0.md)
-
