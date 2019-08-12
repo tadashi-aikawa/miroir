@@ -3,6 +3,7 @@
 - [Trial table](trialtable.md)
 - [Check YAML](checkyaml.md)
 - Releases
+  - [1.0.0](releases/1.0.0.md)
   - [0.29.0](releases/0.29.0.md)
   - 0.28.x
     - [0.28.1](releases/0.28.1.md)
