@@ -695,9 +695,12 @@ export class SummaryComponent implements OnInit {
     dialogRef.componentInstance.value = JSON.stringify(
       this.displayedTrials.map((x: Trial) => ({
         name: x.name,
+        method: x.method,
         path: x.path,
         qs: x.queries,
         headers: x.headers,
+        form: x.form,
+        json: x.json,
       })),
       null,
       4,
