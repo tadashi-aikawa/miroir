@@ -24,6 +24,7 @@ import { matchRegExp } from '../../utils/regexp';
 import { Memoize } from 'lodash-decorators';
 import { regexpComparator } from '../../utils/filters';
 
+const MAX_TAB_INDEX = 2;
 const DIFF_VIEW_SKIP_TAG = 'hide_body';
 
 interface KeyBindings {
@@ -32,9 +33,8 @@ interface KeyBindings {
   move_to_previous_diff: string;
   show_next_trail: string;
   show_previous_trail: string;
-  move_diff_viewer_tab: string;
-  move_query_parameters_tab: string;
-  move_property_diffs_tab: string;
+  move_next_tab: string;
+  move_previous_tab: string;
   copy_trial_url: string;
   copy_path: string;
   copy_one_url: string;
@@ -52,9 +52,8 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
     move_to_previous_diff: 'i',
     show_next_trail: 'l',
     show_previous_trail: 'j',
-    move_diff_viewer_tab: 'd',
-    move_query_parameters_tab: 'q',
-    move_property_diffs_tab: 'p',
+    move_next_tab: '>',
+    move_previous_tab: '<',
     copy_trial_url: 'C',
     copy_path: 'P',
     copy_one_url: 'J',
@@ -70,9 +69,8 @@ const KEY_BINDINGS_BY: Dictionary<KeyBindings> = {
     move_to_previous_diff: 'k',
     show_next_trail: 'l',
     show_previous_trail: 'h',
-    move_diff_viewer_tab: 'd',
-    move_query_parameters_tab: 'q',
-    move_property_diffs_tab: 'p',
+    move_next_tab: '>',
+    move_previous_tab: '<',
     copy_trial_url: 'Y',
     copy_path: 'P',
     copy_one_url: 'H',
@@ -180,7 +178,7 @@ export class DetailDialogComponent implements OnInit {
   @Input() trials: Trial[];
   @Input() ignores: IgnoreCase[] = [];
   @Input() checkedAlready: IgnoreCase[] = [];
-  @Input() activeTabIndex: string;
+  @Input() activeTabIndex: string = '0';
   @Input() cheatSheet = false;
 
   // Toggles
@@ -327,31 +325,22 @@ export class DetailDialogComponent implements OnInit {
         'Show previous trial.',
       ),
       new Hotkey(
-        keyMode.move_diff_viewer_tab,
+        keyMode.move_next_tab,
         () => {
-          this.changeTab(0);
+          this.moveToNextTab();
           return false;
         },
         null,
-        'Move `Diff viewer` tab.',
+        'Move to next tab.',
       ),
       new Hotkey(
-        keyMode.move_query_parameters_tab,
+        keyMode.move_previous_tab,
         () => {
-          this.changeTab(1);
+          this.moveToPreviousTab();
           return false;
         },
         null,
-        'Move `Query parameters` tab.',
-      ),
-      new Hotkey(
-        keyMode.move_property_diffs_tab,
-        () => {
-          this.changeTab(2);
-          return false;
-        },
-        null,
-        'Move `Property diffs` tab.',
+        'Move to previous tab.',
       ),
       new Hotkey(
         keyMode.copy_trial_url,
@@ -613,8 +602,14 @@ export class DetailDialogComponent implements OnInit {
       : { one: bodyApplyIgnoredPair.one, other: bodyApplyIgnoredPair.other };
   }
 
-  changeTab(index: number): void {
-    this.activeTabIndex = String(index);
+  moveToNextTab(): void {
+    const dst = Number(this.activeTabIndex) + 1;
+    this.activeTabIndex = String(dst > MAX_TAB_INDEX ? 0 : dst);
+  }
+
+  moveToPreviousTab(): void {
+    const dst = Number(this.activeTabIndex) - 1;
+    this.activeTabIndex = String(dst < 0 ? MAX_TAB_INDEX : dst);
   }
 
   changeFullscreen(fullscreen: boolean) {
