@@ -67,8 +67,6 @@ cases:
 ### 特定pathやnameの場合だけ無視 + URL埋め込み
 
 ```yaml
-vars:
-  mimizou: https://avatars0.githubusercontent.com/u/9500018?v=3&s=460
 cases:
   - title: nameにignoreが入っている場合は無視してよい
     link: http://yourdocument
@@ -89,6 +87,8 @@ cases:
 ### アイコン画像に変数を指定
 
 ```yaml
+vars:
+  mimizou: https://avatars0.githubusercontent.com/u/9500018?v=3&s=460
 cases:
   - title: timeが含まれる場合は無視
     image: '{{ mimizou }}'
