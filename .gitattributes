@@ -3,3 +3,9 @@
 *.bat  text eol=crlf
 *.vbs  text eol=crlf
 *.txt  -text
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.mp4 binary
+
