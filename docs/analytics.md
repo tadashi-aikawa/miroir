@@ -13,7 +13,7 @@ Analyticsではプロパティの差分を**3つのグループに分類しま�
 2. Checked already
 3. Attentions
 
-![](resources/analytics/summary.png)
+![](./resources/analytics/summary.png)
 
 `Count`は*条件に一致したTrialの数*を示しています。  
 プロパティ差分の数ではありません。
@@ -53,7 +53,7 @@ Trialが`trials[].diffs_by_cognition`に`unknown`以外のキーを持つ場合�
 
 上記のTrialによって、以下それぞれの項目が`+1`されます。
 
-![](resources/analytics/ignored.png)
+![](./resources/analytics/ignored.png)
 
 ?> `Ignore ignore_id`はCountが2なので、上記以外で該当するTrialが1つ存在します
 
@@ -81,7 +81,7 @@ Trialが[Check YAML]の条件にマッチした場合にカウントされます
 
 Checked alreadyの確認を助けるバッチがあります。
 
-![](resources/analytics/checked_already.png)
+![](./resources/analytics/checked_already.png)
 
 このバッチは、*Checked alreadyに該当するTrialの数*を示しています。  
 これをクリックすると、確認の必要がある結果のみを詳細ダイアログで確認できます。
@@ -131,7 +131,7 @@ IgnoredとChecked alreadyに該当しない差分プロパティが1つでも存
 
 `type`が意図した形式になっているか確認してみてください。
 
-![](resources/analytics/type.png)
+![](./resources/analytics/type.png)
 
 
 ### Both failure!!
