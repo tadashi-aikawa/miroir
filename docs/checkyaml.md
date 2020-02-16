@@ -3,7 +3,7 @@ Check YAML
 
 本ページでは、Checked Alreadyの判定に使用するYAMLファイルの定義を記載します。
 
-[![](./resources/checkyaml.jpg)](./resources/checkyaml.jpg)
+![](./resources/checkyaml.jpg)
 
 
 定義
