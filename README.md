@@ -6,14 +6,14 @@ Miroir
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
 
-Documentation
--------------
+📜 Documentation
+------------------
 
 https://tadashi-aikawa.github.io/miroir
 
 
-AWS Setup
----------
+☁ AWS Setup
+------------
 
 ```
 $ ./setup-aws.sh <bucket_name> <table_name>
@@ -22,8 +22,8 @@ $ ./setup-aws.sh <bucket_name> <table_name>
 `./setup-aws.sh -h` shows usages and a example.
 
 
-Develop
--------
+💻 Develop
+------------
 
 ### Preparation for development
 
@@ -45,10 +45,10 @@ Then access to `http://localhost:4200/`
 $ make serve-docs
 ```
 
-Release
--------
+📦 Release
+------------
 
-**Window is OK!! Good :+1:**
+**Window is OK!! Good 👍**
 
 Before release, you need to `Confirm that your branch name equals release version`
 
