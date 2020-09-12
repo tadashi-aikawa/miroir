@@ -73,7 +73,7 @@ export class MarkdownInlineEditorComponent {
     editing = false;
     previousValue: string;
 
-    @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
+    @ViewChild('autosize') autosize: CdkTextareaAutosize;
 
     constructor(private _dialog: MatDialog) {
     }

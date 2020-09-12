@@ -191,7 +191,7 @@ export class DetailDialogComponent implements OnInit {
 
   @ViewChild('selector', { static: true }) selector;
   @ViewChild('diffView', { static: true }) diffView;
-  @ViewChild('jsonParametersEditor', { static: false }) jsonParametersEditor;
+  @ViewChild('jsonParametersEditor') jsonParametersEditor;
   @ViewChild('editor', { static: true }) editor;
 
   tableQueryRowData: QueryRowData[];

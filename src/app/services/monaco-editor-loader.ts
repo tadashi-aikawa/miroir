@@ -1,5 +1,7 @@
+import { Injectable } from "@angular/core";
 declare const require: any;
 
+@Injectable()
 export class MonacoEditorLoader {
     private _loaded = false;
     private _loadPromise: Promise<void>;

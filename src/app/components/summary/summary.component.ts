@@ -158,7 +158,7 @@ export class SummaryComponent implements OnInit {
 
   @ViewChild('sidenav', { static: true }) sideNav: MatSidenav;
   @ViewChild('keyWord', { static: true }) keyWord: ElementRef;
-  @ViewChild('trialsTable', { static: false }) trialsTable: TrialsTableComponent;
+  @ViewChild('trialsTable') trialsTable: TrialsTableComponent;
   @ViewChild('analytics', { static: true }) analytics: AnalyticsComponent;
 
   word = '';
