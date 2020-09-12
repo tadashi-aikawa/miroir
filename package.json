@@ -38,7 +38,7 @@
     "angular2-counto": "^1.2.5",
     "angular2-hotkeys": "^2.1.4",
     "angular2-markdown": "^2.2.3",
-    "angular2-toaster": "^7.0.0",
+    "angular2-toaster": "^8.0.0",
     "aws-sdk": "^2.471.0",
     "aws-sdk-webpack": "2.18.0",
     "core-js": "^3.1.3",
