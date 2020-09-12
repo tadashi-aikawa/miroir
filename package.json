@@ -57,6 +57,7 @@
     "rxjs": "^6.5.2",
     "rxjs-compat": "^6.5.2",
     "ts-clipboard": "^1.0.17",
+    "tslib": "^1.13.0",
     "typescript-lazy-get-decorator": "^1.2.2",
     "zone.js": "^0.9.1"
   },
