@@ -3,7 +3,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterModule, Routes} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HttpModule} from '@angular/common/http';
+import {HttpClientModule} from '@angular/common/http';
 import {
     MatAutocompleteModule,
     MatButtonModule,
@@ -112,7 +112,7 @@ const appRoutes: Routes = [
         RouterModule.forRoot(appRoutes),
         FormsModule,
         ReactiveFormsModule,
-        HttpModule,
+        HttpClientModule,
         NgSelectModule, FormsModule,
         CommonModule,
         Ng2HighchartsModule,
