@@ -14,7 +14,9 @@ import {
 } from '../../models/models';
 import { AwsService } from '../../services/aws-service';
 import { Component, ElementRef, Input, OnInit, Optional, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogRef, MatSidenav, MatSnackBar } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatSidenav } from '@angular/material/sidenav';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fileSaver from 'file-saver';
 import * as _ from 'lodash';
 import { Dictionary } from 'lodash';

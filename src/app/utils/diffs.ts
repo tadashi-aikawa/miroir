@@ -23,7 +23,7 @@ function toLodashPath(property: string): string {
 }
 
 function toCheckedAlready(yamlStr: string): IgnoreCase[] {
-    const checkPoint: CheckPoint = yaml.safeLoad(yamlStr);
+    const checkPoint: CheckPoint = yaml.safeLoad(yamlStr) as CheckPoint;
     const assignVars = (ignoreCase: IgnoreCase): IgnoreCase =>
         _.reduce(checkPoint.vars, (result, v, k) => Object.assign({}, result, {
             image: result.image ? result.image.replace(new RegExp(`{{ ${k} }}`, 'g'), v) : undefined,
