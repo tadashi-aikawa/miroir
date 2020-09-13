@@ -121,13 +121,13 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
                     name: summary.one.name,
                     color: 'rgba(100,100,255,0.5)',
                     type: 'spline',
-                    data: trials.map(x => ({
+                    data: trials.map((x, i) => ({
                         y: x.one.response_sec,
                         name: trialToTitle(x),
                         marker: statusToMarker(x.one.status_code),
                         events: {
                             click: e => {
-                                this.onPointClick.emit(e.point.index);
+                                this.onPointClick.emit(i);
                                 return false;
                             }
                         }
@@ -137,13 +137,13 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
                     name: summary.other.name,
                     color: 'rgba(255,100,100,0.5)',
                     type: 'spline',
-                    data: trials.map(x => ({
+                    data: trials.map((x, i) => ({
                         y: x.other.response_sec,
                         name: trialToTitle(x),
                         marker: statusToMarker(x.other.status_code),
                         events: {
                             click: e => {
-                                this.onPointClick.emit(e.point.index);
+                                this.onPointClick.emit(i);
                                 return false;
                             }
                         }
@@ -153,12 +153,12 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
                     name: 'Numerical difference',
                     color: 'rgba(100,255,100,0.5)',
                     type: 'area',
-                    data: trials.map(x => ({
+                    data: trials.map((x, i) => ({
                         y: x.responseSecDiff,
                         name: trialToTitle(x),
                         events: {
                             click: e => {
-                                this.onPointClick.emit(e.point.index);
+                                this.onPointClick.emit(i);
                                 return false;
                             }
                         }

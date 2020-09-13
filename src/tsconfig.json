@@ -24,7 +24,8 @@
     "noStrictGenericChecks": true,
     "plugins": [
       { "name": "@angular/language-service" }
-    ]
+    ],
+    "skipLibCheck": true
   },
   "angularCompilerOptions": {
     "enableIvy": false

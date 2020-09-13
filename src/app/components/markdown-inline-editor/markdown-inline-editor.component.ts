@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {animate, style, transition, trigger} from '@angular/animations';
-import {MatDialog} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import {Change} from 'app/models/models';
 import {ConfirmDialogComponent} from 'app/components/dialogs/confirm-dialog/confirm-dialog.component';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field'
@@ -73,7 +73,7 @@ export class MarkdownInlineEditorComponent {
     editing = false;
     previousValue: string;
 
-    @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
+    @ViewChild('autosize') autosize: CdkTextareaAutosize;
 
     constructor(private _dialog: MatDialog) {
     }

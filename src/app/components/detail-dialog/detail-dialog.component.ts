@@ -11,7 +11,8 @@ import {
 import { animate, style, transition, trigger } from '@angular/animations';
 import { AwsService } from '../../services/aws-service';
 import { Component, Input, OnInit, Optional, ViewChild } from '@angular/core';
-import { MatDialogRef, MatSnackBar } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgOption } from '@ng-select/ng-select';
 import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 import * as _ from 'lodash';
@@ -191,7 +192,7 @@ export class DetailDialogComponent implements OnInit {
 
   @ViewChild('selector', { static: true }) selector;
   @ViewChild('diffView', { static: true }) diffView;
-  @ViewChild('jsonParametersEditor', { static: false }) jsonParametersEditor;
+  @ViewChild('jsonParametersEditor') jsonParametersEditor;
   @ViewChild('editor', { static: true }) editor;
 
   tableQueryRowData: QueryRowData[];
