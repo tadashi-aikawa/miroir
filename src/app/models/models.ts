@@ -165,6 +165,7 @@ export class Trial {
   queries: any;
   form?: Dictionary<string[]>;
   json?: Object;
+  raw?: string;
   one: ResponseSummary;
   other: ResponseSummary;
   method: HttpMethod;

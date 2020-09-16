@@ -202,6 +202,15 @@
         >
         </app-editor>
       </div>
+      <div *ngIf="trial.raw" class="smart-padding" style="width: calc(95vw / 2)">
+        <h3>Raw body</h3>
+        <app-editor
+          #rawEditor
+          [config]="rawEditorConfig"
+          height="{{ fullscreen ? 'calc(95vh - 245px)' : 'calc(95vh - 375px)' }}"
+        >
+        </app-editor>
+      </div>
     </div>
   </mat-tab>
   <mat-tab label="Property diffs">
@@ -381,7 +390,7 @@
           </a>
         </div>
         <app-editor
-          #editor
+          #configEditor
           [config]="editorConfig"
           height="{{ fullscreen ? 'calc(95vh - 245px)' : 'calc(95vh - 375px)' }}"
         >

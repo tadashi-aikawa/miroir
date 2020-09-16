@@ -193,7 +193,8 @@ export class DetailDialogComponent implements OnInit {
   @ViewChild('selector' ) selector;
   @ViewChild('diffView', { static: true }) diffView;
   @ViewChild('jsonParametersEditor') jsonParametersEditor;
-  @ViewChild('editor', { static: true }) editor;
+  @ViewChild('rawEditor') rawEditor;
+  @ViewChild('configEditor', { static: true }) configEditor;
 
   tableQueryRowData: QueryRowData[];
   tableFormParametersRowData: QueryRowData[];
@@ -214,6 +215,7 @@ export class DetailDialogComponent implements OnInit {
 
   diffViewConfig: DiffViewConfig;
   jsonParametersEditorConfig: EditorConfig;
+  rawEditorConfig: EditorConfig;
   editorConfig: EditorConfig;
   displayedQueries: { key: string; value: string }[];
   filteredWord: string;
@@ -587,6 +589,13 @@ export class DetailDialogComponent implements OnInit {
         readOnly: true,
       };
     }
+    if (this.trial.raw) {
+      this.rawEditorConfig = {
+        content: this.trial.raw,
+        contentType: 'raw',
+        readOnly: false,
+      };
+    }
 
     // Property diffs
     this.propertyDiffsByCognition = createPropertyDiffs(trial, this.ignores, this.checkedAlready);
@@ -655,17 +664,18 @@ export class DetailDialogComponent implements OnInit {
     if (index === 0 && this.diffView) {
       this.diffView.updateView();
     }
-    if (index === 1 && this.jsonParametersEditor) {
-      this.jsonParametersEditor.updateView();
+    if (index === 1) {
+      this.jsonParametersEditor?.updateView();
+      this.rawEditor?.updateView();
     }
-    if (index === 2 && this.editor) {
-      this.editor.updateView();
+    if (index === 2 && this.configEditor) {
+      this.configEditor.updateView();
     }
   }
 
   updateEditorConfig() {
-    this.checkedAlready = toCheckedAlready(this.editor.getValue());
-    this.settingsService.checkList = this.editor.getValue();
+    this.checkedAlready = toCheckedAlready(this.configEditor.getValue());
+    this.settingsService.checkList = this.configEditor.getValue();
     this.propertyDiffsByCognition = createPropertyDiffs(this.trial, this.ignores, this.checkedAlready);
     this.updateDiffEditorBodies();
   }
