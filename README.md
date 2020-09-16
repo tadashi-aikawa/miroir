@@ -50,15 +50,16 @@ $ make serve-docs
 
 **Window is OK!! Good 👍**
 
-Before release, you need to `Confirm that your branch name equals release version`
-
 1. `make add-release` for createing `docs/releases/*.md`
 2. Update `docs/_sidebar.md`
 3. Update version in `docs/index.md`
 4. Check Miroir and documentation
-5. `make release`
 
-Finally, create pull request and merge to master!!
+Then
+
+```
+make release version=x.y.z
+```
 
 
 Deploy

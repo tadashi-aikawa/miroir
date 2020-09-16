@@ -10,8 +10,8 @@ PORT := 8888
 BASE_URL := http://localhost:8888/miroir/
 
 -include .env
-version := $(shell git rev-parse --abbrev-ref HEAD)
 
+#-------------------------------------------------------
 
 help: ## Print this help
 	@echo 'Usage: make [target]'
@@ -19,76 +19,56 @@ help: ## Print this help
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9][a-zA-Z0-9_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+guard-%:
+	@ if [ "${${*}}" = "" ]; then \
+		echo "[REQUIRED ERROR] \`$*\` is required."; \
+		exit 1; \
+	fi
 
-init: ## Initialize for build and package
-	@echo 'Start $@'
-	@docker build -t tadashi-aikawa/miroir .
-	@echo 'End $@'
+#-------------------------------------------------------
 
 dev: ## Run for development
-	@echo 'Start $@'
 	@npm run dev
-	@echo 'End $@'
+
+build: ## Build
+	@npm run build
 
 serve-docs: ## Initialize for build and package
-	@echo 'Start $@'
 	@npm run docs
-	@echo 'End $@'
-
-_clean-package:
-	@echo 'Start $@'
-	@docker rm -f tmp-miroir || echo "No need to clean"
-	@echo 'End $@'
-
-package: init _clean-package ## Package to dist (Set BASE_URL[def: http://localhost:8888/miroir/])
-	@echo 'Start $@'
-	@docker run -i -e BASE_URL=$(BASE_URL) --name tmp-miroir tadashi-aikawa/miroir npm run package
-	@rm -rf dist
-	@docker cp tmp-miroir:/usr/src/app/dist .
-	@docker rm -f tmp-miroir
-	@echo 'End $@'
 
 add-release:  ## Add releases to documentation
-	@echo 'Start $@'
 	@cat docs/releases/template.md | sed -r 's/x.y.z/$(version)/g' | sed -r s@yyyy/MM/dd@`date '+%Y/%m/%d'`@g > docs/releases/$(version).md
-	@echo 'End $@'
 
-_clean-deploy-container:
-	@echo 'Start $@'
-	@docker rm -f miroir || echo "No need to clean"
-	@echo 'End $@'
-
-release:  ## Release
-	@echo 'Start $@'
-
+release: guard-version build ## make release version=x.y.z
 	@echo '1. Staging and commit'
 	git add docs
 	git commit -m ':pencil: Add release note'
 
-	@echo '2. Version up'
+	@echo '2. Increment version'
 	npm version $(version)
 
 	@echo '3. Push'
 	git push
 	git push --tags
 
-	@echo 'Success All!!'
-	@echo 'Create a pull request and merge to master!!'
-	@echo 'https://github.com/tadashi-aikawa/miroir/compare/$(version)?expand=1'
+	@echo "All Successed!!"
+	@echo 'Finally, you have to close a milestone about this version.'
+	@echo 'https://github.com/tadashi-aikawa/miroir/milestones'
 
-	@echo 'End $@'
+#==============
 
-deploy-container: _clean-deploy-container ## Deploy by docker (Set: PORT[def: 8888] and Requirements: dist)
-	@echo 'Start $@'
+package: ## Package to dist (Set BASE_URL[def: http://localhost:8888/miroir/])
+	@docker build -t tadashi-aikawa/miroir .
+	@docker rm -f tmp-miroir || echo "No need to clean"
+	@docker run -i -e BASE_URL=$(BASE_URL) --name tmp-miroir tadashi-aikawa/miroir npm run package
+	@rm -rf dist
+	@docker cp tmp-miroir:/usr/src/app/dist .
+	@docker rm -f tmp-miroir
+
+deploy-container: ## Deploy by docker (Set: PORT[def: 8888] and Requirements: dist)
+	@docker rm -f miroir || echo "No need to clean"
 	@docker run --name miroir -v `pwd`/dist:/usr/share/nginx/html/miroir:ro -p $(PORT):80 -d nginx
-	@echo 'End $@'
 
-_clean-deploy-s3:
-	@echo 'Start $@'
+deploy-s3: ## Deploy by docker (Set: BUCKET and Requirements dist, aws-cli)
 	@aws s3 rm s3://$(BUCKET) || echo "No need to clean"
-	@echo 'End $@'
-
-deploy-s3: _clean-deploy-s3 ## Deploy by docker (Set: BUCKET and Requirements dist, aws-cli)
-	@echo 'Start $@'
 	@aws s3 cp --acl private `pwd`/dist/ s3://$(BUCKET)/ --recursive
-	@echo 'End $@'
