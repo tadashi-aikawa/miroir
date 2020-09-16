@@ -36,7 +36,7 @@ build: ## Build
 serve-docs: ## Initialize for build and package
 	@npm run docs
 
-add-release:  ## Add releases to documentation
+add-release-note: guard-version ## make add-release-note version=x.y.z
 	@cat docs/releases/template.md | sed -r 's/x.y.z/$(version)/g' | sed -r s@yyyy/MM/dd@`date '+%Y/%m/%d'`@g > docs/releases/$(version).md
 
 release: guard-version build ## make release version=x.y.z

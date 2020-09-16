@@ -50,7 +50,7 @@ $ make serve-docs
 
 **Window is OK!! Good 👍**
 
-1. `make add-release` for createing `docs/releases/*.md`
+1. `make add-release-note version=x.y.z` for createing `docs/releases/*.md`
 2. Update `docs/_sidebar.md`
 3. Update version in `docs/index.md`
 4. Check Miroir and documentation
