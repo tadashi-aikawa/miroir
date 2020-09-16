@@ -154,14 +154,14 @@ export class ResponseTimeChartComponent implements OnChanges, AfterViewInit {
                     color: 'rgba(100,255,100,0.5)',
                     type: 'area',
                     data: trials.map((x, i) => ({
-                        y: x.responseSecDiff,
-                        name: trialToTitle(x),
                         events: {
                             click: e => {
                                 this.onPointClick.emit(i);
                                 return false;
                             }
-                        }
+                        },
+                        y: x.responseSecDiff,
+                        name: trialToTitle(x)
                     }))
                 }
             ]

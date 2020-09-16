@@ -190,7 +190,7 @@ export class DetailDialogComponent implements OnInit {
   @Input() isLineFilterEnabled: boolean = this.settingsService.isLineFilterEnabled;
   @Input() isLineFilterNegative: boolean = this.settingsService.isLineFilterNegative;
 
-  @ViewChild('selector', { static: true }) selector;
+  @ViewChild('selector' ) selector;
   @ViewChild('diffView', { static: true }) diffView;
   @ViewChild('jsonParametersEditor') jsonParametersEditor;
   @ViewChild('editor', { static: true }) editor;
