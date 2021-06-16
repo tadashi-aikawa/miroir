@@ -1,14 +1,14 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
-import {DynamoDB} from 'aws-sdk';
-import {LocalStorageService} from 'angular-2-local-storage';
+import { DynamoDB } from 'aws-sdk';
+import { LocalStorageService } from 'angular-2-local-storage';
 import DocumentClient = DynamoDB.DocumentClient;
 
 export type KeyMode = 'default' | 'vim';
 const KEY_MODE_DEFAULT: KeyMode = 'default';
-const IS_LINE_FILTER_ENABLED_DEFAULT: boolean = false;
-const IS_LINE_FILTER_NEGATIVE_DEFAULT: boolean = false;
+const IS_LINE_FILTER_ENABLED_DEFAULT = false;
+const IS_LINE_FILTER_NEGATIVE_DEFAULT = false;
 
 const CHECKLIST_DEFAULT = `
 vars:
@@ -30,170 +30,175 @@ cases:
 
 @Injectable()
 export class SettingsService {
+  constructor(private localStorageService: LocalStorageService) {}
 
-    constructor(private localStorageService: LocalStorageService) {
-    }
+  get region(): string {
+    return this.localStorageService.get<string>('region');
+  }
 
-    get region(): string {
-        return this.localStorageService.get<string>('region');
-    }
+  set region(value: string) {
+    this.localStorageService.set('region', value);
+  }
 
-    set region(value: string) {
-        this.localStorageService.set('region', value);
-    }
+  get table(): string {
+    return this.localStorageService.get<string>('table');
+  }
 
-    get table(): string {
-        return this.localStorageService.get<string>('table');
-    }
+  set table(value: string) {
+    this.localStorageService.set('table', value);
+  }
 
-    set table(value: string) {
-        this.localStorageService.set('table', value);
-    }
+  get bucket(): string {
+    return this.localStorageService.get<string>('bucket');
+  }
 
-    get bucket(): string {
-        return this.localStorageService.get<string>('bucket');
-    }
+  set bucket(value: string) {
+    this.localStorageService.set('bucket', value);
+  }
 
-    set bucket(value: string) {
-        this.localStorageService.set('bucket', value);
-    }
+  get prefix(): string {
+    return this.localStorageService.get<string>('prefix') || '';
+  }
 
-    get prefix(): string {
-        return this.localStorageService.get<string>('prefix') || '';
-    }
+  set prefix(value: string) {
+    this.localStorageService.set('prefix', value);
+  }
 
-    set prefix(value: string) {
-        this.localStorageService.set('prefix', value);
-    }
+  get tmpAccessKeyId(): string {
+    return this.localStorageService.get<string>('tmpAccessKeyId');
+  }
 
-    get tmpAccessKeyId(): string {
-        return this.localStorageService.get<string>('tmpAccessKeyId');
-    }
+  set tmpAccessKeyId(value: string) {
+    this.localStorageService.set('tmpAccessKeyId', value);
+  }
 
-    set tmpAccessKeyId(value: string) {
-        this.localStorageService.set('tmpAccessKeyId', value);
-    }
+  removeTmpAccessKeyId() {
+    this.localStorageService.remove('tmpAccessKeyId');
+  }
 
-    removeTmpAccessKeyId() {
-        this.localStorageService.remove('tmpAccessKeyId');
-    }
+  get tmpSecretAccessKey(): string {
+    return this.localStorageService.get<string>('tmpSecretAccessKey');
+  }
 
-    get tmpSecretAccessKey(): string {
-        return this.localStorageService.get<string>('tmpSecretAccessKey');
-    }
+  set tmpSecretAccessKey(value: string) {
+    this.localStorageService.set('tmpSecretAccessKey', value);
+  }
 
-    set tmpSecretAccessKey(value: string) {
-        this.localStorageService.set('tmpSecretAccessKey', value);
-    }
+  removeTmpSecretAccessKeyId() {
+    this.localStorageService.remove('tmpSecretAccessKeyId');
+  }
 
-    removeTmpSecretAccessKeyId() {
-        this.localStorageService.remove('tmpSecretAccessKeyId');
-    }
+  get tmpSessionToken(): string {
+    return this.localStorageService.get<string>('tmpSessionToken');
+  }
 
-    get tmpSessionToken(): string {
-        return this.localStorageService.get<string>('tmpSessionToken');
-    }
+  set tmpSessionToken(value: string) {
+    this.localStorageService.set('tmpSessionToken', value);
+  }
 
-    set tmpSessionToken(value: string) {
-        this.localStorageService.set('tmpSessionToken', value);
-    }
+  removeTmpSessionToken() {
+    this.localStorageService.remove('tmpSessionToken');
+  }
 
-    removeTmpSessionToken() {
-        this.localStorageService.remove('tmpSessionToken');
-    }
+  get tmpExpireTime(): Date {
+    return new Date(this.localStorageService.get<Date>('tmpExpireTime'));
+  }
 
-    get tmpExpireTime(): Date {
-        return new Date(this.localStorageService.get<Date>('tmpExpireTime'));
-    }
+  set tmpExpireTime(value: Date) {
+    this.localStorageService.set('tmpExpireTime', value);
+  }
 
-    set tmpExpireTime(value: Date) {
-        this.localStorageService.set('tmpExpireTime', value);
-    }
+  removeTmpExpireTime() {
+    this.localStorageService.remove('tmpExpireTime');
+  }
 
-    removeTmpExpireTime() {
-        this.localStorageService.remove('tmpExpireTime');
-    }
+  get useLocalStack(): boolean {
+    return this.localStorageService.get<boolean>('useLocalStack');
+  }
 
-    get useLocalStack(): boolean {
-        return this.localStorageService.get<boolean>('useLocalStack');
-    }
+  set useLocalStack(value: boolean) {
+    this.localStorageService.set('useLocalStack', value);
+  }
 
-    set useLocalStack(value: boolean) {
-        this.localStorageService.set('useLocalStack', value);
-    }
+  get keyMode(): KeyMode {
+    return this.localStorageService.get<KeyMode>('keyMode') || KEY_MODE_DEFAULT;
+  }
 
-    get keyMode(): KeyMode {
-        return this.localStorageService.get<KeyMode>('keyMode') || KEY_MODE_DEFAULT;
-    }
+  set keyMode(value: KeyMode) {
+    this.localStorageService.set('keyMode', value);
+  }
 
-    set keyMode(value: KeyMode) {
-        this.localStorageService.set('keyMode', value);
-    }
+  get alwaysIntelligentAnalytics(): boolean {
+    return this.localStorageService.get<boolean>('alwaysIntelligentAnalytics');
+  }
 
-    get alwaysIntelligentAnalytics(): boolean {
-        return this.localStorageService.get<boolean>('alwaysIntelligentAnalytics');
-    }
+  set alwaysIntelligentAnalytics(value: boolean) {
+    this.localStorageService.set('alwaysIntelligentAnalytics', value);
+  }
 
-    set alwaysIntelligentAnalytics(value: boolean) {
-        this.localStorageService.set('alwaysIntelligentAnalytics', value);
-    }
+  get localStackEndpoint(): string {
+    return this.localStorageService.get<string>('localStackEndpoint');
+  }
 
-    get localStackEndpoint(): string {
-        return this.localStorageService.get<string>('localStackEndpoint');
-    }
+  set localStackEndpoint(value: string) {
+    this.localStorageService.set('localStackEndpoint', value);
+  }
 
-    set localStackEndpoint(value: string) {
-        this.localStorageService.set('localStackEndpoint', value);
-    }
+  get unifiedDiff(): boolean {
+    return this.localStorageService.get<boolean>('unifiedDiff');
+  }
 
-    get unifiedDiff(): boolean {
-        return this.localStorageService.get<boolean>('unifiedDiff');
-    }
+  set unifiedDiff(value: boolean) {
+    this.localStorageService.set('unifiedDiff', value);
+  }
 
-    set unifiedDiff(value: boolean) {
-        this.localStorageService.set('unifiedDiff', value);
-    }
+  get isIgnoredDiffHidden(): boolean {
+    return this.localStorageService.get<boolean>('isIgnoredDiffHidden');
+  }
 
-    get isIgnoredDiffHidden(): boolean {
-        return this.localStorageService.get<boolean>('isIgnoredDiffHidden');
-    }
+  set isIgnoredDiffHidden(value: boolean) {
+    this.localStorageService.set('isIgnoredDiffHidden', value);
+  }
 
-    set isIgnoredDiffHidden(value: boolean) {
-        this.localStorageService.set('isIgnoredDiffHidden', value);
-    }
+  get isCheckedAlreadyDiffHidden(): boolean {
+    return this.localStorageService.get<boolean>('isCheckedAlreadyDiffHidden');
+  }
 
-    get isCheckedAlreadyDiffHidden(): boolean {
-        return this.localStorageService.get<boolean>('isCheckedAlreadyDiffHidden');
-    }
+  set isCheckedAlreadyDiffHidden(value: boolean) {
+    this.localStorageService.set('isCheckedAlreadyDiffHidden', value);
+  }
 
-    set isCheckedAlreadyDiffHidden(value: boolean) {
-        this.localStorageService.set('isCheckedAlreadyDiffHidden', value);
-    }
+  get isLineFilterEnabled(): boolean {
+    const r = this.localStorageService.get<boolean>('isLineFilterEnabled');
+    return r === null ? IS_LINE_FILTER_ENABLED_DEFAULT : r;
+  }
 
-    get isLineFilterEnabled(): boolean {
-        const r = this.localStorageService.get<boolean>('isLineFilterEnabled');
-        return r === null ? IS_LINE_FILTER_ENABLED_DEFAULT : r
-    }
+  set isLineFilterEnabled(value: boolean) {
+    this.localStorageService.set('isLineFilterEnabled', value);
+  }
 
-    set isLineFilterEnabled(value: boolean) {
-        this.localStorageService.set('isLineFilterEnabled', value);
-    }
+  get isLineFilterNegative(): boolean {
+    const r = this.localStorageService.get<boolean>('isLineFilterNegative');
+    return r === null ? IS_LINE_FILTER_NEGATIVE_DEFAULT : r;
+  }
 
-    get isLineFilterNegative(): boolean {
-        const r = this.localStorageService.get<boolean>('isLineFilterNegative');
-        return r === null ? IS_LINE_FILTER_NEGATIVE_DEFAULT : r
-    }
+  set isLineFilterNegative(value: boolean) {
+    this.localStorageService.set('isLineFilterNegative', value);
+  }
 
-    set isLineFilterNegative(value: boolean) {
-        this.localStorageService.set('isLineFilterNegative', value);
-    }
+  get isResponseHeaderShown(): boolean {
+    return this.localStorageService.get<boolean>('isResponseHeaderShown');
+  }
 
-    get checkList(): string {
-        return this.localStorageService.get<string>('checkList') || CHECKLIST_DEFAULT;
-    }
+  set isResponseHeaderShown(value: boolean) {
+    this.localStorageService.set('isResponseHeaderShown', value);
+  }
 
-    set checkList(value: string) {
-        this.localStorageService.set('checkList', value);
-    }
+  get checkList(): string {
+    return this.localStorageService.get<string>('checkList') || CHECKLIST_DEFAULT;
+  }
 
+  set checkList(value: string) {
+    this.localStorageService.set('checkList', value);
+  }
 }

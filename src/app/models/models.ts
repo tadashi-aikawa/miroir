@@ -179,10 +179,6 @@ export class Trial {
   propertyDiffsByCognition?: PropertyDiffsByCognition;
   attention?: string;
 
-  hasResponse(): boolean {
-    return this.one.file !== undefined && this.other.file !== undefined;
-  }
-
   static toTsvHeader(): string {
     return [
       'Seq',
@@ -205,6 +201,10 @@ export class Trial {
       '[Other] Content type',
       'Request time',
     ].join('\t');
+  }
+
+  hasResponse(): boolean {
+    return this.one.file !== undefined && this.other.file !== undefined;
   }
 
   toTsvRecord(): string {
@@ -259,6 +259,7 @@ export class ResponseSummary {
   file?: string;
   prop_file?: string;
   content_type?: string;
+  response_header?: Dictionary<string>;
 }
 
 export class Pair<T> {

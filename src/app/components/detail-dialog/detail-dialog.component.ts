@@ -179,7 +179,7 @@ export class DetailDialogComponent implements OnInit {
   @Input() trials: Trial[];
   @Input() ignores: IgnoreCase[] = [];
   @Input() checkedAlready: IgnoreCase[] = [];
-  @Input() activeTabIndex: string = '0';
+  @Input() activeTabIndex = '0';
   @Input() cheatSheet = false;
 
   // Toggles
@@ -189,8 +189,9 @@ export class DetailDialogComponent implements OnInit {
   @Input() isCheckedAlreadyDiffHidden: boolean = this.settingsService.isCheckedAlreadyDiffHidden;
   @Input() isLineFilterEnabled: boolean = this.settingsService.isLineFilterEnabled;
   @Input() isLineFilterNegative: boolean = this.settingsService.isLineFilterNegative;
+  @Input() isResponseHeaderShown: boolean = this.settingsService.isResponseHeaderShown;
 
-  @ViewChild('selector' ) selector;
+  @ViewChild('selector') selector;
   @ViewChild('diffView', { static: true }) diffView;
   @ViewChild('jsonParametersEditor') jsonParametersEditor;
   @ViewChild('rawEditor') rawEditor;
@@ -256,7 +257,10 @@ export class DetailDialogComponent implements OnInit {
   private calcDiffViewerHeight(fullscreen: boolean, isLineFilterEnabled: boolean): string {
     const heightBehindFullscreen = fullscreen ? 0 : 130;
     const heightBehindLineFilter = isLineFilterEnabled ? 50 : 0;
-    return `calc(95vh - ${175 + heightBehindFullscreen + heightBehindLineFilter}px)`;
+    const heightBehindResponseHeaderToggle = 20;
+    return `calc(95vh - ${175 +
+      heightBehindFullscreen +
+      heightBehindLineFilter}px - ${heightBehindResponseHeaderToggle}px)`;
   }
 
   get diffViewerHeight(): string {
@@ -294,7 +298,7 @@ export class DetailDialogComponent implements OnInit {
       new Hotkey(
         keyMode.move_to_next_diff,
         () => {
-          this.diffView.moveToNextDiff(true);
+          this.diffView.moveToNextDiff();
           return false;
         },
         null,
@@ -303,7 +307,7 @@ export class DetailDialogComponent implements OnInit {
       new Hotkey(
         keyMode.move_to_previous_diff,
         () => {
-          this.diffView.moveToPreviousDiff(true);
+          this.diffView.moveToPreviousDiff();
           return false;
         },
         null,
@@ -478,7 +482,10 @@ export class DetailDialogComponent implements OnInit {
         .filter(x => this.isLineFilterNegative !== matchRegExp(x, this.filteredWord))
         .join('\n');
 
-    const bodyPair: Pair<string> = this.maskIgnores(this.originalEditorBody, this.editorLanguage);
+    // XXX: Avoid bugs what is both `Red eye` and `Response header` are checked.
+    const bodyPair: Pair<string> = this.isResponseHeaderShown
+      ? { one: this.originalEditorBody.one, other: this.originalEditorBody.other }
+      : this.maskIgnores(this.originalEditorBody, this.editorLanguage);
     const needsFilter: boolean = this.isLineFilterEnabled && !!this.filteredWord;
 
     this.diffViewConfig = createConfig(
@@ -510,58 +517,76 @@ export class DetailDialogComponent implements OnInit {
   showTrial(trial: Trial): void {
     // Diff viewer
     this.isLoading = true;
-    if (trial.hasResponse()) {
-      if (trial.one.type === 'octet-stream' || trial.other.type === 'octet-stream') {
-        this.showRejectMessageOnDiffViewer('(^_^;) Binary is not supported to show');
-      } else if (_.includes(trial.tags, DIFF_VIEW_SKIP_TAG)) {
-        this.showRejectMessageOnDiffViewer(`(´Д｀) There is ${DIFF_VIEW_SKIP_TAG} tag so not to show body`);
-      } else {
-        const fetchFile = (file: string) => this.service.fetchFile(this.reportKey, file);
 
-        this.errorMessage = undefined;
-        Promise.all(
-          _.compact([trial.one.file, trial.other.file, trial.one.prop_file, trial.other.prop_file]).map(x =>
-            fetchFile(x),
-          ),
-        )
-          .then((rs: { encoding: string; body: string }[]) => {
-            this.isLoading = false;
-            this.targetPropertyValue = undefined;
-
-            this.originalEditorBody = { one: rs[0].body, other: rs[1].body };
-            this.editorLanguage = {
-              one: trial.one.type,
-              other: trial.other.type,
-            };
-            this.expectedEncoding = { one: rs[0].encoding, other: rs[1].encoding };
-
-            // has property json?
-            if (rs.length === 4) {
-              this.propertyObject = {
-                one: JSON.parse(rs[2].body),
-                other: JSON.parse(rs[3].body),
-              };
-            }
-
-            this.updateDiffEditorBodies();
-          })
-          .catch(err => {
-            this.isLoading = false;
-            this.errorMessage = err;
-          });
-      }
-    } else {
+    if (this.isResponseHeaderShown) {
       this.errorMessage = undefined;
       // We must initialize diffView after set config.
       // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
       setTimeout(() => {
         this.isLoading = false;
         this.targetPropertyValue = undefined;
-        this.originalEditorBody = { one: 'No file', other: 'No file' };
-        this.editorLanguage = { one: 'text', other: 'text' };
-        this.expectedEncoding = { one: 'None', other: 'None' };
+        this.originalEditorBody = {
+          one: JSON.stringify(trial.one.response_header, null, 4),
+          other: JSON.stringify(trial.other.response_header, null, 4),
+        };
+        this.editorLanguage = { one: 'json', other: 'json' };
+        this.expectedEncoding = { one: 'utf-8', other: 'utf-8' };
         this.updateDiffEditorBodies();
       }, 100);
+    } else {
+      if (trial.hasResponse()) {
+        if (trial.one.type === 'octet-stream' || trial.other.type === 'octet-stream') {
+          this.showRejectMessageOnDiffViewer('(^_^;) Binary is not supported to show');
+        } else if (_.includes(trial.tags, DIFF_VIEW_SKIP_TAG)) {
+          this.showRejectMessageOnDiffViewer(`(´Д｀) There is ${DIFF_VIEW_SKIP_TAG} tag so not to show body`);
+        } else {
+          const fetchFile = (file: string) => this.service.fetchFile(this.reportKey, file);
+
+          this.errorMessage = undefined;
+          Promise.all(
+            _.compact([trial.one.file, trial.other.file, trial.one.prop_file, trial.other.prop_file]).map(x =>
+              fetchFile(x),
+            ),
+          )
+            .then((rs: { encoding: string; body: string }[]) => {
+              this.isLoading = false;
+              this.targetPropertyValue = undefined;
+
+              this.originalEditorBody = { one: rs[0].body, other: rs[1].body };
+              this.editorLanguage = {
+                one: trial.one.type,
+                other: trial.other.type,
+              };
+              this.expectedEncoding = { one: rs[0].encoding, other: rs[1].encoding };
+
+              // has property json?
+              if (rs.length === 4) {
+                this.propertyObject = {
+                  one: JSON.parse(rs[2].body),
+                  other: JSON.parse(rs[3].body),
+                };
+              }
+
+              this.updateDiffEditorBodies();
+            })
+            .catch(err => {
+              this.isLoading = false;
+              this.errorMessage = err;
+            });
+        }
+      } else {
+        this.errorMessage = undefined;
+        // We must initialize diffView after set config.
+        // Changing `this.isLoading` and sleep a bit time causes onInit event so I wrote ...
+        setTimeout(() => {
+          this.isLoading = false;
+          this.targetPropertyValue = undefined;
+          this.originalEditorBody = { one: 'No file', other: 'No file' };
+          this.editorLanguage = { one: 'text', other: 'text' };
+          this.expectedEncoding = { one: 'None', other: 'None' };
+          this.updateDiffEditorBodies();
+        }, 100);
+      }
     }
 
     // Parameters
@@ -658,6 +683,12 @@ export class DetailDialogComponent implements OnInit {
     this.isLineFilterEnabled = enabled;
     this.settingsService.isLineFilterEnabled = enabled;
     this.updateDiffEditorBodies();
+  }
+
+  changeResponseHeaderShown(shown: boolean) {
+    this.isResponseHeaderShown = shown;
+    this.settingsService.isResponseHeaderShown = shown;
+    this.showTrial(this.trial);
   }
 
   afterChangeTab(index: number): void {

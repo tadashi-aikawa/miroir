@@ -1,108 +1,124 @@
 :host >>> th.ng2-smart-th.key {
-    width: 200px;
+  width: 200px;
 }
 
 .smart-padding-without-left {
-    padding-top: 5px;
+  padding-top: 5px;
 }
 
 .origin-queries {
-    font-size: 50%;
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 15px;
+  font-size: 50%;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 15px;
 }
 
 .origin-queries:hover {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    overflow-wrap: break-word;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: break-word;
 }
 
 .count-word {
-    color: gray;
-    font-size: 75%;
+  color: gray;
+  font-size: 75%;
 }
 
 .property-diffs {
-    font-size: 75%;
+  font-size: 75%;
 }
 
 .diff-type-number {
-    font-size: 70%;
-    color: gray;
+  font-size: 70%;
+  color: gray;
 }
 
 .comment {
-    color: gray;
-    margin-left: 5px;
+  color: gray;
+  margin-left: 5px;
 }
 
 .added {
-    color: green;
+  color: green;
 }
 
 .removed {
-    color: red;
+  color: red;
 }
 
 .changed {
-    color: cornflowerblue;
+  color: cornflowerblue;
 }
 
 .label {
-    font-size: 60%;
-    font-weight: bold;
-    border-radius: 15px;
-    padding: 1px 5px 1px 5px;
-    border: 1px outset;
-    text-shadow: 5px 5px 3px rgba(0, 0, 0, 0.2);
+  font-size: 60%;
+  font-weight: bold;
+  border-radius: 15px;
+  padding: 1px 5px 1px 5px;
+  border: 1px outset;
+  text-shadow: 5px 5px 3px rgba(0, 0, 0, 0.2);
 }
 
 .path-label {
-    color: whitesmoke;
-    background-color: #6e81b7;
-    font-size: 75%;
-    border-radius: 15px;
-    padding: 1px 5px 1px 5px;
-    margin: 0 1px;
+  color: whitesmoke;
+  background-color: #6e81b7;
+  font-size: 75%;
+  border-radius: 15px;
+  padding: 1px 5px 1px 5px;
+  margin: 0 1px;
 }
 
 .overwritten-query-label {
-    color: whitesmoke;
-    background-color: #71b771;
-    font-size: 75%;
-    border-radius: 15px;
-    padding: 1px 5px 1px 5px;
-    margin: 0 1px;
+  color: whitesmoke;
+  background-color: #71b771;
+  font-size: 75%;
+  border-radius: 15px;
+  padding: 1px 5px 1px 5px;
+  margin: 0 1px;
 }
 
 .removed-query-label {
-    color: whitesmoke;
-    background-color: #f44336;
-    font-size: 75%;
-    border-radius: 15px;
-    padding: 1px 5px 1px 5px;
-    margin: 0 1px;
+  color: whitesmoke;
+  background-color: #f44336;
+  font-size: 75%;
+  border-radius: 15px;
+  padding: 1px 5px 1px 5px;
+  margin: 0 1px;
 }
 
 .diff-button {
-    min-width: 0;
-    line-height: 25px;
+  min-width: 0;
+  line-height: 25px;
 }
 
 .diff-property-overlay {
-    display: grid;
-    grid-template-columns: 10fr 1fr 10fr;
-    background-color: #000000;
-    color: whitesmoke;
-    opacity: 0.65;
+  display: grid;
+  grid-template-columns: 10fr 1fr 10fr;
+  background-color: #000000;
+  color: whitesmoke;
+  opacity: 0.65;
 }
 
 .diffs-expansion-panel {
-    padding: 5px;
-    margin: 5px 20px;
+  padding: 5px;
+  margin: 5px 20px;
+}
+
+.response-header-toggle {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+  color: grey;
+  font-size: 0.9rem;
+  padding: 10px;
+  /*text-align: right;*/
+}
+
+.emphasis-label {
+  color: #3f51b5;
+  font-weight: bold;
 }

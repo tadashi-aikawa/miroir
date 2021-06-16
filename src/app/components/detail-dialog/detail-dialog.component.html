@@ -131,6 +131,13 @@
         </div>
 
         <app-diff-viewer #diffView [config]="diffViewConfig" [height]="diffViewerHeight"> </app-diff-viewer>
+
+        <div class="response-header-toggle">
+          <span [class.emphasis-label]='!isResponseHeaderShown'>Body</span>
+          <mat-slide-toggle color='primary' [checked]="isResponseHeaderShown" (change)="changeResponseHeaderShown($event.source.checked)">
+          </mat-slide-toggle>
+          <span [class.emphasis-label]='isResponseHeaderShown'>Response header</span>
+        </div>
       </div>
       <div style="padding-top: 40px; padding-left: 10px;">
         <div>
