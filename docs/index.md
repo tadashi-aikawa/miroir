@@ -5,4 +5,4 @@ Miroir
 
 Viewer for [jumeaux](https://github.com/tadashi-aikawa/jumeaux).
 
-![](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![](https://img.shields.io/badge/version-2.0.1-blue.svg)
