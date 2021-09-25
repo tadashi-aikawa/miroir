@@ -5,6 +5,7 @@
 - [Analytics](analytics.md)
 - Releases
   - 2.0.x
+    - [2.0.2](releases/2.0.2.md)
     - [2.0.1](releases/2.0.1.md)
     - [2.0.0](releases/2.0.0.md)
   - [1.1.0](releases/1.1.0.md)
