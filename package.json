@@ -50,7 +50,7 @@
     "js-yaml": "^3.14.1",
     "lodash": "^4.17.21",
     "lodash-decorators": "^6.0.1",
-    "luxon": "^1.27.0",
+    "luxon": "^1.28.1",
     "monaco-editor": "^0.17.0",
     "ng2-highcharts": "^1.2.0",
     "rxjs": "^6.6.7",
